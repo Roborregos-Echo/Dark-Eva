@@ -7,6 +7,10 @@
 //********************************************
 
 // eSTO ES  UNA PRUEBA
+// agregarLast
+
+
+//Bueno comentario
 
 
 
@@ -25,6 +29,8 @@
 #include <PID_v1.h>
 #include <Encoder.h>
 
+
+const int p = 0;
 
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
