@@ -1927,3 +1927,9 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
+
+// YA ESTOY HASTA LA VE
+// TODO: PORFAS
+// FIXME: NOW
+
+// QUIERO COMER
