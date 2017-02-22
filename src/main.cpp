@@ -9,7 +9,7 @@
 
 //********************************************
 //---------------- LIBRERÍAS ----------------
-//******************************************** TODO
+//******************************************** TODO: Hacer esto
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -22,6 +22,10 @@
 #include <PID_v1.h>
 #include <Encoder.h>
 
+//XXX: mari PUTISIMO
+
+
+// CHANGED: Aqui
 
 
 //********************************************
