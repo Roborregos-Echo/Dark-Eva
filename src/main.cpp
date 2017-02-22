@@ -9,7 +9,7 @@
 
 //********************************************
 //---------------- LIBRERÍAS ----------------
-//******************************************** TODO
+//******************************************** TODO: fngfgnf
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -21,6 +21,8 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <Encoder.h>
+
+///XXX: que pedo
 
 
 
