@@ -10,9 +10,6 @@
 //********************************************
 //---------------- LIBRERÍAS ----------------
 //********************************************
-//********************************************
-//********************************************
-//********************************************
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -24,6 +21,7 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <Encoder.h>
+
 
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
@@ -110,9 +108,9 @@ bool subirRampa = false;
 const float PRECISION_IMU = 0.85;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
-double Setpoint, Setpoint2, Input, Input2, Output, Output2;
-PID izqPID(&Input, &Output, &Setpoint, 13, 0, 0, DIRECT);
-PID derPID(&Input2, &Output2, &Setpoint2, 13, 0, 0, REVERSE);
+double setIzq, setDer, inIzq, inDer, outIzq, outDer;
+PID izqPID(&inIzq, &outIzq, &setIzq, 13, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 13, 0, 0, REVERSE);
 
 
 //******************************************
@@ -176,7 +174,7 @@ byte BotonColor;
 
 //********************************************
 //------------------- IMU -------------------
-float angulo() {
+float getAngulo() {
     sensors_event_t event;
     bno.getEvent(&event);
     return event.orientation.x;
@@ -243,65 +241,68 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void vueltaIzquierda() {
+    //Compensar futuro
     atras();
     delay(300);
     detener();
-    float oPos, ePos, iLim, oLim;
-    oPos = angulo();
+
+
+    float posInicial, posFinal, limInf, limSup;
+    posInicial = getAngulo();
     switch(iOrientacion) {
         case A_NORTE:
-        ePos = 270;
-        Setpoint = 270;
-        Setpoint2 = 270;
+        posFinal = 270;
+        setIzq = 270;
+        setDer = 270;
         break;
 
         case B_NORTE:
-        ePos = 180;
-        Setpoint = 180;
-        Setpoint2 = 180;
+        posFinal = 180;
+        setIzq = 180;
+        setDer = 180;
         break;
 
         case C_NORTE:
-        ePos = 90;
-        Setpoint = 90;
-        Setpoint2 = 90;
+        posFinal = 90;
+        setIzq = 90;
+        setDer = 90;
         break;
 
         case D_NORTE:
-        ePos = 0;
-        Setpoint = 0;
-        Setpoint2 = 0;
+        posFinal = 0;
+        setIzq = 0;
+        setDer = 0;
         break;
     }
 
-    if (ePos - PRECISION_IMU <= 0)
-        iLim = ePos + 360 - PRECISION_IMU;
+    if (posFinal - PRECISION_IMU <= 0)
+        limInf = posFinal + 360 - PRECISION_IMU;
     else
-        iLim = ePos - PRECISION_IMU;
+        limInf = posFinal - PRECISION_IMU;
 
-    if (ePos + PRECISION_IMU > 360)
-        oLim =  ePos - 360 + PRECISION_IMU;
+    if (posFinal + PRECISION_IMU > 360)
+        limSup =  posFinal - 360 + PRECISION_IMU;
     else
-        oLim = ePos + PRECISION_IMU;
+        limSup = posFinal + PRECISION_IMU;
 
     avanzar();
     delay(300);
     detener();
     izquierda();
 
-    if(oLim > iLim)
-        while(!(oPos >= iLim && oPos <= oLim)) {
-            oPos = angulo();
-            Serial.println(ePos);
+    if(limSup > limInf)
+        while(!(posInicial >= limInf && posInicial <= limSup)) {
+            posInicial = getAngulo();
+            Serial.println(posFinal);
             Serial.println("\t");
-            Serial.println(oPos);
+            Serial.println(posInicial);
         }
     else
-        while(!(oPos >= iLim || oPos <= oLim)) {
-            oPos = angulo();
-            Serial.println(ePos);
+        while(!(posInicial >= limInf || posInicial <= limSup)) {
+            posInicial = getAngulo();
+            Serial.println(posFinal);
             Serial.println("\t");
-            Serial.println(oPos);
+            Serial.println(posInicial);
         }
     detener();
 
@@ -331,62 +332,62 @@ void vueltaDerecha() {
     atras();
     delay(300);
     detener();
-    float oPos, ePos, iLim, oLim;
-    oPos = angulo();
+    float posInicial, posFinal, limInf, limSup;
+    posInicial = getAngulo();
     switch(iOrientacion) {
         case A_NORTE:
-        ePos = 90;
-        Setpoint = 90;
-        Setpoint2 = 90;
+        posFinal = 90;
+        setIzq = 90;
+        setDer = 90;
         break;
 
         case B_NORTE:
-        ePos = 0;
-        Setpoint = 0;
-        Setpoint2 = 0;
+        posFinal = 0;
+        setIzq = 0;
+        setDer = 0;
         break;
 
         case C_NORTE:
-        ePos = 270;
-        Setpoint = 270;
-        Setpoint2 = 270;
+        posFinal = 270;
+        setIzq = 270;
+        setDer = 270;
         break;
 
         case D_NORTE:
-        ePos = 180;
-        Setpoint = 180;
-        Setpoint2 = 180;
+        posFinal = 180;
+        setIzq = 180;
+        setDer = 180;
         break;
     }
 
-    if (ePos - PRECISION_IMU <= 0)
-        iLim = ePos + 360 - PRECISION_IMU;
+    if (posFinal - PRECISION_IMU <= 0)
+        limInf = posFinal + 360 - PRECISION_IMU;
     else
-        iLim = ePos - PRECISION_IMU;
+        limInf = posFinal - PRECISION_IMU;
 
-    if (ePos + PRECISION_IMU > 360)
-        oLim =  ePos - 360 + PRECISION_IMU;
+    if (posFinal + PRECISION_IMU > 360)
+        limSup =  posFinal - 360 + PRECISION_IMU;
     else
-        oLim = ePos + PRECISION_IMU;
+        limSup = posFinal + PRECISION_IMU;
 
     avanzar();
     delay(300);
     detener();
     derecha();
 
-    if(oLim > iLim)
-        while(!(oPos >= iLim && oPos <= oLim)) {
-            oPos = angulo();
-            Serial.println(ePos);
+    if(limSup > limInf)
+        while(!(posInicial >= limInf && posInicial <= limSup)) {
+            posInicial = getAngulo();
+            Serial.println(posFinal);
             Serial.println("\t");
-            Serial.println(oPos);
+            Serial.println(posInicial);
         }
     else
-        while(!(oPos >= iLim || oPos <= oLim)) {
-            oPos = angulo();
-            Serial.println(ePos);
+        while(!(posInicial >= limInf || posInicial <= limSup)) {
+            posInicial = getAngulo();
+            Serial.println(posFinal);
             Serial.println("\t");
-            Serial.println(oPos);
+            Serial.println(posInicial);
         }
     detener();
 
@@ -413,62 +414,62 @@ void vueltaDerecha() {
 }
 
 void vueltaAtras() {
-    float oPos, ePos, iLim, oLim;
-    oPos = angulo();
+    float posInicial, posFinal, limInf, limSup;
+    posInicial = getAngulo();
     switch(iOrientacion) {
         case A_NORTE:
-        ePos = 180;
-        Setpoint = 180;
-        Setpoint2 = 180;
+        posFinal = 180;
+        setIzq = 180;
+        setDer = 180;
         break;
 
         case B_NORTE:
-        ePos = 90;
-        Setpoint = 90;
-        Setpoint2 = 90;
+        posFinal = 90;
+        setIzq = 90;
+        setDer = 90;
         break;
 
         case C_NORTE:
-        ePos = 0;
-        Setpoint = 0;
-        Setpoint2 = 0;
+        posFinal = 0;
+        setIzq = 0;
+        setDer = 0;
         break;
 
         case D_NORTE:
-        ePos = 270;
-        Setpoint = 270;
-        Setpoint2 = 270;
+        posFinal = 270;
+        setIzq = 270;
+        setDer = 270;
         break;
     }
 
-    if (ePos - PRECISION_IMU <= 0)
-        iLim = ePos + 360 - PRECISION_IMU;
+    if (posFinal - PRECISION_IMU <= 0)
+        limInf = posFinal + 360 - PRECISION_IMU;
     else
-        iLim = ePos - PRECISION_IMU;
+        limInf = posFinal - PRECISION_IMU;
 
-    if (ePos + PRECISION_IMU > 360)
-        oLim =  ePos - 360 + PRECISION_IMU;
+    if (posFinal + PRECISION_IMU > 360)
+        limSup =  posFinal - 360 + PRECISION_IMU;
     else
-        oLim = ePos + PRECISION_IMU;
+        limSup = posFinal + PRECISION_IMU;
 
     avanzar();
     delay(300);
     detener();
     derecha();
 
-    if(oLim > iLim)
-        while(!(oPos >= iLim && oPos <= oLim)) {
-            oPos = angulo();
-            Serial.println(ePos);
+    if(limSup > limInf)
+        while(!(posInicial >= limInf && posInicial <= limSup)) {
+            posInicial = getAngulo();
+            Serial.println(posFinal);
             Serial.println("\t");
-            Serial.println(oPos);
+            Serial.println(posInicial);
         }
     else
-        while(!(oPos >= iLim || oPos <= oLim)) {
-            oPos = angulo();
-            Serial.println(ePos);
+        while(!(posInicial >= limInf || posInicial <= limSup)) {
+            posInicial = getAngulo();
+            Serial.println(posFinal);
             Serial.println("\t");
-            Serial.println(oPos);
+            Serial.println(posInicial);
         }
 
     detener();
@@ -499,82 +500,82 @@ void moverCuadro() {
     unsigned long inicio = millis();
     avanzar();
     while (millis() - inicio <= 1000) {
-        if(angulo() > 320)
-            Input = - (360 - angulo());
+        if(getAngulo() > 320)
+            inIzq = - (360 - getAngulo());
         else
-            Input = angulo();
-        if(angulo() > 320)
-            Input2 = - (360 - angulo());
+            inIzq = getAngulo();
+        if(getAngulo() > 320)
+            inDer = - (360 - getAngulo());
         else
-            Input2 = angulo();
+            inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(137 + Output, 152 + Output2, 64 + Output, 131 + Output2);
+        velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
     }
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
         while (vec.y() < -4.0) {
             subirRampa = true;
-            if(angulo() > 320)
-                Input = - (360 - angulo());
+            if(getAngulo() > 320)
+                inIzq = - (360 - getAngulo());
             else
-                Input = angulo();
-            if(angulo() > 320)
-                Input2 = - (360 - angulo());
+                inIzq = getAngulo();
+            if(getAngulo() > 320)
+                inDer = - (360 - getAngulo());
             else
-                Input2 = angulo();
+                inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(162 + Output, 180 + Output2, 76 + Output, 156 + Output2);
+            velocidad(162 + outIzq, 180 + outDer, 76 + outIzq, 156 + outDer);
             vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
         }
         velocidad(137, 152, 63, 130);
     } else if(vec.y() > 4.0) {
         bajarRampa = true;
         while (vec.y() > 4.0) {
-            if(angulo() > 320)
-                Input = - (360 - angulo());
+            if(getAngulo() > 320)
+                inIzq = - (360 - getAngulo());
             else
-                Input = angulo();
-            if(angulo() > 320)
-                Input2 = - (360 - angulo());
+                inIzq = getAngulo();
+            if(getAngulo() > 320)
+                inDer = - (360 - getAngulo());
             else
-                Input2 = angulo();
+                inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(135 + Output, 150 + Output2, 64 + Output, 131 + Output2);
+            velocidad(135 + outIzq, 150 + outDer, 64 + outIzq, 131 + outDer);
             vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
         }
         velocidad(137, 152, 63, 130);
     } else {
         inicio = millis();
         while (millis() - inicio <= 450) {
-            if(angulo() > 320)
-                Input = - (360 - angulo());
+            if(getAngulo() > 320)
+                inIzq = - (360 - getAngulo());
             else
-                Input = angulo();
-            if(angulo() > 320)
-                Input2 = - (360 - angulo());
+                inIzq = getAngulo();
+            if(getAngulo() > 320)
+                inDer = - (360 - getAngulo());
             else
-                Input2 = angulo();
+                inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(137 + Output, 152 + Output2, 64 + Output, 131 + Output2);
+            velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
         }
     }
     inicio = millis();
     while (millis() - inicio <= 400) {
-        if(angulo() > 320)
-            Input = - (360 - angulo());
+        if(getAngulo() > 320)
+            inIzq = - (360 - getAngulo());
         else
-            Input = angulo();
-        if(angulo() > 320)
-            Input2 = - (360 - angulo());
+            inIzq = getAngulo();
+        if(getAngulo() > 320)
+            inDer = - (360 - getAngulo());
         else
-            Input2 = angulo();
+            inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(137 + Output, 152 + Output2, 64 + Output, 131 + Output2);
+        velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
     }
     detener();
     delay(1000);
@@ -1942,16 +1943,16 @@ void setup() {
 
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
-    Setpoint = 0;
-    Setpoint2 = 0;
-    if(angulo() > 300)
-        Input = - (360 - angulo());
+    setIzq = 0;
+    setDer = 0;
+    if(getAngulo() > 300)
+        inIzq = - (360 - getAngulo());
     else
-        Input = angulo();
-    if(angulo() > 300)
-        Input2 = - (360 - angulo());
+        inIzq = getAngulo();
+    if(getAngulo() > 300)
+        inDer = - (360 - getAngulo());
     else
-        Input2 = angulo();
+        inDer = getAngulo();
 
 
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
