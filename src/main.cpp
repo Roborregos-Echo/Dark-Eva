@@ -9,11 +9,9 @@
 
 //********************************************
 //---------------- LIBRERÍAS ----------------
-<<<<<<< HEAD
 //******************************************** TODO: Hacer esto
-=======
+
 //******************************************** TODO: fngfgnf
->>>>>>> a8d67e09473c7d4e546dddb3183f7c655ddd27eb
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -25,7 +23,7 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <Encoder.h>
-    
+
 ///XXX: que pedo
 
 //XXX: mari PUTISIMO
@@ -1934,3 +1932,6 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
+
+//Si esto jala es lo mejor que puede pasar
+// Gracias
