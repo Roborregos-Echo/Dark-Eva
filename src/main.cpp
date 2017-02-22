@@ -29,7 +29,7 @@
 // FIXME: Aqui esta tu cosa que quiere que borre
 
 // por ejemplo
-const int hola;
+const int malditomerge;
 
 
 //********************************************
