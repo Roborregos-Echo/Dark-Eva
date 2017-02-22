@@ -25,8 +25,8 @@
 #include <PID_v1.h>
 #include <Encoder.h>
 
-//BORRAMEEEEEE NETO
-// FIXME: Aqui
+// YA LO BORRE
+// FIXME: Aqui esta tu cosa que quiere que borre
 
 
 //********************************************
