@@ -25,17 +25,12 @@
 #include <PID_v1.h>
 #include <Encoder.h>
 
-// YA LO BORRE
-// FIXME: Aqui esta tu cosa que quiere que borre
-
-// por ejemplo
-const int malditomerge = 012;
-
-
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
 
+//Declarame esta
+const int TENGOHAMBRE;
 
 //******************************************
 //-------------CLASE CUADRO-----------------
