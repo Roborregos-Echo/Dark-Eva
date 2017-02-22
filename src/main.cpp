@@ -28,7 +28,7 @@
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
-        
+
 //Declarame esta
 const int TENGOHAMBRE;
 
@@ -1927,3 +1927,7 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
+
+// YA ESTOY HASTA LA VE
+// TODO: PORFAS
+// FIXME: NOW
