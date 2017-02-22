@@ -72,12 +72,6 @@ byte    y_last  = 255;
 byte    x_last2 = 255;
 byte    y_last2 = 255;
 
-// Utilizadas para posibles Rampas
-byte LastMove;
-byte RampaDiff;
-byte PisoReal;      // 0,1,0
-
-
 // Varias
 byte x_inicio, y_inicio, z_inicio;
 byte x_InicioB, y_InicioB, z_InicioB;
@@ -134,6 +128,13 @@ int closedList[GRID_MAX];
 int backList[GRID_MAX];
 int Neighbors[4];
 
+//******************************************
+//-------------RAMPA ALGORITHM--------------
+bool Piso1 = false; bool Piso2 = false; bool Piso3 = false;
+bool GridOriginal[GRID_MAX];
+byte LastMove;
+byte RampaDiff;
+byte PisoReal;               // 0,1,0
 
 //******************************************
 //---------------INTERRUPTS-----------------
@@ -1394,8 +1395,6 @@ void resolverLaberinto(){
         Serial.println("ENTRE AL SHORTMOVE");
         if(!D_wall) {
             Serial.println("Short Izquierda");
-            vueltaIzquierda();
-            moverCuadro();
             switch(iOrientacion) {
                 case A_NORTE:
                 x_actual--;
@@ -1417,10 +1416,11 @@ void resolverLaberinto(){
                 LastMove = TO_NORTH;
                 break;
             }
+            vueltaIzquierda();
+            moverCuadro();
             checarLasts();
         } else if(!A_wall) {
             Serial.println("Short Frente");
-            moverCuadro();
             switch(iOrientacion) {
                 case A_NORTE:
                 y_actual++;
@@ -1442,11 +1442,10 @@ void resolverLaberinto(){
                 LastMove = TO_EAST;
                 break;
             }
+            moverCuadro();
             checarLasts();
         } else if(!B_wall) {
             Serial.println("Short Derecha");
-            vueltaDerecha();
-            moverCuadro();
             switch(iOrientacion) {
                 case A_NORTE:
                 x_actual++;
@@ -1468,11 +1467,11 @@ void resolverLaberinto(){
                 LastMove = TO_SOUTH;
                 break;
             }
+            vueltaDerecha();
+            moverCuadro();
             checarLasts();
         } else {
             Serial.println("Short Atras");
-            vueltaAtras();
-            moverCuadro();
             switch(iOrientacion) {
                 case A_NORTE:
                 y_actual--;
@@ -1494,6 +1493,8 @@ void resolverLaberinto(){
                 LastMove = TO_WEST;
                 break;
             }
+            vueltaAtras();
+            moverCuadro();
             checarLasts();
         }
     } else {
@@ -1598,7 +1599,7 @@ void recorrerX(){
     Serial.println("Recorrer X");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<Y_MAX; j++) {
-            for(int i=X_MAX; i>0; i--) {
+            for(int i=X_MAX-1; i>0; i--) {
                 cuadros[i][j][k].setEstado(cuadros[i-1][j][k].getEstado());
                 cuadros[i][j][k].setPared('N', cuadros[i-1][j][k].getPared('N'));
                 cuadros[i][j][k].setPared('E', cuadros[i-1][j][k].getPared('E'));
@@ -1616,6 +1617,9 @@ void recorrerX(){
     }
 
     x_actual++;
+    x_inicio++;
+    x_InicioB++;
+    x_InicioC++;
 
     if(x_last != 255 and y_last != 255)
         x_last++;
@@ -1629,7 +1633,7 @@ void recorrerY(){
     Serial.println("Recorrer Y");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<X_MAX; j++) {
-            for(int i=Y_MAX; i>0; i--){
+            for(int i=Y_MAX-1; i>0; i--){
                 cuadros[j][i][k].setEstado(cuadros[j][i-1][k].getEstado());
                 cuadros[j][i][k].setPared('N', cuadros[j][i-1][k].getPared('N'));
                 cuadros[j][i][k].setPared('E', cuadros[j][i-1][k].getPared('E'));
@@ -1647,6 +1651,9 @@ void recorrerY(){
     }
 
     y_actual++;
+    y_inicio++;
+    y_InicioB++;
+    y_InicioC++;
 
     if(x_last != 255 and y_last != 255)
         y_last++;
@@ -1658,10 +1665,7 @@ void recorrerY(){
 
 // Si el array esta a punto de salir de los parametros, mueve la matriz una linea completa
 void checarArray(){
-    if(x_actual == 0 and y_actual == 0) {
-        recorrerX();
-        recorrerY();
-    } else if(x_actual == 0) {
+    if (x_actual == 0) {
         recorrerX();
     } else if(y_actual == 0) {
         recorrerY();
