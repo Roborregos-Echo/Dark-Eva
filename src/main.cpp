@@ -132,7 +132,7 @@ bool Piso1 = false; bool Piso2 = false; bool Piso3 = false;
 bool GridOriginal[GRID_MAX];
 byte LastMove;
 byte RampaDiff;
-byte PisoReal;               // 0,1,0
+byte PisoReal;              // 0,1,0
 
 //******************************************
 //---------------INTERRUPTS-----------------
