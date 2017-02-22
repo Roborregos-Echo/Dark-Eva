@@ -29,11 +29,11 @@
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
 
-//Declarame esta
-const int MALDITO_WQ = 999;
 
 //******************************************
 //-------------CLASE CUADRO-----------------
+
+// iEstado
 const int NO_EXISTE     =   0;
 const int SIN_RECORRER  =   1;
 const int RECORRIDO     =   2;
@@ -42,6 +42,13 @@ const int NEGRO         =   4;
 const int RAMPA         =   5;
 const int INICIO        =   6;
 
+// LastMove
+const byte TO_NORTH = 0;
+const byte TO_EAST  = 1;
+const byte TO_SOUTH = 2;
+const byte TO_WEST  = 3;
+
+// iOrientacion
 const byte A_NORTE = 0;
 const byte B_NORTE = 1;
 const byte C_NORTE = 2;
@@ -49,29 +56,39 @@ const byte D_NORTE = 3;
 
 byte iOrientacion = A_NORTE;
 
+// Coordenadas maximas
 const byte X_MAX = 8;
 const byte Y_MAX = 10;
-const byte Z_MAX = 2;
+const byte Z_MAX = 3;
 
+// Coordeanas actuales
 byte    x_actual = 0;
 byte    y_actual = 0;
 byte    z_actual = 0;
 
+// Ultimas coordeanas vistas
 byte    x_last  = 255;
 byte    y_last  = 255;
 byte    x_last2 = 255;
 byte    y_last2 = 255;
 
-byte x_inicio, y_inicio;
+// Utilizadas para posibles Rampas
+byte LastMove;
+byte RampaDiff;
+byte PisoReal;      // 0,1,0
+
+
+// Varias
+byte x_inicio, y_inicio, z_inicio;
+byte x_InicioB, y_InicioB, z_InicioB;
+byte x_InicioC, y_InicioC, z_InicioC;
 bool shortMove, Last, Last2;
 bool A_wall, B_wall, C_wall, D_wall;
 
-//Se utiliza para guardar las coordenadas de los cuadros "SIN_RECORRER"
+// Se utiliza para guardar las coordenadas de los cuadros "SIN_RECORRER"
 byte ArrayCSR;
 byte x_recorrer[50];
 byte y_recorrer[50];
-//byte suma_recorrer[50];
-//byte xn_actual, yn_actual, CRS_actual;
 
 
 //******************************************
@@ -1382,18 +1399,22 @@ void resolverLaberinto(){
             switch(iOrientacion) {
                 case A_NORTE:
                 x_actual--;
+                LastMove = TO_WEST;
                 break;
 
                 case B_NORTE:
                 y_actual--;
+                LastMove = TO_SOUTH;
                 break;
 
                 case C_NORTE:
                 x_actual++;
+                LastMove = TO_EAST;
                 break;
 
                 case D_NORTE:
                 y_actual++;
+                LastMove = TO_NORTH;
                 break;
             }
             checarLasts();
@@ -1403,18 +1424,22 @@ void resolverLaberinto(){
             switch(iOrientacion) {
                 case A_NORTE:
                 y_actual++;
+                LastMove = TO_NORTH;
                 break;
 
                 case B_NORTE:
                 x_actual--;
+                LastMove = TO_WEST;
                 break;
 
                 case C_NORTE:
                 y_actual--;
+                LastMove = TO_SOUTH;
                 break;
 
                 case D_NORTE:
                 x_actual++;
+                LastMove = TO_EAST;
                 break;
             }
             checarLasts();
@@ -1425,18 +1450,22 @@ void resolverLaberinto(){
             switch(iOrientacion) {
                 case A_NORTE:
                 x_actual++;
+                LastMove = TO_EAST;
                 break;
 
                 case B_NORTE:
                 y_actual++;
+                LastMove = TO_NORTH;
                 break;
 
                 case C_NORTE:
                 x_actual--;
+                LastMove = TO_WEST;
                 break;
 
                 case D_NORTE:
                 y_actual--;
+                LastMove = TO_SOUTH;
                 break;
             }
             checarLasts();
@@ -1447,18 +1476,22 @@ void resolverLaberinto(){
             switch(iOrientacion) {
                 case A_NORTE:
                 y_actual--;
+                LastMove = TO_SOUTH;
                 break;
 
                 case B_NORTE:
                 x_actual++;
+                LastMove = TO_EAST;
                 break;
 
                 case C_NORTE:
                 y_actual++;
+                LastMove = TO_NORTH;
                 break;
 
                 case D_NORTE:
                 x_actual--;
+                LastMove = TO_WEST;
                 break;
             }
             checarLasts();
@@ -1563,22 +1596,25 @@ void resolverLaberinto(){
 //Verificar si en el for i es i>1 o i>0 (probar)
 void recorrerX(){
     Serial.println("Recorrer X");
-    for(int j=0; j<Y_MAX; j++) {
-        for(int i=X_MAX; i>0; i--) {
-            cuadros[i][j][z_actual].setEstado(cuadros[i-1][j][z_actual].getEstado());
-            cuadros[i][j][z_actual].setPared('N', cuadros[i-1][j][z_actual].getPared('N'));
-            cuadros[i][j][z_actual].setPared('E', cuadros[i-1][j][z_actual].getPared('E'));
-            cuadros[i][j][z_actual].setPared('S', cuadros[i-1][j][z_actual].getPared('S'));
-            cuadros[i][j][z_actual].setPared('O', cuadros[i-1][j][z_actual].getPared('O'));
-            cuadros[i][j][z_actual].setMlx(cuadros[i-1][j][z_actual].getMlx());
+    for(int k=0; k<Z_MAX; k++){
+        for(int j=0; j<Y_MAX; j++) {
+            for(int i=X_MAX; i>0; i--) {
+                cuadros[i][j][k].setEstado(cuadros[i-1][j][k].getEstado());
+                cuadros[i][j][k].setPared('N', cuadros[i-1][j][k].getPared('N'));
+                cuadros[i][j][k].setPared('E', cuadros[i-1][j][k].getPared('E'));
+                cuadros[i][j][k].setPared('S', cuadros[i-1][j][k].getPared('S'));
+                cuadros[i][j][k].setPared('O', cuadros[i-1][j][k].getPared('O'));
+                cuadros[i][j][k].setMlx(cuadros[i-1][j][k].getMlx());
+            }
+            cuadros[0][j][k].setEstado(NO_EXISTE);
+            cuadros[0][j][k].setPared('N', false);
+            cuadros[0][j][k].setPared('E', false);
+            cuadros[0][j][k].setPared('S', false);
+            cuadros[0][j][k].setPared('O', false);
+            cuadros[0][j][k].setMlx(false);
         }
-        cuadros[0][j][z_actual].setEstado(NO_EXISTE);
-        cuadros[0][j][z_actual].setPared('N', false);
-        cuadros[0][j][z_actual].setPared('E', false);
-        cuadros[0][j][z_actual].setPared('S', false);
-        cuadros[0][j][z_actual].setPared('O', false);
-        cuadros[0][j][z_actual].setMlx(false);
     }
+
     x_actual++;
 
     if(x_last != 255 and y_last != 255)
@@ -1591,22 +1627,25 @@ void recorrerX(){
 
 void recorrerY(){
     Serial.println("Recorrer Y");
-    for(int j=0; j<X_MAX; j++) {
-        for(int i=Y_MAX; i>0; i--){
-            cuadros[j][i][z_actual].setEstado(cuadros[j][i-1][z_actual].getEstado());
-            cuadros[j][i][z_actual].setPared('N', cuadros[j][i-1][z_actual].getPared('N'));
-            cuadros[j][i][z_actual].setPared('E', cuadros[j][i-1][z_actual].getPared('E'));
-            cuadros[j][i][z_actual].setPared('S', cuadros[j][i-1][z_actual].getPared('S'));
-            cuadros[j][i][z_actual].setPared('O', cuadros[j][i-1][z_actual].getPared('O'));
-            cuadros[j][i][z_actual].setMlx(cuadros[i-1][j][z_actual].getMlx());
+    for(int k=0; k<Z_MAX; k++){
+        for(int j=0; j<X_MAX; j++) {
+            for(int i=Y_MAX; i>0; i--){
+                cuadros[j][i][k].setEstado(cuadros[j][i-1][k].getEstado());
+                cuadros[j][i][k].setPared('N', cuadros[j][i-1][k].getPared('N'));
+                cuadros[j][i][k].setPared('E', cuadros[j][i-1][k].getPared('E'));
+                cuadros[j][i][k].setPared('S', cuadros[j][i-1][k].getPared('S'));
+                cuadros[j][i][k].setPared('O', cuadros[j][i-1][k].getPared('O'));
+                cuadros[j][i][k].setMlx(cuadros[i-1][j][k].getMlx());
+            }
+            cuadros[j][0][k].setEstado(NO_EXISTE);
+            cuadros[j][0][k].setPared('N', false);
+            cuadros[j][0][k].setPared('E', false);
+            cuadros[j][0][k].setPared('S', false);
+            cuadros[j][0][k].setPared('O', false);
+            cuadros[j][0][k].setMlx(false);
         }
-        cuadros[j][0][z_actual].setEstado(NO_EXISTE);
-        cuadros[j][0][z_actual].setPared('N', false);
-        cuadros[j][0][z_actual].setPared('E', false);
-        cuadros[j][0][z_actual].setPared('S', false);
-        cuadros[j][0][z_actual].setPared('O', false);
-        cuadros[j][0][z_actual].setMlx(false);
     }
+
     y_actual++;
 
     if(x_last != 255 and y_last != 255)
@@ -1915,8 +1954,8 @@ void setup() {
         Input2 = angulo();
 
 
-    x_inicio = 1; y_inicio = 1;
-    x_actual = 1; y_actual = 1; z_actual =0;
+    x_inicio = 1; y_inicio = 1; z_inicio = 0;
+    x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 }
 
@@ -1927,9 +1966,3 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
-
-// YA ESTOY HASTA LA VE
-// TODO: PORFAS
-// FIXME: NOW
-
-// QUIERO COMER
