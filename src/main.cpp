@@ -1934,3 +1934,4 @@ void loop() {
 }
 // despues de muhco, ya jalo
 // cero miedo
+const int x;
