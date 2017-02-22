@@ -2,8 +2,8 @@
 //********************************************
 //                  E V A
 //********************************************
-//-------------- VERSIÓN 1.0.4 ---------------
-//----------- 20 / FEBRERO / 2017 ------------
+//-------------- VERSIÓN 1.0.5 ---------------
+//----------- 22 / FEBRERO / 2017 ------------
 //********************************************
 
 
@@ -46,9 +46,9 @@ const byte D_NORTE = 3;
 
 byte iOrientacion = A_NORTE;
 
-const byte x_max = 8;
-const byte y_max = 10;
-const byte z_max = 2;
+const byte X_MAX = 8;
+const byte Y_MAX = 10;
+const byte Z_MAX = 2;
 
 byte    x_actual = 0;
 byte    y_actual = 0;
@@ -80,12 +80,14 @@ Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
 Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
 Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
 
+const int VELOCIDAD_MOTOR = 100;
+
 
 //******************************************
 //------------- IMU BNO055 ----------------
 bool bajarRampa = false;
 bool subirRampa = false;
-const float precisionIMU = 0.85;
+const float PRECISION_IMU = 0.85;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double Setpoint, Setpoint2, Input, Input2, Output, Output2;
@@ -105,11 +107,11 @@ const int SHARP_D2  = 5;
 
 //******************************************
 //------------- PATHFINDING ----------------
-const int grid_max = x_max * y_max;
+const int GRID_MAX = X_MAX * Y_MAX;
 
-int openList[grid_max];
-int closedList[grid_max];
-int backList[grid_max];
+int openList[GRID_MAX];
+int closedList[GRID_MAX];
+int backList[GRID_MAX];
 int Neighbors[4];
 
 
@@ -252,15 +254,15 @@ void vueltaIzquierda() {
         break;
     }
 
-    if (ePos - precisionIMU <= 0)
-        iLim = ePos + 360 - precisionIMU;
+    if (ePos - PRECISION_IMU <= 0)
+        iLim = ePos + 360 - PRECISION_IMU;
     else
-        iLim = ePos - precisionIMU;
+        iLim = ePos - PRECISION_IMU;
 
-    if (ePos + precisionIMU > 360)
-        oLim =  ePos - 360 + precisionIMU;
+    if (ePos + PRECISION_IMU > 360)
+        oLim =  ePos - 360 + PRECISION_IMU;
     else
-        oLim = ePos + precisionIMU;
+        oLim = ePos + PRECISION_IMU;
 
     avanzar();
     delay(300);
@@ -337,15 +339,15 @@ void vueltaDerecha() {
         break;
     }
 
-    if (ePos - precisionIMU <= 0)
-        iLim = ePos + 360 - precisionIMU;
+    if (ePos - PRECISION_IMU <= 0)
+        iLim = ePos + 360 - PRECISION_IMU;
     else
-        iLim = ePos - precisionIMU;
+        iLim = ePos - PRECISION_IMU;
 
-    if (ePos + precisionIMU > 360)
-        oLim =  ePos - 360 + precisionIMU;
+    if (ePos + PRECISION_IMU > 360)
+        oLim =  ePos - 360 + PRECISION_IMU;
     else
-        oLim = ePos + precisionIMU;
+        oLim = ePos + PRECISION_IMU;
 
     avanzar();
     delay(300);
@@ -419,15 +421,15 @@ void vueltaAtras() {
         break;
     }
 
-    if (ePos - precisionIMU <= 0)
-        iLim = ePos + 360 - precisionIMU;
+    if (ePos - PRECISION_IMU <= 0)
+        iLim = ePos + 360 - PRECISION_IMU;
     else
-        iLim = ePos - precisionIMU;
+        iLim = ePos - PRECISION_IMU;
 
-    if (ePos + precisionIMU > 360)
-        oLim =  ePos - 360 + precisionIMU;
+    if (ePos + PRECISION_IMU > 360)
+        oLim =  ePos - 360 + PRECISION_IMU;
     else
-        oLim = ePos + precisionIMU;
+        oLim = ePos + PRECISION_IMU;
 
     avanzar();
     delay(300);
@@ -593,15 +595,15 @@ byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
 
 //Formula para identificar un cuadro (x,y) en una de las listas
 int coordToGrid(byte x, byte y) {
-    return x + (y * x_max);
+    return x + (y * X_MAX);
 }
 
 //Formula para identificar un 'num' en un cuadro (x,y)
 byte gridToCoord(byte grid, char eje) {
     if(eje == 'x')
-    return grid % x_max;
+    return grid % X_MAX;
     else if(eje == 'y')
-    return grid / x_max;
+    return grid / X_MAX;
 }
 
 class Cuadro {
@@ -669,7 +671,7 @@ class Cuadro {
     }
 };
 
-Cuadro cuadros[x_max][y_max][z_max];
+Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
 void absoluteMove(char cLado) {
     switch (iOrientacion) {
         case A_NORTE:
@@ -823,7 +825,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     bool firstLoop = false;
 
     byte x_lastPath, y_lastPath;
-    int back_index = grid_max-1;
+    int back_index = GRID_MAX-1;
     byte x_back;
     byte y_back;
     bool backFinished = false;
@@ -832,13 +834,13 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
     int gridActual = coordToGrid(x_actual, y_actual);
 
-    for (int i=0; i<grid_max; i++)
+    for (int i=0; i<GRID_MAX; i++)
         openList[i] = 999;
 
-    for (int i=0; i<grid_max; i++)
+    for (int i=0; i<GRID_MAX; i++)
         closedList[i] = 999;
 
-    for (int i=0; i<grid_max; i++)
+    for (int i=0; i<GRID_MAX; i++)
         backList[i] = 999;
 
 
@@ -877,7 +879,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         }
 
         if (!cuadros[x_path][y_path][z_actual].getPared('E')) {
-            if(x_path < x_max -1) {
+            if(x_path < X_MAX -1) {
                 if (cuadros[x_path+1][y_path][z_actual].getEstado() == INICIO or cuadros[x_path+1][y_path][z_actual].getEstado() == CHECKPOINT or
                 cuadros[x_path+1][y_path][z_actual].getEstado() == RECORRIDO or (x_path+1 == x_destino and y_path == y_destino)) {
                     Grid = coordToGrid(x_path+1, y_path);
@@ -890,7 +892,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         }
 
         if (!cuadros[x_path][y_path][z_actual].getPared('N')) {
-            if(y_path < y_max -1) {
+            if(y_path < Y_MAX -1) {
                 if (cuadros[x_path][y_path+1][z_actual].getEstado() == INICIO or cuadros[x_path][y_path+1][z_actual].getEstado() == CHECKPOINT or
                 cuadros[x_path][y_path+1][z_actual].getEstado() == RECORRIDO or (x_path == x_destino and y_path+1 == y_destino)) {
                     Grid = coordToGrid(x_path, y_path+1);
@@ -942,7 +944,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 break;
             }
         } else {
-            for(int i=0; i<grid_max; i++) {
+            for(int i=0; i<GRID_MAX; i++) {
                 if(openList[i] < openSortValue) {
                     open_index = i;
                     openSortValue = openList[i];
@@ -978,11 +980,11 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         Serial.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino and y_path == y_destino) {
-                    /*for(int i=0; i<grid_max; i++)
+                    /*for(int i=0; i<GRID_MAX; i++)
                     {
                     Serial.println("Open[" + String(i) + "] = " + String (openList[i]));
                 }
-                for(int i=0; i<grid_max; i++)
+                for(int i=0; i<GRID_MAX; i++)
                 {
                 Serial.println("Closed[" + String(i) + "] = " + String (closedList[i]));
             }*/
@@ -1009,7 +1011,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 }
 
                 if(!cuadros[x_back][y_back][z_actual].getPared('E')) {
-                    if(x_back < x_max -1) {
+                    if(x_back < X_MAX -1) {
                         TempGrid = coordToGrid(x_back+1, y_back);
                         if(closedList[TempGrid] != 999 and backList[lastBackGrid+1] != TempGrid)
                         Neighbors[1] = pathway(x_back+1, y_back, x_actual, y_actual);
@@ -1017,7 +1019,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 }
 
                 if(!cuadros[x_back][y_back][z_actual].getPared('N')) {
-                    if(y_back < y_max -1) {
+                    if(y_back < Y_MAX -1) {
                         TempGrid = coordToGrid(x_back, y_back+1);
                         if(closedList[TempGrid] != 999 and backList[lastBackGrid+1] != TempGrid)
                         Neighbors[2] = pathway(x_back, y_back+1, x_actual, y_actual);
@@ -1085,12 +1087,12 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     backFinished = true;
 
                     if(ref == 255) {
-                        for(int i=0; i<grid_max; i++) {
+                        for(int i=0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
-                                if(gridActual-backList[i] == x_max) {
+                                if(gridActual-backList[i] == X_MAX) {
                                     Serial.println("Abajo");
                                     absoluteMove('S');
-                                    gridActual -= x_max;
+                                    gridActual -= X_MAX;
                                 }
 
                                 if(gridActual-backList[i] == -1) {
@@ -1099,10 +1101,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                     gridActual += 1;
                                 }
 
-                                if(gridActual-backList[i] == -x_max) {
+                                if(gridActual-backList[i] == -X_MAX) {
                                     Serial.println("Arriba");
                                     absoluteMove('N');
-                                    gridActual += x_max;
+                                    gridActual += X_MAX;
                                 }
 
                                 if(gridActual-backList[i] == 1) {
@@ -1115,7 +1117,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                         x_actual = x_destino;
                         y_actual = y_destino;
                     } else {
-                        for(int i=0; i<grid_max; i++) {
+                        for(int i=0; i<GRID_MAX; i++) {
                             if(backList[i] != 999)
                             ref++;
                         }
@@ -1138,9 +1140,9 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
 void guardarCSR(){
     ArrayCSR = 0;
-    for(int x=0; x<x_max; x++)
+    for(int x=0; x<X_MAX; x++)
     {
-        for(int y=0; y<y_max; y++)
+        for(int y=0; y<Y_MAX; y++)
         {
             if(cuadros[x][y][z_actual].getEstado() == SIN_RECORRER)
             {
@@ -1464,9 +1466,9 @@ void resolverLaberinto(){
             /*Serial.print(x_last);
             Serial.print(" | ");
             Serial.println(y_last);*/
-            /*for(int x=0; x<x_max; x++)
+            /*for(int x=0; x<X_MAX; x++)
             {
-            for(int y=0; y<y_max; y++)
+            for(int y=0; y<Y_MAX; y++)
             {
             Serial.print(y);
             Serial.print(" , ");
@@ -1558,8 +1560,8 @@ void resolverLaberinto(){
 //Verificar si en el for i es i>1 o i>0 (probar)
 void recorrerX(){
     Serial.println("Recorrer X");
-    for(int j=0; j<y_max; j++) {
-        for(int i=x_max; i>0; i--) {
+    for(int j=0; j<Y_MAX; j++) {
+        for(int i=X_MAX; i>0; i--) {
             cuadros[i][j][z_actual].setEstado(cuadros[i-1][j][z_actual].getEstado());
             cuadros[i][j][z_actual].setPared('N', cuadros[i-1][j][z_actual].getPared('N'));
             cuadros[i][j][z_actual].setPared('E', cuadros[i-1][j][z_actual].getPared('E'));
@@ -1586,8 +1588,8 @@ void recorrerX(){
 
 void recorrerY(){
     Serial.println("Recorrer Y");
-    for(int j=0; j<x_max; j++) {
-        for(int i=y_max; i>0; i--){
+    for(int j=0; j<X_MAX; j++) {
+        for(int i=Y_MAX; i>0; i--){
             cuadros[j][i][z_actual].setEstado(cuadros[j][i-1][z_actual].getEstado());
             cuadros[j][i][z_actual].setPared('N', cuadros[j][i-1][z_actual].getPared('N'));
             cuadros[j][i][z_actual].setPared('E', cuadros[j][i-1][z_actual].getPared('E'));
