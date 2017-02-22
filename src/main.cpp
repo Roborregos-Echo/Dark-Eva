@@ -9,8 +9,14 @@
 
 //********************************************
 //---------------- LIBRERÍAS ----------------
+<<<<<<< HEAD
 //********************************************
 //********************************************
+=======
+//******************************************** TODO: Hacer esto
+
+//******************************************** TODO: fngfgnf
+>>>>>>> 07281b7bc3eae1eb097e5c07268cb916cd19c2af
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -22,6 +28,11 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <Encoder.h>
+<<<<<<< HEAD
+=======
+
+///XXX: que pedo
+>>>>>>> 07281b7bc3eae1eb097e5c07268cb916cd19c2af
 
 
 //TODO: Test pull / push
@@ -1931,3 +1942,6 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
+
+//Si esto jala es lo mejor que puede pasar
+// Gracias
