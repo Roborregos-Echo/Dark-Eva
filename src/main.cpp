@@ -1921,15 +1921,12 @@ void setup() {
 }
 
 void loop() {
-    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
         cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
-    checarArray();
+        checarArray();
     checarParedes();
-    resolverLaberinto();
+    resolverLaberinto();*/
+
+    vueltaIzquierda();
+    delay(1000);
 }
-
-// YA ESTOY HASTA LA VE
-// TODO: PORFAS
-// FIXME: NOW
-
-// QUIERO COMER
