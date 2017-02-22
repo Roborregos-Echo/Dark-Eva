@@ -1929,6 +1929,5 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
-
-//Si esto jala es lo mejor que puede pasar
-// Gracias
+// despues de muhco, ya jalo
+// cero miedo
