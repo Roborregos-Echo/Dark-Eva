@@ -1968,4 +1968,6 @@ void loop() {
     resolverLaberinto();*/
     vueltaIzquierda();
     delay(1000);
+    vueltaDerecha();
+    delay(1000);
 }
