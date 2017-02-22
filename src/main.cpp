@@ -1932,6 +1932,3 @@ void loop() {
     checarParedes();
     resolverLaberinto();
 }
-// despues de muhco, ya jalo
-// cero miedo
-const int tengo_un_chingo_de_hambre;
