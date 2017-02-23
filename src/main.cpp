@@ -72,7 +72,7 @@ byte    y_last2 = 255;
 
 // Varias
 byte x_inicio, y_inicio, z_inicio;
-byte x_InicioB, y_InicioB, z_InicioB;
+byte x_InicioB = 255; byte y_InicioB = 255; byte z_InicioB = 255;
 byte x_InicioC, y_InicioC, z_InicioC;
 bool shortMove, Last, Last2;
 bool A_wall, B_wall, C_wall, D_wall;
@@ -132,9 +132,12 @@ int Neighbors[4];
 //-------------RAMPA ALGORITHM--------------
 bool Piso1 = false; bool Piso2 = false; bool Piso3 = false;
 bool GridOriginal[GRID_MAX];
-byte LastMove;
-byte RampaDiff;
-byte PisoReal;              // 0,1,0
+bool Fusion = false;        // Cambiar a true cuando se junten los pisos
+
+byte RampaDiff = 4;
+byte PisoReal  = 0;
+byte MoveL1, MoveL2;
+byte LastMove;            // 0,1,0
 
 //******************************************
 //---------------INTERRUPTS-----------------
@@ -1386,6 +1389,113 @@ void checarParedes(){
         if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
         break;
+    }
+}
+
+void checarRampa(){
+    if(subirRampa or bajarRampa)
+    {
+        switch(LastMove)
+        {
+            case TO_NORTH:
+            y_actual += (RampaDiff-1);
+            break;
+
+            case TO_EAST:
+            x_actual += (RampaDiff-1);
+            break;
+
+            case TO_SOUTH:
+            y_actual -= (RampaDiff-1);
+            break;
+
+            case TO_WEST:
+            x_actual -= (RampaDiff-1);
+            break;
+        }
+
+        if(subirRampa)
+        {
+            if(Piso3 and Fusion)
+            z_actual++;
+            else
+            if(Piso3 and !Fusion)
+            z_actual--;
+            else
+            z_actual++;
+
+            PisoReal++;
+            subirRampa = false;
+        }
+        else
+        if(bajarRampa)
+        {
+            if(Piso2 or Piso3)
+            z_actual--;
+            else
+            z_actual++;
+        }
+
+        if(z_actual == 0)
+        {
+            switch(LastMove)
+            {
+                case TO_NORTH:
+                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                break;
+
+                case TO_EAST:
+                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                break;
+
+                case TO_SOUTH:
+                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                break;
+
+                case TO_WEST:
+                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                break;
+            }
+        }
+        else
+        if(z_actual == 1)
+        {
+            if(z_InicioB == 255)
+            {
+                x_InicioB = x_actual;
+                y_InicioB = y_actual;
+                z_InicioB = z_actual;
+                MoveL1 = LastMove;
+            }
+            else
+            {
+                switch(LastMove)
+                {
+                    case TO_NORTH:
+                    cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                    break;
+
+                    case TO_EAST:
+                    cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                    break;
+
+                    case TO_SOUTH:
+                    cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                    break;
+
+                    case TO_WEST:
+                    cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                    break;
+                }
+            }
+        }
+        else
+        if(z_actual == 2)
+        {
+            x_InicioC = x_actual;
+            y_InicioC = y_actual;
+            z_InicioC = z_actual;
+        }
     }
 }
 
