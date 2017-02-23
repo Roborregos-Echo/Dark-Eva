@@ -100,6 +100,7 @@ const int VEL_MOTOR_150 = 100;
 //------------- IMU BNO055 ----------------
 bool bajarRampa = false;
 bool subirRampa = false;
+bool permisoRampa = true;
 const float PRECISION_IMU = 3.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
@@ -193,7 +194,7 @@ void avanzar() {
     MotorCD -> run(FORWARD);
 }
 
-void reversaa() {
+void reversa() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(BACKWARD);
@@ -207,18 +208,36 @@ void detener() {
     MotorCD -> run(BRAKE);
 }
 
-void derecha() {
+void vueltaDerecha() {
     MotorAI -> run(FORWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(FORWARD);
     MotorCD -> run(BACKWARD);
 }
 
-void izquierda() {
+void vueltaIzquierda() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(FORWARD);
     MotorCI -> run(BACKWARD);
     MotorCD -> run(FORWARD);
+}
+
+void horizontalDerecha() {
+    MotorAI -> run(FORWARD);
+    MotorAD -> run(BACKWARD);
+    MotorCI -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
+}
+
+void horizontalIzquierda() {
+    MotorAI -> run(BACKWARD);
+    MotorAD -> run(FORWARD);
+    MotorCI -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
+}
+
+void checarRampa() {
+    //TODO:
 }
 
 void velocidad(int ai, int ad, int ci, int cd) {
@@ -243,7 +262,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
         MotorCD -> setSpeed(cd);
 }
 
-void vueltaIzquierda() {
+void vueltavueltaIzquierda() {
     avanzar();
     delay(200);
     detener();
@@ -287,7 +306,7 @@ void vueltaIzquierda() {
         limSup = posFinal + PRECISION_IMU;
 
 
-    izquierda();
+    vueltaIzquierda();
 
     if(limSup > limInf)
         while(!(posInicial >= limInf && posInicial <= limSup)) {
@@ -324,7 +343,7 @@ void vueltaIzquierda() {
     }
 }
 
-void vueltaDerecha() {
+void vueltavueltaDerecha() {
     avanzar();
     delay(200);
     detener();
@@ -367,7 +386,7 @@ void vueltaDerecha() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    derecha();
+    vueltaDerecha();
 
     if(limSup > limInf)
         while(!(posInicial >= limInf && posInicial <= limSup)) {
@@ -448,7 +467,7 @@ void vueltaAtras() {
         limSup = posFinal + PRECISION_IMU;
 
 
-    derecha();
+    vueltaDerecha();
 
     if(limSup > limInf)
         while(!(posInicial >= limInf && posInicial <= limSup)) {
@@ -504,39 +523,77 @@ void moverCuadro() {
     }
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
-        while (vec.y() < -4.0) {
-            subirRampa = true;
-            if(getAngulo() > 320)
-                inIzq = - (360 - getAngulo());
-            else
-                inIzq = getAngulo();
-            if(getAngulo() > 320)
-                inDer = - (360 - getAngulo());
-            else
-                inDer = getAngulo();
-            izqPID.Compute();
-            derPID.Compute();
-            velocidad(162 + outIzq, 180 + outDer, 76 + outIzq, 156 + outDer);
-            vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+        subirRampa = true;
+        checarRampa();
+        if (permisoRampa) {
+            while (vec.y() < -4.0) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(162 + outIzq, 180 + outDer, 76 + outIzq, 156 + outDer);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+            }
+            velocidad(137, 152, 63, 130);
+        } else {
+            inicio = millis();
+            reversa();
+            while (millis() - inicio <= 1000) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+            }
         }
-        velocidad(137, 152, 63, 130);
     } else if(vec.y() > 4.0) {
         bajarRampa = true;
-        while (vec.y() > 4.0) {
-            if(getAngulo() > 320)
-                inIzq = - (360 - getAngulo());
-            else
-                inIzq = getAngulo();
-            if(getAngulo() > 320)
-                inDer = - (360 - getAngulo());
-            else
-                inDer = getAngulo();
-            izqPID.Compute();
-            derPID.Compute();
-            velocidad(135 + outIzq, 150 + outDer, 64 + outIzq, 131 + outDer);
-            vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+        checarRampa();
+        if (permisoRampa) {
+            while (vec.y() > 4.0) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(135 + outIzq, 150 + outDer, 64 + outIzq, 131 + outDer);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+            }
+            velocidad(137, 152, 63, 130);
+        } else {
+            inicio = millis();
+            reversa();
+            while (millis() - inicio <= 1000) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+            }
         }
-        velocidad(137, 152, 63, 130);
     } else {
         inicio = millis();
         while (millis() - inicio <= 450) {
@@ -569,6 +626,7 @@ void moverCuadro() {
     }
     detener();
     delay(1000);
+    permisoRampa = true;
 }
 
 //******************************************
@@ -721,7 +779,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
 
@@ -731,7 +789,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
         }
@@ -740,7 +798,7 @@ void absoluteMove(char cLado) {
         case B_NORTE:
         switch(cLado) {
             case 'N':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
 
@@ -750,7 +808,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
 
@@ -768,7 +826,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
 
@@ -777,7 +835,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
         }
@@ -786,7 +844,7 @@ void absoluteMove(char cLado) {
         case D_NORTE:
         switch(cLado) {
             case 'N':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
 
@@ -795,7 +853,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
 
@@ -1435,7 +1493,7 @@ void resolverLaberinto(){
                 LastMove = TO_NORTH;
                 break;
             }
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             checarLasts();
         } else if(!A_wall) {
@@ -1486,7 +1544,7 @@ void resolverLaberinto(){
                 LastMove = TO_SOUTH;
                 break;
             }
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             checarLasts();
         } else {
