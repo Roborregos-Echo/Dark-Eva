@@ -92,14 +92,15 @@ Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
 Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
 Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
 
-const int VELOCIDAD_MOTOR = 100;
+const int VEL_MOTOR_90 = 100;
+const int VEL_MOTOR_150 = 100;
 
 
 //******************************************
 //------------- IMU BNO055 ----------------
 bool bajarRampa = false;
 bool subirRampa = false;
-const float PRECISION_IMU = 0.85;
+const float PRECISION_IMU = 3.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
@@ -115,7 +116,8 @@ const int SHARP_B2  = 2;
 const int SHARP_C   = 10;
 const int SHARP_D1  = 14;
 const int SHARP_D2  = 5;
-
+const int SHARP_LA  = 0;
+const int SHARP_LC  = 0;
 
 //******************************************
 //------------- PATHFINDING ----------------
@@ -242,11 +244,9 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void vueltaIzquierda() {
-    //Compensar futuro
-    atras();
-    delay(300);
+    avanzar();
+    delay(200);
     detener();
-
 
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
@@ -286,9 +286,7 @@ void vueltaIzquierda() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    avanzar();
-    delay(300);
-    detener();
+
     izquierda();
 
     if(limSup > limInf)
@@ -324,15 +322,13 @@ void vueltaIzquierda() {
         iOrientacion = A_NORTE;
         break;
     }
-    atras();
-    delay(500);
-    detener();
 }
 
 void vueltaDerecha() {
-    atras();
-    delay(300);
+    avanzar();
+    delay(200);
     detener();
+
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -371,9 +367,6 @@ void vueltaDerecha() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    avanzar();
-    delay(300);
-    detener();
     derecha();
 
     if(limSup > limInf)
@@ -409,12 +402,13 @@ void vueltaDerecha() {
         iOrientacion = C_NORTE;
         break;
     }
-    atras();
-    delay(500);
-    detener();
 }
 
 void vueltaAtras() {
+    avanzar();
+    delay(200);
+    detener();
+
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -453,9 +447,7 @@ void vueltaAtras() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    avanzar();
-    delay(300);
-    detener();
+
     derecha();
 
     if(limSup > limInf)
@@ -492,9 +484,6 @@ void vueltaAtras() {
         iOrientacion = B_NORTE;
         break;
     }
-    atras();
-    delay(500);
-    detener();
 }
 
 void moverCuadro() {
@@ -584,32 +573,62 @@ void moverCuadro() {
 
 //******************************************
 //----------- SHARP GP2Y0A21YK -------------
-int getSharp(int iSharp) {
+float getSharpCorta(int iSharp) {
     //int sharp = 2316.6 *(0.985 / analogRead(A7));
-    int sharpRead[9];
-    int sharp;
-    for(int i = 0; i < 9; i++) {
+    float sharpRead[8];
+    float resultado;
+    for(int i = 0; i < 8; i++) {
         sharpRead[i] = analogRead(iSharp);
         delay(20);
     }
 
-    for (int j = 0; j < 9; j++) {
-        for (int i = 0; i < 8; i++) {
-            int Temporal;
+    for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 7; i++) {
+            int temp;
             if(sharpRead[i] > sharpRead[i + 1]) {
-                Temporal = sharpRead[i+1];
+                temp = sharpRead[i+1];
                 sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = Temporal;
+                sharpRead[i] = temp;
             }
         }
     }
 
-    if (sharpRead[4] >= 99 and sharpRead[4] <= 530)
-        sharp = 3742.4 * (1 / pow(sharpRead[4], 1.081));
+    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
+        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
     else
-        sharp = 30;
-    return sharp;
+        resultado = 30;
+    return resultado;
 }
+
+float getSharpLarga(int iSharp) {
+    //int sharp = 2316.6 *(0.985 / analogRead(A7));
+    float sharpRead[8];
+    float resultado;
+    for(int i = 0; i < 8; i++) {
+        sharpRead[i] = analogRead(iSharp);
+        delay(20);
+    }
+
+    for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 7; i++) {
+            int temp;
+            if(sharpRead[i] > sharpRead[i + 1]) {
+                temp = sharpRead[i+1];
+                sharpRead[i + 1] = sharpRead[i];
+                sharpRead[i] = temp;
+            }
+        }
+    }
+
+    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
+        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
+    else
+        resultado = 30;
+    return resultado;
+}
+
+
+
 
 byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
     return fabs(x_final - x_inicial) + fabs(y_final - y_inicial);
@@ -1184,7 +1203,7 @@ void checarParedes(){
     switch(iOrientacion) {
         case A_NORTE:
         if(y_actual > 0)
-            if(getSharp(SHARP_C) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('S');
                 shortMove = true;
@@ -1192,149 +1211,149 @@ void checarParedes(){
                 C_wall = true;
             }
 
-        if(getSharp(SHARP_C) < 15)
+        if(getSharpCorta(SHARP_C) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
 
-        if(getSharp(SHARP_B1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharp(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharp(SHARP_A) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             A_wall = true;
         }
-        if(getSharp(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
-            if(getSharp(SHARP_D1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('O');
                 shortMove = true;
             } else {
                 D_wall = true;
             }
-        if(getSharp(SHARP_D1) < 15)
+        if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         break;
         //--------------------------------------------------------------------
         case B_NORTE:
-        if(getSharp(SHARP_C)  > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_C)  > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharp(SHARP_C)  < 15)
+        if(getSharpCorta(SHARP_C)  < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharp(SHARP_B1)  > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_B1)  > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharp(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
 
         if(x_actual > 0)
-            if(getSharp(SHARP_A)  > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_A)  > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('O');
                 shortMove = true;
             } else {
                 A_wall = true;
             }
-        if(getSharp(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
-            if(getSharp(SHARP_D1)  > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_D1)  > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('S');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharp(SHARP_D1)  < 15)
+        if(getSharpCorta(SHARP_D1)  < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         break;
         //--------------------------------------------------------------------
         case C_NORTE:
-        if(getSharp(SHARP_C) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharp(SHARP_C) < 15)
+        if(getSharpCorta(SHARP_C) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
-            if(getSharp(SHARP_B1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('O');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharp(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
-            if(getSharp(SHARP_A) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('S');
             shortMove = true;
         } else {
             A_wall = true;
         }
-        if(getSharp(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharp(SHARP_D1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharp(SHARP_D1) < 15)
+        if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         break;
         //--------------------------------------------------------------------
         case D_NORTE:
         if(x_actual > 0)
-            if(getSharp(SHARP_C) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('O');
                 shortMove = true;
             } else {
                 C_wall = true;
             }
-        if(getSharp(SHARP_C) < 15)
+        if(getSharpCorta(SHARP_C) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
 
         if(y_actual > 0)
-            if(getSharp(SHARP_B1) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('S');
                 shortMove = true;
@@ -1342,10 +1361,10 @@ void checarParedes(){
                 B_wall = true;
         }
 
-        if(getSharp(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharp(SHARP_A) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -1353,18 +1372,18 @@ void checarParedes(){
             A_wall = true;
         }
 
-        if(getSharp(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
 
-        if(getSharp(SHARP_D1) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharp(SHARP_D1) < 15)
+        if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
         break;
     }
@@ -1965,13 +1984,9 @@ void setup() {
 }
 
 void loop() {
-    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
         cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
         checarArray();
     checarParedes();
-    resolverLaberinto();*/
-    vueltaIzquierda();
-    delay(1000);
-    vueltaDerecha();
-    delay(1000);
+    resolverLaberinto();
 }
