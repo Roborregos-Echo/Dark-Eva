@@ -620,10 +620,10 @@ float getSharpLarga(int iSharp) {
         }
     }
 
-    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
-        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
+    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
+        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
     else
-        resultado = 30;
+        resultado = -1;
     return resultado;
 }
 
@@ -1984,9 +1984,11 @@ void setup() {
 }
 
 void loop() {
-    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
         cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
         checarArray();
     checarParedes();
-    resolverLaberinto();
+    resolverLaberinto();*/
+
+    Serial.println(getSharpLarga(SHARP_LA));
 }
