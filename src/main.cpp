@@ -193,7 +193,7 @@ void avanzar() {
     MotorCD -> run(FORWARD);
 }
 
-void atras() {
+void reversaa() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(BACKWARD);
