@@ -601,7 +601,6 @@ float getSharpCorta(int iSharp) {
 }
 
 float getSharpLarga(int iSharp) {
-    //int sharp = 2316.6 *(0.985 / analogRead(A7));
     float sharpRead[8];
     float resultado;
     for(int i = 0; i < 8; i++) {
