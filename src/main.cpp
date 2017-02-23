@@ -1616,7 +1616,7 @@ void resolverLaberinto(){
 
 //Verificar si en el for i es i>1 o i>0 (probar)
 void recorrerX(){
-    Serial.println("Recorrer X");
+    Serial.println("Recorrer X");   
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<Y_MAX; j++) {
             for(int i=X_MAX-1; i>0; i--) {
