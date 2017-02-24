@@ -158,8 +158,8 @@ byte checkList2[GRID_MAX];
 
 //******************************************
 //---------------INTERRUPTS-----------------
-#define interruptB 20
-#define interruptD 21
+#define interruptB 2
+#define interruptD 3
 
 void addStep()
 {
@@ -2320,6 +2320,15 @@ void servoMotor() {
         servo.write(0);
 }
 
+void checarMlx(){
+  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
+  {
+    servoMotor();
+    cuadros[x_actual][y_actual][z_actual].setMlx(true);
+  }
+}
+
+
 //******************************************
 //******************************************
 //---------------INTERRUPTS-----------------
@@ -2328,15 +2337,23 @@ void servoMotor() {
 
 
 void funcionB(){
-  vueltaIzquierda();
-  servoMotor();
-  vueltaDerecha();
+  //vueltaIzq();
+  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
+  {
+    servoMotor();
+    cuadros[x_actual][y_actual][z_actual].setMlx(true);
+  }
+  //vueltaDer();
 }
 
 void funcionD(){
-  vueltaDerecha();
-  servoMotor();
-  vueltaIzquierda();
+  //vueltaDer();
+  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
+  {
+    servoMotor();
+    cuadros[x_actual][y_actual][z_actual].setMlx(true);
+  }
+  //vueltaIzq();
 }
 
 void LackOfProgress(){
@@ -2519,11 +2536,12 @@ void setup() {
 }
 
 void loop() {
-    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    checarParedes();
    resolverLaberinto();
+
    /*Serial.print(getSharpCorta(SHARP_A));
     Serial.print("\t");
     Serial.print(getSharpCorta(SHARP_B1));
@@ -2540,4 +2558,7 @@ void loop() {
     Serial.println(getSharpLarga(SHARP_LC));
     Serial.println("");
     delay(500);*/
+
+   //checarMlx();
+   //alinear();
 }
