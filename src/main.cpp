@@ -2523,6 +2523,9 @@ void loop() {
   if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
+   Serial.println("Last " + String(x_last) + "," + String(y_last));
+   Serial.println("Last2 " + String(x_last2) + "," + String(y_last2));
+   Serial.println("ORIENTACION: " + String(iOrientacion));
    checarArray();
    Serial.println(String(x_actual) + "," + String(y_actual));
    checarParedes();
