@@ -2418,11 +2418,11 @@ void LCD_Blink(byte n) {
 
 void setup() {
     Serial.begin(9600);
-    /*PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
+    PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD*/
+    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
@@ -2472,14 +2472,14 @@ void setup() {
 }
 
 void loop() {
-    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    checarParedes();
    resolverLaberinto();
-   checarMlx();
+   //checarMlx();
    //alinear();
 
-
    Serial.println("Holo");
+
 }
