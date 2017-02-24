@@ -54,8 +54,8 @@ const byte D_NORTE = 3;
 byte iOrientacion = A_NORTE;
 
 // Coordenadas maximas
-const byte X_MAX = 8;
-const byte Y_MAX = 10;
+const byte X_MAX = 15;
+const byte Y_MAX = 15;
 const byte Z_MAX = 3;
 
 // Coordeanas actuales
@@ -158,8 +158,8 @@ byte checkList2[GRID_MAX];
 
 //******************************************
 //---------------INTERRUPTS-----------------
-#define interruptB 2
-#define interruptD 3
+#define interruptB 20
+#define interruptD 21
 
 void addStep()
 {
@@ -2243,15 +2243,36 @@ void checarArray(){
 
 //******************************************
 //******************************************
+//--------------SERVO MOTOR-----------------
+//******************************************
+//******************************************
+
+
+//Gira el servo 180 grados
+void servoMotor() {
+    if(servo.read() == 0)
+        servo.write(180);
+    else
+        servo.write(0);
+}
+
+//******************************************
+//******************************************
 //---------------INTERRUPTS-----------------
 //******************************************
 //******************************************
 
 
 void funcionB(){
+  vueltaIzquierda();
+  servoMotor();
+  vueltaDerecha();
 }
 
 void funcionD(){
+  vueltaDerecha();
+  servoMotor();
+  vueltaIzquierda();
 }
 
 void LackOfProgress(){
@@ -2336,21 +2357,6 @@ void LackOfProgress(){
   }
 }
 
-//******************************************
-//******************************************
-//--------------SERVO MOTOR-----------------
-//******************************************
-//******************************************
-
-
-//Gira el servo 180 grados
-void servoMotor() {
-    if(servo.read() == 0)
-        servo.write(180);
-    else
-        servo.write(0);
-}
-
 
 //******************************************
 //******************************************
@@ -2393,14 +2399,13 @@ void LCD_Blink(byte n) {
 
 
 
-
 void setup() {
     Serial.begin(9600);
-    //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    //pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    //attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
+    pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
@@ -2455,8 +2460,4 @@ void loop() {
    checarArray();
    checarParedes();
    resolverLaberinto();
-
-    /*
-    alinear();
-    delay(5000);*/
 }
