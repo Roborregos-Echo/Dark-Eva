@@ -298,7 +298,7 @@ void checarRampa() {
 }
 
 void alinear() {
-    if(getSharpCorta(SHARP_B1) < 20) {
+    if(getSharpCorta(SHARP_B1) < 20.0) {
         while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             while (getSharpCorta(SHARP_B1) < 6.5) {
                 horizontalIzquierda();
@@ -308,18 +308,18 @@ void alinear() {
             }
             detener();
         }
-        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 2 ) {
+        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 2.0 ) {
             while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
                 vueltaIzquierda();
             }
             detener();
-        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 2 ) {
+        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 2.0 ) {
             while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
                 vueltaDerecha();
             }
             detener();
         }
-    } else if(getSharpCorta(SHARP_D1) < 20) {
+    } else if(getSharpCorta(SHARP_D1) < 20.0) {
         while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             while (getSharpCorta(SHARP_D1) < 6.5) {
                 horizontalDerecha();
@@ -329,12 +329,12 @@ void alinear() {
             }
             detener();
         }
-        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 2 ) {
+        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 2.0 ) {
             while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
                 vueltaDerecha();
             }
             detener();
-        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 2 ) {
+        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 2.0 ) {
             while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
                 vueltaIzquierda();
             }
@@ -342,54 +342,50 @@ void alinear() {
         }
     }
 
-    if (getSharpCorta(SHARP_A) < 20) {
-        if (getSharpCorta(SHARP_A) < 4) {
+    if (getSharpCorta(SHARP_A) < 20.0) {
+        if (getSharpCorta(SHARP_A) < 4.0) {
             while (getSharpCorta(SHARP_A) < 5.5) {
                 reversa();
             }
             detener();
-        } else if (getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 30) {
+        } else if (getSharpCorta(SHARP_A) > 7.0 && getSharpCorta(SHARP_A) < 30.0) {
             while (getSharpCorta(SHARP_A) < 5.5) {
                 avanzar();
             }
             detener();
         }
-    } else if (getSharpCorta(SHARP_C) < 20) {
-        if (getSharpCorta(SHARP_C) < 4) {
+    } else if (getSharpCorta(SHARP_C) < 20.0) {
+        if (getSharpCorta(SHARP_C) < 4.0) {
             while (getSharpCorta(SHARP_C) < 5.5) {
                 avanzar();
             }
             detener();
-        } else if (getSharpCorta(SHARP_C) > 7 && getSharpCorta(SHARP_C) < 30) {
+        } else if (getSharpCorta(SHARP_C) > 7.0 && getSharpCorta(SHARP_C) < 30.0) {
             while (getSharpCorta(SHARP_C) < 5.5) {
                 reversa();
             }
             detener();
         }
-    } else if (getSharpLarga(SHARP_LA) > 25) {
-        if (getSharpLarga(SHARP_LA) < 4) {
-            while (getSharpLarga(SHARP_LA) < 5.5) {
-                reversa();
-            }
-            detener();
-        } else if (getSharpLarga(SHARP_LA) > 7 && getSharpLarga(SHARP_LA) < 30) {
-            while (getSharpLarga(SHARP_LA) < 5.5) {
-                avanzar();
-            }
-            detener();
+    } else if ((int) getSharpLarga(SHARP_LA) % 30 > 10 && (int) getSharpLarga(SHARP_LA) % 30 <= 18) {
+        while ((int) getSharpLarga(SHARP_LA) % 30 > 8) {
+            avanzar();
         }
-    } else if (getSharpLarga(SHARP_LC) > 25) {
-        if (getSharpLarga(SHARP_LC) < 4) {
-            while (getSharpLarga(SHARP_LC) < 5.5) {
-                avanzar();
-            }
-            detener();
-        } else if (getSharpLarga(SHARP_LC) > 7 && getSharpLarga(SHARP_LC) < 30) {
-            while (getSharpLarga(SHARP_LC) < 5.5) {
-                reversa();
-            }
-            detener();
+        detener();
+    } else if ((int) getSharpLarga(SHARP_LA) % 30 > 18 && (int) getSharpLarga(SHARP_LA) % 30 <= 27) {
+        while ((int) getSharpLarga(SHARP_LA) % 30 - 7 > 3) {
+            avanzar();
         }
+        detener();
+    } else if ((int) getSharpLarga(SHARP_LC) % 30 > 10 && (int) getSharpLarga(SHARP_LC) % 30 <= 18) {
+        while ((int) getSharpLarga(SHARP_LC) % 30 > 8) {
+            reversa();
+        }
+        detener();
+    } else if ((int) getSharpLarga(SHARP_LC) % 30 > 18 && (int) getSharpLarga(SHARP_LC) % 30 <= 27) {
+        while ((int) getSharpLarga(SHARP_LC) % 30 - 7 > 3) {
+            reversa();
+        }
+        detener();
     }
 }
 
