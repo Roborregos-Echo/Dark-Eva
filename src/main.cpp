@@ -341,8 +341,8 @@ void velocidad(int ai, int ad, int ci, int cd) {
 void alinear() {
     velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
     if(getSharpCorta(SHARP_B1) < 20.0) {
-        while (!(getSharpCorta(SHARP_B1) > 7 && getSharpCorta(SHARP_B1) < 10)) {
-            while (getSharpCorta(SHARP_B1) < 7) {
+        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 9.5)) {
+            while (getSharpCorta(SHARP_B1) < 6.5) {
                 horizontalIzquierda();
             }
             while (getSharpCorta(SHARP_B1) > 10) {
@@ -350,33 +350,33 @@ void alinear() {
             }
             detener();
         }
-        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 3.0 ) {
+        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 2 ) {
             while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
                 vueltaIzquierda();
             }
             detener();
-        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 3.0 ) {
+        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 2.0 ) {
             while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
                 vueltaDerecha();
             }
             detener();
         }
     } else if(getSharpCorta(SHARP_D1) < 20.0) {
-        while (!(getSharpCorta(SHARP_D1) > 7 && getSharpCorta(SHARP_D1) < 10)) {
-            while (getSharpCorta(SHARP_D1) < 7) {
+        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 9.5)) {
+            while (getSharpCorta(SHARP_D1) < 6.5) {
                 horizontalDerecha();
             }
-            while (getSharpCorta(SHARP_D1) > 10) {
+            while (getSharpCorta(SHARP_D1) > 9.5) {
                 horizontalIzquierda();
             }
             detener();
         }
-        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 3.0 ) {
+        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 2.0 ) {
             while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
                 vueltaDerecha();
             }
             detener();
-        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 3.0 ) {
+        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 2.0 ) {
             while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
                 vueltaIzquierda();
             }
@@ -385,30 +385,30 @@ void alinear() {
     }
 /*
     if (getSharpCorta(SHARP_A) < 20.0) {
-        if (getSharpCorta(SHARP_A) < 4.0) {
+        if (getSharpCorta(SHARP_A) < 5.0) {
             while (getSharpCorta(SHARP_A) < 5.5) {
                 reversa();
             }
             detener();
         } else if (getSharpCorta(SHARP_A) > 7.0 && getSharpCorta(SHARP_A) < 30.0) {
-            while (getSharpCorta(SHARP_A) < 5.5) {
+            while (getSharpCorta(SHARP_A) < 8) {
                 avanzar();
             }
             detener();
         }
     } else if (getSharpCorta(SHARP_C) < 20.0) {
-        if (getSharpCorta(SHARP_C) < 4.0) {
+        if (getSharpCorta(SHARP_C) < 5.0) {
             while (getSharpCorta(SHARP_C) < 5.5) {
                 avanzar();
             }
             detener();
         } else if (getSharpCorta(SHARP_C) > 7.0 && getSharpCorta(SHARP_C) < 30.0) {
-            while (getSharpCorta(SHARP_C) < 5.5) {
+            while (getSharpCorta(SHARP_C) < 8) {
                 reversa();
             }
             detener();
         }
-    } else if ((int) getSharpLarga(SHARP_LA) % 30 > 10 && (int) getSharpLarga(SHARP_LA) % 30 <= 18) {
+    } /*else if ((int) getSharpLarga(SHARP_LA) % 30 > 10 && (int) getSharpLarga(SHARP_LA) % 30 <= 18) {
         while ((int) getSharpLarga(SHARP_LA) % 30 > 8) {
             avanzar();
         }
@@ -426,9 +426,9 @@ void alinear() {
     } else if ((int) getSharpLarga(SHARP_LC) % 30 > 18 && (int) getSharpLarga(SHARP_LC) % 30 <= 27) {
         while ((int) getSharpLarga(SHARP_LC) % 30 - 7 > 3) {
             reversa();
-        }
+        }*/
         detener();
-    }*/
+    //}
     velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
 }
 
@@ -2479,6 +2479,7 @@ void loop() {
    resolverLaberinto();
    checarMlx();
    //alinear();
+
 
    Serial.println("Holo");
 }
