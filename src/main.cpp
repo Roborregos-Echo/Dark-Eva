@@ -2302,5 +2302,5 @@ void loop() {
     checarParedes();
     resolverLaberinto();*/
 
-    Serial.println(getSharpLarga(SHARP_LA));
+    Serial.println(steps);
 }
