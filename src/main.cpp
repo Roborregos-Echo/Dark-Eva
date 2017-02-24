@@ -1055,7 +1055,7 @@ void checarCheckpoint(){
     checkList1[checkGrid] += 1;
 
 
-    if(checarCuadroColor(CHECKPOINT, 20)
+    if(checarCuadroColor(CHECKPOINT, 20))
     {
 
     }
