@@ -142,6 +142,7 @@ byte LastMove;            // 0,1,0
 
 //******************************************
 //-------------- CHECKPOINT ----------------
+const int TOTAL_GRID_MAX = X_MAX * Y_MAX * Z_MAX;
 byte checkList1[GRID_MAX];
 byte checkList2[GRID_MAX];
 
@@ -300,10 +301,6 @@ float getSharpLarga(int iSharp) {
     return resultado;
 }
 
-
-void checarRampa() {
-    //TODO:
-}
 
 void alinear() {
     if(getSharpCorta(SHARP_B1) < 20.0) {
@@ -662,6 +659,113 @@ void vueltaAtras() {
     }
 }
 
+void checarRampa(){
+    if(subirRampa or bajarRampa)
+    {
+        switch(LastMove)
+        {
+            case TO_NORTH:
+            y_actual += (RampaDiff-1);
+            break;
+
+            case TO_EAST:
+            x_actual += (RampaDiff-1);
+            break;
+
+            case TO_SOUTH:
+            y_actual -= (RampaDiff-1);
+            break;
+
+            case TO_WEST:
+            x_actual -= (RampaDiff-1);
+            break;
+        }
+
+        if(subirRampa)
+        {
+            if(Piso3 and Fusion)
+            z_actual++;
+            else
+            if(Piso3 and !Fusion)
+            z_actual--;
+            else
+            z_actual++;
+
+            PisoReal++;
+            subirRampa = false;
+        }
+        else
+        if(bajarRampa)
+        {
+            if(Piso2 or Piso3)
+            z_actual--;
+            else
+            z_actual++;
+        }
+
+        if(z_actual == 0)
+        {
+            switch(LastMove)
+            {
+                case TO_NORTH:
+                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                break;
+
+                case TO_EAST:
+                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                break;
+
+                case TO_SOUTH:
+                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                break;
+
+                case TO_WEST:
+                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                break;
+            }
+        }
+        else
+        if(z_actual == 1)
+        {
+            if(z_InicioB == 255)
+            {
+                x_InicioB = x_actual;
+                y_InicioB = y_actual;
+                z_InicioB = z_actual;
+                MoveL1 = LastMove;
+            }
+            else
+            {
+                switch(LastMove)
+                {
+                    case TO_NORTH:
+                    cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                    break;
+
+                    case TO_EAST:
+                    cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                    break;
+
+                    case TO_SOUTH:
+                    cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                    break;
+
+                    case TO_WEST:
+                    cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                    break;
+                }
+            }
+        }
+        else
+        if(z_actual == 2)
+        {
+            x_InicioC = x_actual;
+            y_InicioC = y_actual;
+            z_InicioC = z_actual;
+        }
+    }
+}
+
 void moverCuadro() {
     unsigned long inicio = millis();
     avanzar();
@@ -804,6 +908,13 @@ byte gridToCoord(byte grid, char eje) {
     return grid % X_MAX;
     else if(eje == 'y')
     return grid / X_MAX;
+}
+
+byte totalGridToCoord(int grid, char eje) {
+    byte z = grid/ (X_MAX*Y_MAX);
+    byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
+    btye x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
+
 }
 
 class Cuadro {
@@ -1049,24 +1160,52 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 void checarCheckpoint(){
 
-    byte checkGrid = coordToGrid(x_actual, y_actual);
+    int Grid = coordToGrid(x_actual, y_actual);
 
     if(cuadros[x_actual][y_actual][z_actual].getMlx())
-    checkList1[checkGrid] += 16;
+    checkList1[Grid] += 16;
 
     if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-    checkList1[checkGrid] += 8;
+    checkList1[Grid] += 8;
 
     if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-    checkList1[checkGrid] += 4;
+    checkList1[Grid] += 4;
 
     if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-    checkList1[checkGrid] += 2;
+    checkList1[Grid] += 2;
 
     if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-    checkList1[checkGrid] += 1;
+    checkList1[Grid] += 1;
 
+    switch(cuadros[x_actual][y_actual][z_actual].getEstado()){
+        case NO_EXISTE:
+        checkList2[Grid] = 0;
+        break;
 
+        case SIN_RECORRER:
+        checkList2[Grid] = 1;
+        break;
+
+        case RECORRIDO:
+        checkList2[Grid] = 2;
+        break;
+
+        case CHECKPOINT:
+        checkList2[Grid] = 3;
+        break;
+
+        case NEGRO:
+        checkList2[Grid] = 4;
+        break;
+
+        case RAMPA:
+        checkList2[Grid] = 5;
+        break;
+
+        case INICIO:
+        checkList2[Grid] = 6;
+        break;
+    }
 
 
     if(checarCuadroColor(CHECKPOINT, 20))
@@ -1752,112 +1891,6 @@ void checarParedes(){
     }
 }
 
-void checarRampa(){
-    if(subirRampa or bajarRampa)
-    {
-        switch(LastMove)
-        {
-            case TO_NORTH:
-            y_actual += (RampaDiff-1);
-            break;
-
-            case TO_EAST:
-            x_actual += (RampaDiff-1);
-            break;
-
-            case TO_SOUTH:
-            y_actual -= (RampaDiff-1);
-            break;
-
-            case TO_WEST:
-            x_actual -= (RampaDiff-1);
-            break;
-        }
-
-        if(subirRampa)
-        {
-            if(Piso3 and Fusion)
-            z_actual++;
-            else
-            if(Piso3 and !Fusion)
-            z_actual--;
-            else
-            z_actual++;
-
-            PisoReal++;
-            subirRampa = false;
-        }
-        else
-        if(bajarRampa)
-        {
-            if(Piso2 or Piso3)
-            z_actual--;
-            else
-            z_actual++;
-        }
-
-        if(z_actual == 0)
-        {
-            switch(LastMove)
-            {
-                case TO_NORTH:
-                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
-                break;
-
-                case TO_EAST:
-                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
-                break;
-
-                case TO_SOUTH:
-                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-                break;
-
-                case TO_WEST:
-                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-                break;
-            }
-        }
-        else
-        if(z_actual == 1)
-        {
-            if(z_InicioB == 255)
-            {
-                x_InicioB = x_actual;
-                y_InicioB = y_actual;
-                z_InicioB = z_actual;
-                MoveL1 = LastMove;
-            }
-            else
-            {
-                switch(LastMove)
-                {
-                    case TO_NORTH:
-                    cuadros[x_actual][y_actual][z_actual].setPared('S', true);
-                    break;
-
-                    case TO_EAST:
-                    cuadros[x_actual][y_actual][z_actual].setPared('O', true);
-                    break;
-
-                    case TO_SOUTH:
-                    cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-                    break;
-
-                    case TO_WEST:
-                    cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-                    break;
-                }
-            }
-        }
-        else
-        if(z_actual == 2)
-        {
-            x_InicioC = x_actual;
-            y_InicioC = y_actual;
-            z_InicioC = z_actual;
-        }
-    }
-}
 
 void checarLasts(){
     if(x_last2 != 255 and y_last2 != 255) {
