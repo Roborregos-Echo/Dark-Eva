@@ -1051,8 +1051,22 @@ void checarCheckpoint(){
 
     byte checkGrid = coordToGrid(x_actual, y_actual);
 
+    if(cuadros[x_actual][y_actual][z_actual].getMlx())
+    checkList1[checkGrid] += 16;
+
+    if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
+    checkList1[checkGrid] += 8;
+
+    if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
+    checkList1[checkGrid] += 4;
+
+    if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
+    checkList1[checkGrid] += 2;
+
     if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
     checkList1[checkGrid] += 1;
+
+
 
 
     if(checarCuadroColor(CHECKPOINT, 20))
@@ -2257,6 +2271,13 @@ void setup() {
         inDer = - (360 - getAngulo());
     else
         inDer = getAngulo();
+
+    // Inicializa toda la matriz de checkpoint en 0
+    for(int i=0; i<GRID_MAX; i++)
+    {
+        checkList1[i] = 0;
+        checkList2[i] = 0;
+    }
 
 
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
