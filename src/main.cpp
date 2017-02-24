@@ -522,17 +522,11 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     }
@@ -605,17 +599,11 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     }
@@ -688,17 +676,11 @@ void vueltaAtras() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
 
         detener();
@@ -2533,13 +2515,32 @@ void setup() {
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
+
+    delay(5000);
 }
 
 void loop() {
  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+   Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
+   Serial.println("Last " + String(x_last) + "," + String(y_last));
+   Serial.println("Last2 " + String(x_last2) + "," + String(y_last2));
+   Serial.println("ORIENTACION: " + String(iOrientacion));
    checarArray();
+   Serial.println(String(x_actual) + "," + String(y_actual));
    checarParedes();
+
+   if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
+   Serial.println("Pared S");
+
+   if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
+   Serial.println("Pared E");
+
+   if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
+   Serial.println("Pared N");
+
+   if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
+   Serial.println("Pared O");
    resolverLaberinto();
 
 
