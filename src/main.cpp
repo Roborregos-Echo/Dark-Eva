@@ -2247,15 +2247,49 @@ void funcionD(){
 void LackOfProgress(){
 
   byte x, y, z;
-  bool Mlx, S, E, N, O;
-  int Num, Div, Mod;
+  int Num, Div;
+  int list[5];
+  byte Count = 0;
 
   for(int i=0; i<TOTAL_GRID_MAX; i++){
     x = totalGridToCoord(i, 'x');
     y = totalGridToCoord(i, 'y');
     z = totalGridToCoord(i, 'z');
 
-    Num = i;
+    Num = checkList1[i];
+
+    while(Num != 0)
+    {
+      Div = Num / 2;
+      list[Count] = Num % 2;
+      Num = Div;
+      Count++;
+    }
+
+    if(list[4])
+    cuadros[x][y][z].setMlx(true);
+    else
+    cuadros[x][y][z].setMlx(false);
+
+    if(list[3])
+    cuadros[x][y][z].setPared('S', true);
+    else
+    cuadros[x][y][z].setPared('S', false);
+
+    if(list[2])
+    cuadros[x][y][z].setPared('E', true);
+    else
+    cuadros[x][y][z].setPared('E', false);
+
+    if(list[1])
+    cuadros[x][y][z].setPared('N', true);
+    else
+    cuadros[x][y][z].setPared('N', false);
+
+    if(list[0])
+    cuadros[x][y][z].setPared('O', true);
+    else
+    cuadros[x][y][z].setPared('O', false);
 
   }
 }
