@@ -115,14 +115,14 @@ PID derPID(&inDer, &outDer, &setDer, 13, 0, 0, REVERSE);
 
 //******************************************
 //----------- SHARP GP2Y0A21YK -------------
-const int SHARP_A   = 12;
-const int SHARP_B1  = 9;
-const int SHARP_B2  = 2;
-const int SHARP_C   = 10;
-const int SHARP_D1  = 14;
-const int SHARP_D2  = 5;
+const int SHARP_A   = 1;
+const int SHARP_B1  = 4;
+const int SHARP_B2  = 6;
+const int SHARP_C   = 2;
+const int SHARP_D1  = 5;
+const int SHARP_D2  = 7;
 const int SHARP_LA  = 0;
-const int SHARP_LC  = 0;
+const int SHARP_LC  = 3;
 
 //******************************************
 //------------- PATHFINDING ----------------
@@ -2340,20 +2340,20 @@ void LCD_Blink(byte n) {
 
 void setup() {
     Serial.begin(9600);
-    PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
+    //pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    //pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    //attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    //attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
-    pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
+    /*pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
     pinMode(S0, OUTPUT);         //Establece  pin de Salida
     pinMode(S1, OUTPUT);         //Establece  pin de Salida
     pinMode(S2, OUTPUT);         //Establece  pin de Salida
-    pinMode(S3, OUTPUT);         //Establece  pin de Salida
+    pinMode(S3, OUTPUT);         //Establece  pin de Salida*/
     if(!bno.begin())
         Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     bno.setExtCrystalUse(true);
@@ -2390,6 +2390,8 @@ void setup() {
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
+
+    Serial.println("wdddddwwewe");
 }
 
 void loop() {
@@ -2399,6 +2401,31 @@ void loop() {
     checarParedes();
     resolverLaberinto();*/
 
-    Serial.println(steps);
-    delay(500);
+    sensors_event_t event;
+    bno.getEvent(&event);
+
+    Serial.print(F("Orientation: "));
+    Serial.print((float)event.orientation.x);
+    Serial.print(F(" "));
+    Serial.print((float)event.orientation.y);
+    Serial.print(F(" "));
+    Serial.print((float)event.orientation.z);
+    Serial.println(F(""));
+
+    /* Also send calibration data for each sensor. */
+    uint8_t sys, gyro, accel, mag = 0;
+    bno.getCalibration(&sys, &gyro, &accel, &mag);
+    Serial.print(F("Calibration: "));
+    Serial.print(sys, DEC);
+    Serial.print(F(" "));
+    Serial.print(gyro, DEC);
+    Serial.print(F(" "));
+    Serial.print(accel, DEC);
+    Serial.print(F(" "));
+    Serial.println(mag, DEC);
+
+    Serial.println("wdwwewe");
+    LCD_Write("Ojala", "JALE");
+    delay(1000);
+
 }
