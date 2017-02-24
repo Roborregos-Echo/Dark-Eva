@@ -2,8 +2,8 @@
 //********************************************
 //                  E V A
 //********************************************
-//-------------- VERSIÓN 1.0.5 ---------------
-//----------- 22 / FEBRERO / 2017 ------------
+//-------------- VERSIÓN 1.0.6 ---------------
+//----------- 24 / FEBRERO / 2017 ------------
 //********************************************
 
 
@@ -20,7 +20,6 @@
 #include <Wire.h>
 #include <Servo.h>
 #include <PID_v1.h>
-#include <Encoder.h>
 
 
 //********************************************
@@ -97,7 +96,7 @@ const int VEL_MOTOR_150 = 100;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
-int steps = 0;
+unsigned long steps = 0;
 
 void addStep()
 {
@@ -2329,6 +2328,7 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
@@ -2381,5 +2381,6 @@ void loop() {
     checarParedes();
     resolverLaberinto();*/
 
-    Serial.println(getSharpLarga(SHARP_LA));
+    Serial.println(steps);
+    delay(500);
 }
