@@ -141,6 +141,11 @@ byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
 
 //******************************************
+//-------------- CHECKPOINT ----------------
+byte checkList1[GRID_MAX];
+byte checkList2[GRID_MAX];
+
+//******************************************
 //---------------INTERRUPTS-----------------
 #define interruptB 2
 #define interruptD 3
@@ -867,6 +872,196 @@ class Cuadro {
 };
 
 Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
+
+//******************************************
+//---------------TCS3200------------------
+
+/* Cambia la frecuencia del sensor:
+*  0 = filtro apagado
+*  2 = filtro del 2%
+*  20 = filtro del 20%
+*  100 = filtro del 100%
+*/
+void setFrecuencia(byte frecuencia){
+    switch(frecuencia) {
+        case 0:
+        digitalWrite(S0, LOW);
+        digitalWrite(S1, LOW);
+        break;
+
+        case 2:
+        digitalWrite(S0, LOW);
+        digitalWrite(S1, HIGH);
+        break;
+
+        case 20:
+        digitalWrite(S0, HIGH);
+        digitalWrite(S1, LOW);
+        break;
+
+        case 100:
+        digitalWrite(S0, HIGH);
+        digitalWrite(S1, HIGH);
+        break;
+    }
+}
+
+
+/* Cambia el filtro del sensor:
+*  'N' = Sin filtro
+*  'R' = Filtro rojo
+*  'G' = Filtro verde
+*  'B' = Filtro azul
+*/
+void setFiltro(char filtro){
+    switch(filtro) {
+        case 'N':
+        digitalWrite(S2, HIGH);
+        digitalWrite(S3, LOW);
+        break;
+
+        case 'R':
+        digitalWrite(S2, LOW);
+        digitalWrite(S3, LOW);
+        break;
+
+        case 'G':
+        digitalWrite(S2, HIGH);
+        digitalWrite(S3, HIGH);
+        break;
+
+        case 'B':
+        digitalWrite(S2, LOW);
+        digitalWrite(S3, HIGH);
+        break;
+    }
+}
+
+// Valor que retorna el sensor
+int getColor(){
+    return (pulseIn(sensorOut, LOW));
+}
+
+// Funcion para calibrar los colores que se usaran
+void calibrarColor(){
+    while(EstadoColor == ESTADO_OFF) {
+        Serial.println("Calibrar...");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            //*Limpia la pantalla
+            EstadoColor = ESTADO_NEGRO;
+            delay(1000);
+        }
+    }
+
+    while(EstadoColor == ESTADO_NEGRO) {
+        Serial.println("Calibrar Negro");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            setFiltro('N');
+            iN_NEGRO = getColor();
+
+            setFiltro('R');
+            iR_NEGRO = getColor();
+
+            setFiltro('G');
+            iV_NEGRO = getColor();
+
+            setFiltro('B');
+            iA_NEGRO = getColor();
+
+            //*Limpia la pantalla
+            delay(1000);
+            EstadoColor = ESTADO_CHECKPOINT;
+        }
+    }
+
+    while(EstadoColor == ESTADO_CHECKPOINT) {
+        Serial.println("Calibrar Checkpoint");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            setFiltro('N');
+            iN_CHECKPOINT = getColor();
+
+            setFiltro('R');
+            iR_CHECKPOINT = getColor();
+
+            setFiltro('G');
+            iV_CHECKPOINT = getColor();
+
+            setFiltro('B');
+            iA_CHECKPOINT = getColor();
+
+            //*Limpia la pantalla
+            EstadoColor = ESTADO_LISTO;
+            delay(1000);
+        }
+    }
+
+    while(EstadoColor == ESTADO_LISTO) {
+        Serial.println("Listo...");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            //*Limpia la pantalla
+            EstadoColor++;
+            //*Pasa al siguiente estado
+        }
+    }
+}
+
+// Regresa true si el sensor detecta el color que declares en el parametro
+// respetando el margen elegido
+bool checarCuadroColor(byte cuadro, byte margen) {
+    setFiltro('N');
+    iNone = getColor();
+
+    setFiltro('R');
+    iRojo = getColor();
+
+    setFiltro('G');
+    iVerde = getColor();
+
+    setFiltro('B');
+    iAzul = getColor();
+
+    switch (cuadro) {
+        case COLOR_NEGRO:
+        if(iNone <= iN_NEGRO+margen and iNone >= iN_NEGRO-margen and iRojo <= iR_NEGRO+margen and iRojo >= iR_NEGRO-margen
+        and iVerde <= iV_NEGRO+margen and iVerde >= iV_NEGRO-margen and iAzul <= iA_NEGRO+margen and iAzul >= iA_NEGRO-margen)
+            return true;
+        else
+            return false;
+        break;
+
+        case COLOR_CHECKPOINT:
+        if(iNone <= iN_CHECKPOINT+margen and iNone >= iN_CHECKPOINT-margen and iRojo <= iR_CHECKPOINT+margen and iRojo >= iR_CHECKPOINT-margen
+        and iVerde <= iV_CHECKPOINT+margen and iVerde >= iV_CHECKPOINT-margen and iAzul <= iA_CHECKPOINT+margen and iAzul >= iA_CHECKPOINT-margen)
+            return true;
+        else
+            return false;
+        break;
+
+        default:
+        return false;
+    }
+}
+
+
+void checarCheckpoint(){
+
+    byte checkGrid = coordToGrid(x_actual, y_actual);
+
+    if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
+    checkList1[checkGrid] += 1;
+
+
+    if(checarCuadroColor(CHECKPOINT, 20)
+    {
+
+    }
+
+}
+
 void absoluteMove(char cLado) {
     switch (iOrientacion) {
         case A_NORTE:
@@ -1981,181 +2176,6 @@ void servoMotor() {
         servo.write(0);
 }
 
-
-
-
-//******************************************
-//---------------TCS3200------------------
-
-/* Cambia la frecuencia del sensor:
-*  0 = filtro apagado
-*  2 = filtro del 2%
-*  20 = filtro del 20%
-*  100 = filtro del 100%
-*/
-void setFrecuencia(byte frecuencia){
-    switch(frecuencia) {
-        case 0:
-        digitalWrite(S0, LOW);
-        digitalWrite(S1, LOW);
-        break;
-
-        case 2:
-        digitalWrite(S0, LOW);
-        digitalWrite(S1, HIGH);
-        break;
-
-        case 20:
-        digitalWrite(S0, HIGH);
-        digitalWrite(S1, LOW);
-        break;
-
-        case 100:
-        digitalWrite(S0, HIGH);
-        digitalWrite(S1, HIGH);
-        break;
-    }
-}
-
-
-/* Cambia el filtro del sensor:
-*  'N' = Sin filtro
-*  'R' = Filtro rojo
-*  'G' = Filtro verde
-*  'B' = Filtro azul
-*/
-void setFiltro(char filtro){
-    switch(filtro) {
-        case 'N':
-        digitalWrite(S2, HIGH);
-        digitalWrite(S3, LOW);
-        break;
-
-        case 'R':
-        digitalWrite(S2, LOW);
-        digitalWrite(S3, LOW);
-        break;
-
-        case 'G':
-        digitalWrite(S2, HIGH);
-        digitalWrite(S3, HIGH);
-        break;
-
-        case 'B':
-        digitalWrite(S2, LOW);
-        digitalWrite(S3, HIGH);
-        break;
-    }
-}
-
-// Valor que retorna el sensor
-int getColor(){
-    return (pulseIn(sensorOut, LOW));
-}
-
-// Funcion para calibrar los colores que se usaran
-void calibrarColor(){
-    while(EstadoColor == ESTADO_OFF) {
-        Serial.println("Calibrar...");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            //*Limpia la pantalla
-            EstadoColor = ESTADO_NEGRO;
-            delay(1000);
-        }
-    }
-
-    while(EstadoColor == ESTADO_NEGRO) {
-        Serial.println("Calibrar Negro");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            setFiltro('N');
-            iN_NEGRO = getColor();
-
-            setFiltro('R');
-            iR_NEGRO = getColor();
-
-            setFiltro('G');
-            iV_NEGRO = getColor();
-
-            setFiltro('B');
-            iA_NEGRO = getColor();
-
-            //*Limpia la pantalla
-            delay(1000);
-            EstadoColor = ESTADO_CHECKPOINT;
-        }
-    }
-
-    while(EstadoColor == ESTADO_CHECKPOINT) {
-        Serial.println("Calibrar Checkpoint");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            setFiltro('N');
-            iN_CHECKPOINT = getColor();
-
-            setFiltro('R');
-            iR_CHECKPOINT = getColor();
-
-            setFiltro('G');
-            iV_CHECKPOINT = getColor();
-
-            setFiltro('B');
-            iA_CHECKPOINT = getColor();
-
-            //*Limpia la pantalla
-            EstadoColor = ESTADO_LISTO;
-            delay(1000);
-        }
-    }
-
-    while(EstadoColor == ESTADO_LISTO) {
-        Serial.println("Listo...");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            //*Limpia la pantalla
-            EstadoColor++;
-            //*Pasa al siguiente estado
-        }
-    }
-}
-
-// Regresa true si el sensor detecta el color que declares en el parametro
-// respetando el margen elegido
-bool checarCuadroColor(byte cuadro, byte margen) {
-    setFiltro('N');
-    iNone = getColor();
-
-    setFiltro('R');
-    iRojo = getColor();
-
-    setFiltro('G');
-    iVerde = getColor();
-
-    setFiltro('B');
-    iAzul = getColor();
-
-    switch (cuadro) {
-        case COLOR_NEGRO:
-        if(iNone <= iN_NEGRO+margen and iNone >= iN_NEGRO-margen and iRojo <= iR_NEGRO+margen and iRojo >= iR_NEGRO-margen
-        and iVerde <= iV_NEGRO+margen and iVerde >= iV_NEGRO-margen and iAzul <= iA_NEGRO+margen and iAzul >= iA_NEGRO-margen)
-            return true;
-        else
-            return false;
-        break;
-
-        case COLOR_CHECKPOINT:
-        if(iNone <= iN_CHECKPOINT+margen and iNone >= iN_CHECKPOINT-margen and iRojo <= iR_CHECKPOINT+margen and iRojo >= iR_CHECKPOINT-margen
-        and iVerde <= iV_CHECKPOINT+margen and iVerde >= iV_CHECKPOINT-margen and iAzul <= iA_CHECKPOINT+margen and iAzul >= iA_CHECKPOINT-margen)
-            return true;
-        else
-            return false;
-        break;
-
-        default:
-        return false;
-    }
-}
 
 //******************************************
 //******************************************
