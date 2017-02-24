@@ -95,6 +95,15 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
 const int VEL_MOTOR_90 = 100;
 const int VEL_MOTOR_150 = 100;
 
+const int ENC1   = 18;
+const int ENC2   = 19;
+int steps = 0;
+
+void addStep()
+{
+  steps++;
+}
+
 
 //******************************************
 //------------- IMU BNO055 ----------------
@@ -2273,6 +2282,7 @@ void setup() {
     pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
