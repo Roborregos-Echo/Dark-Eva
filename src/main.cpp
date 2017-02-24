@@ -2393,7 +2393,6 @@ void LCD_Blink(byte n) {
 
 
 
-
 void setup() {
     Serial.begin(9600);
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
