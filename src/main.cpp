@@ -54,8 +54,8 @@ const byte D_NORTE = 3;
 byte iOrientacion = A_NORTE;
 
 // Coordenadas maximas
-const byte X_MAX = 8;
-const byte Y_MAX = 10;
+const byte X_MAX = 15;
+const byte Y_MAX = 15;
 const byte Z_MAX = 3;
 
 // Coordeanas actuales
