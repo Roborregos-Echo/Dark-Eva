@@ -2221,11 +2221,11 @@ void LCD_Blink(byte n) {
 
 void setup() {
     Serial.begin(9600);
-    //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    //pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    //attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
+    pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
