@@ -100,6 +100,7 @@ const int VEL_MOTOR_150 = 100;
 //------------- IMU BNO055 ----------------
 bool bajarRampa = false;
 bool subirRampa = false;
+bool permisoRampa = true;
 const float PRECISION_IMU = 3.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
@@ -196,7 +197,7 @@ void avanzar() {
     MotorCD -> run(FORWARD);
 }
 
-void reversaa() {
+void reversa() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(BACKWARD);
@@ -210,18 +211,185 @@ void detener() {
     MotorCD -> run(BRAKE);
 }
 
-void derecha() {
+void vueltaDerecha() {
     MotorAI -> run(FORWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(FORWARD);
     MotorCD -> run(BACKWARD);
 }
 
-void izquierda() {
+void vueltaIzquierda() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(FORWARD);
     MotorCI -> run(BACKWARD);
     MotorCD -> run(FORWARD);
+}
+
+void horizontalDerecha() {
+    MotorAI -> run(FORWARD);
+    MotorAD -> run(BACKWARD);
+    MotorCI -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
+}
+
+void horizontalIzquierda() {
+    MotorAI -> run(BACKWARD);
+    MotorAD -> run(FORWARD);
+    MotorCI -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
+}
+
+
+//******************************************
+//----------- SHARP GP2Y0A21YK -------------
+float getSharpCorta(int iSharp) {
+    //int sharp = 2316.6 *(0.985 / analogRead(A7));
+    float sharpRead[8];
+    float resultado;
+    for(int i = 0; i < 8; i++) {
+        sharpRead[i] = analogRead(iSharp);
+        delay(20);
+    }
+
+    for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 7; i++) {
+            int temp;
+            if(sharpRead[i] > sharpRead[i + 1]) {
+                temp = sharpRead[i+1];
+                sharpRead[i + 1] = sharpRead[i];
+                sharpRead[i] = temp;
+            }
+        }
+    }
+
+    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
+        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
+    else
+        resultado = 30;
+    return resultado;
+}
+
+float getSharpLarga(int iSharp) {
+    float sharpRead[8];
+    float resultado;
+    for(int i = 0; i < 8; i++) {
+        sharpRead[i] = analogRead(iSharp);
+        delay(20);
+    }
+
+    for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 7; i++) {
+            int temp;
+            if(sharpRead[i] > sharpRead[i + 1]) {
+                temp = sharpRead[i+1];
+                sharpRead[i + 1] = sharpRead[i];
+                sharpRead[i] = temp;
+            }
+        }
+    }
+
+    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
+        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
+    else
+        resultado = -1;
+    return resultado;
+}
+
+
+void checarRampa() {
+    //TODO:
+}
+
+void alinear() {
+    if(getSharpCorta(SHARP_B1) < 20.0) {
+        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
+            while (getSharpCorta(SHARP_B1) < 6.5) {
+                horizontalIzquierda();
+            }
+            while (getSharpCorta(SHARP_B1) > 8.5) {
+                horizontalDerecha();
+            }
+            detener();
+        }
+        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 2.0 ) {
+            while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
+                vueltaIzquierda();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 2.0 ) {
+            while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
+                vueltaDerecha();
+            }
+            detener();
+        }
+    } else if(getSharpCorta(SHARP_D1) < 20.0) {
+        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
+            while (getSharpCorta(SHARP_D1) < 6.5) {
+                horizontalDerecha();
+            }
+            while (getSharpCorta(SHARP_D1) > 8.5) {
+                horizontalIzquierda();
+            }
+            detener();
+        }
+        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 2.0 ) {
+            while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
+                vueltaDerecha();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 2.0 ) {
+            while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
+                vueltaIzquierda();
+            }
+            detener();
+        }
+    }
+
+    if (getSharpCorta(SHARP_A) < 20.0) {
+        if (getSharpCorta(SHARP_A) < 4.0) {
+            while (getSharpCorta(SHARP_A) < 5.5) {
+                reversa();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_A) > 7.0 && getSharpCorta(SHARP_A) < 30.0) {
+            while (getSharpCorta(SHARP_A) < 5.5) {
+                avanzar();
+            }
+            detener();
+        }
+    } else if (getSharpCorta(SHARP_C) < 20.0) {
+        if (getSharpCorta(SHARP_C) < 4.0) {
+            while (getSharpCorta(SHARP_C) < 5.5) {
+                avanzar();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_C) > 7.0 && getSharpCorta(SHARP_C) < 30.0) {
+            while (getSharpCorta(SHARP_C) < 5.5) {
+                reversa();
+            }
+            detener();
+        }
+    } else if ((int) getSharpLarga(SHARP_LA) % 30 > 10 && (int) getSharpLarga(SHARP_LA) % 30 <= 18) {
+        while ((int) getSharpLarga(SHARP_LA) % 30 > 8) {
+            avanzar();
+        }
+        detener();
+    } else if ((int) getSharpLarga(SHARP_LA) % 30 > 18 && (int) getSharpLarga(SHARP_LA) % 30 <= 27) {
+        while ((int) getSharpLarga(SHARP_LA) % 30 - 7 > 3) {
+            avanzar();
+        }
+        detener();
+    } else if ((int) getSharpLarga(SHARP_LC) % 30 > 10 && (int) getSharpLarga(SHARP_LC) % 30 <= 18) {
+        while ((int) getSharpLarga(SHARP_LC) % 30 > 8) {
+            reversa();
+        }
+        detener();
+    } else if ((int) getSharpLarga(SHARP_LC) % 30 > 18 && (int) getSharpLarga(SHARP_LC) % 30 <= 27) {
+        while ((int) getSharpLarga(SHARP_LC) % 30 - 7 > 3) {
+            reversa();
+        }
+        detener();
+    }
 }
 
 void velocidad(int ai, int ad, int ci, int cd) {
@@ -246,7 +414,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
         MotorCD -> setSpeed(cd);
 }
 
-void vueltaIzquierda() {
+void vueltavueltaIzquierda() {
     avanzar();
     delay(200);
     detener();
@@ -290,7 +458,7 @@ void vueltaIzquierda() {
         limSup = posFinal + PRECISION_IMU;
 
 
-    izquierda();
+    vueltaIzquierda();
 
     if(limSup > limInf)
         while(!(posInicial >= limInf && posInicial <= limSup)) {
@@ -327,7 +495,7 @@ void vueltaIzquierda() {
     }
 }
 
-void vueltaDerecha() {
+void vueltavueltaDerecha() {
     avanzar();
     delay(200);
     detener();
@@ -370,7 +538,7 @@ void vueltaDerecha() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    derecha();
+    vueltaDerecha();
 
     if(limSup > limInf)
         while(!(posInicial >= limInf && posInicial <= limSup)) {
@@ -451,7 +619,7 @@ void vueltaAtras() {
         limSup = posFinal + PRECISION_IMU;
 
 
-    derecha();
+    vueltaDerecha();
 
     if(limSup > limInf)
         while(!(posInicial >= limInf && posInicial <= limSup)) {
@@ -507,39 +675,77 @@ void moverCuadro() {
     }
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
-        while (vec.y() < -4.0) {
-            subirRampa = true;
-            if(getAngulo() > 320)
-                inIzq = - (360 - getAngulo());
-            else
-                inIzq = getAngulo();
-            if(getAngulo() > 320)
-                inDer = - (360 - getAngulo());
-            else
-                inDer = getAngulo();
-            izqPID.Compute();
-            derPID.Compute();
-            velocidad(162 + outIzq, 180 + outDer, 76 + outIzq, 156 + outDer);
-            vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+        subirRampa = true;
+        checarRampa();
+        if (permisoRampa) {
+            while (vec.y() < -4.0) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(162 + outIzq, 180 + outDer, 76 + outIzq, 156 + outDer);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+            }
+            velocidad(137, 152, 63, 130);
+        } else {
+            inicio = millis();
+            reversa();
+            while (millis() - inicio <= 1000) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+            }
         }
-        velocidad(137, 152, 63, 130);
     } else if(vec.y() > 4.0) {
         bajarRampa = true;
-        while (vec.y() > 4.0) {
-            if(getAngulo() > 320)
-                inIzq = - (360 - getAngulo());
-            else
-                inIzq = getAngulo();
-            if(getAngulo() > 320)
-                inDer = - (360 - getAngulo());
-            else
-                inDer = getAngulo();
-            izqPID.Compute();
-            derPID.Compute();
-            velocidad(135 + outIzq, 150 + outDer, 64 + outIzq, 131 + outDer);
-            vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+        checarRampa();
+        if (permisoRampa) {
+            while (vec.y() > 4.0) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(135 + outIzq, 150 + outDer, 64 + outIzq, 131 + outDer);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+            }
+            velocidad(137, 152, 63, 130);
+        } else {
+            inicio = millis();
+            reversa();
+            while (millis() - inicio <= 1000) {
+                if(getAngulo() > 320)
+                    inIzq = - (360 - getAngulo());
+                else
+                    inIzq = getAngulo();
+                if(getAngulo() > 320)
+                    inDer = - (360 - getAngulo());
+                else
+                    inDer = getAngulo();
+                izqPID.Compute();
+                derPID.Compute();
+                velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+            }
         }
-        velocidad(137, 152, 63, 130);
     } else {
         inicio = millis();
         while (millis() - inicio <= 450) {
@@ -572,61 +778,7 @@ void moverCuadro() {
     }
     detener();
     delay(1000);
-}
-
-//******************************************
-//----------- SHARP GP2Y0A21YK -------------
-float getSharpCorta(int iSharp) {
-    //int sharp = 2316.6 *(0.985 / analogRead(A7));
-    float sharpRead[8];
-    float resultado;
-    for(int i = 0; i < 8; i++) {
-        sharpRead[i] = analogRead(iSharp);
-        delay(20);
-    }
-
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
-            int temp;
-            if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
-                sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = temp;
-            }
-        }
-    }
-
-    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
-        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
-    else
-        resultado = 30;
-    return resultado;
-}
-
-float getSharpLarga(int iSharp) {
-    float sharpRead[8];
-    float resultado;
-    for(int i = 0; i < 8; i++) {
-        sharpRead[i] = analogRead(iSharp);
-        delay(20);
-    }
-
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
-            int temp;
-            if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
-                sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = temp;
-            }
-        }
-    }
-
-    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
-        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
-    else
-        resultado = -1;
-    return resultado;
+    permisoRampa = true;
 }
 
 
@@ -724,7 +876,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
 
@@ -734,7 +886,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
         }
@@ -743,7 +895,7 @@ void absoluteMove(char cLado) {
         case B_NORTE:
         switch(cLado) {
             case 'N':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
 
@@ -753,7 +905,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
 
@@ -771,7 +923,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
 
@@ -780,7 +932,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
         }
@@ -789,7 +941,7 @@ void absoluteMove(char cLado) {
         case D_NORTE:
         switch(cLado) {
             case 'N':
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             break;
 
@@ -798,7 +950,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             break;
 
@@ -1545,7 +1697,7 @@ void resolverLaberinto(){
                 LastMove = TO_NORTH;
                 break;
             }
-            vueltaIzquierda();
+            vueltavueltaIzquierda();
             moverCuadro();
             checarLasts();
         } else if(!A_wall) {
@@ -1596,7 +1748,7 @@ void resolverLaberinto(){
                 LastMove = TO_SOUTH;
                 break;
             }
-            vueltaDerecha();
+            vueltavueltaDerecha();
             moverCuadro();
             checarLasts();
         } else {
