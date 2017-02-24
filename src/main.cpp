@@ -236,8 +236,161 @@ void horizontalIzquierda() {
     MotorCD -> run(FORWARD);
 }
 
+
+//******************************************
+//----------- SHARP GP2Y0A21YK -------------
+float getSharpCorta(int iSharp) {
+    //int sharp = 2316.6 *(0.985 / analogRead(A7));
+    float sharpRead[8];
+    float resultado;
+    for(int i = 0; i < 8; i++) {
+        sharpRead[i] = analogRead(iSharp);
+        delay(20);
+    }
+
+    for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 7; i++) {
+            int temp;
+            if(sharpRead[i] > sharpRead[i + 1]) {
+                temp = sharpRead[i+1];
+                sharpRead[i + 1] = sharpRead[i];
+                sharpRead[i] = temp;
+            }
+        }
+    }
+
+    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
+        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
+    else
+        resultado = 30;
+    return resultado;
+}
+
+float getSharpLarga(int iSharp) {
+    float sharpRead[8];
+    float resultado;
+    for(int i = 0; i < 8; i++) {
+        sharpRead[i] = analogRead(iSharp);
+        delay(20);
+    }
+
+    for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 7; i++) {
+            int temp;
+            if(sharpRead[i] > sharpRead[i + 1]) {
+                temp = sharpRead[i+1];
+                sharpRead[i + 1] = sharpRead[i];
+                sharpRead[i] = temp;
+            }
+        }
+    }
+
+    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
+        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
+    else
+        resultado = -1;
+    return resultado;
+}
+
+
 void checarRampa() {
     //TODO:
+}
+
+void alinear() {
+    if(getSharpCorta(SHARP_B1) < 20) {
+        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
+            while (getSharpCorta(SHARP_B1) < 6.5) {
+                horizontalIzquierda();
+            }
+            while (getSharpCorta(SHARP_B1) > 8.5) {
+                horizontalDerecha();
+            }
+            detener();
+        }
+        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 2 ) {
+            while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
+                vueltaIzquierda();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 2 ) {
+            while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
+                vueltaDerecha();
+            }
+            detener();
+        }
+    } else if(getSharpCorta(SHARP_D1) < 20) {
+        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
+            while (getSharpCorta(SHARP_D1) < 6.5) {
+                horizontalDerecha();
+            }
+            while (getSharpCorta(SHARP_D1) > 8.5) {
+                horizontalIzquierda();
+            }
+            detener();
+        }
+        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 2 ) {
+            while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
+                vueltaDerecha();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 2 ) {
+            while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
+                vueltaIzquierda();
+            }
+            detener();
+        }
+    }
+
+    if (getSharpCorta(SHARP_A) < 20) {
+        if (getSharpCorta(SHARP_A) < 4) {
+            while (getSharpCorta(SHARP_A) < 5.5) {
+                reversa();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 30) {
+            while (getSharpCorta(SHARP_A) < 5.5) {
+                avanzar();
+            }
+            detener();
+        }
+    } else if (getSharpCorta(SHARP_C) < 20) {
+        if (getSharpCorta(SHARP_C) < 4) {
+            while (getSharpCorta(SHARP_C) < 5.5) {
+                avanzar();
+            }
+            detener();
+        } else if (getSharpCorta(SHARP_C) > 7 && getSharpCorta(SHARP_C) < 30) {
+            while (getSharpCorta(SHARP_C) < 5.5) {
+                reversa();
+            }
+            detener();
+        }
+    } else if (getSharpLarga(SHARP_LA) > 25) {
+        if (getSharpLarga(SHARP_LA) < 4) {
+            while (getSharpLarga(SHARP_LA) < 5.5) {
+                reversa();
+            }
+            detener();
+        } else if (getSharpLarga(SHARP_LA) > 7 && getSharpLarga(SHARP_LA) < 30) {
+            while (getSharpLarga(SHARP_LA) < 5.5) {
+                avanzar();
+            }
+            detener();
+        }
+    } else if (getSharpLarga(SHARP_LC) > 25) {
+        if (getSharpLarga(SHARP_LC) < 4) {
+            while (getSharpLarga(SHARP_LC) < 5.5) {
+                avanzar();
+            }
+            detener();
+        } else if (getSharpLarga(SHARP_LC) > 7 && getSharpLarga(SHARP_LC) < 30) {
+            while (getSharpLarga(SHARP_LC) < 5.5) {
+                reversa();
+            }
+            detener();
+        }
+    }
 }
 
 void velocidad(int ai, int ad, int ci, int cd) {
@@ -627,61 +780,6 @@ void moverCuadro() {
     detener();
     delay(1000);
     permisoRampa = true;
-}
-
-//******************************************
-//----------- SHARP GP2Y0A21YK -------------
-float getSharpCorta(int iSharp) {
-    //int sharp = 2316.6 *(0.985 / analogRead(A7));
-    float sharpRead[8];
-    float resultado;
-    for(int i = 0; i < 8; i++) {
-        sharpRead[i] = analogRead(iSharp);
-        delay(20);
-    }
-
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
-            int temp;
-            if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
-                sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = temp;
-            }
-        }
-    }
-
-    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
-        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
-    else
-        resultado = 30;
-    return resultado;
-}
-
-float getSharpLarga(int iSharp) {
-    float sharpRead[8];
-    float resultado;
-    for(int i = 0; i < 8; i++) {
-        sharpRead[i] = analogRead(iSharp);
-        delay(20);
-    }
-
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
-            int temp;
-            if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
-                sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = temp;
-            }
-        }
-    }
-
-    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
-        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
-    else
-        resultado = -1;
-    return resultado;
 }
 
 
