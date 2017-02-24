@@ -668,6 +668,74 @@ void vueltaAtras() {
     }
 }
 
+class Cuadro {
+    byte Estado;
+    bool Norte, Este, Sur, Oeste;
+    bool Mlx;
+
+    public: Cuadro() {
+        Estado  = NO_EXISTE;
+        Norte   = false;
+        Este    = false;
+        Sur     = false;
+        Oeste   = false;
+        Mlx     = false;
+    }
+
+    void setPared(char cSentido, bool bBool) {
+        switch(cSentido) {
+            case 'N':
+            Norte = bBool;
+            break;
+            case 'E':
+            Este = bBool;
+            break;
+            case 'S':
+            Sur = bBool;
+            break;
+            case 'O':
+            Oeste = bBool;
+            break;
+        }
+    }
+
+    void setEstado(int iEstado) {
+        Estado = iEstado;
+    }
+
+    void setMlx(bool b) {
+        Mlx = b;
+    }
+
+    bool getMlx() {
+        return Mlx;
+    }
+
+    bool getPared(char cSentido) {
+        switch(cSentido) {
+            case 'N':
+            return Norte;
+            break;
+            case 'E':
+            return Este;
+            break;
+            case 'S':
+            return Sur;
+            break;
+            case 'O':
+            return Oeste;
+            break;
+        }
+    }
+
+    int getEstado() {
+        return Estado;
+    }
+};
+
+Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
+
+
 void checarRampa(){
     if(subirRampa or bajarRampa)
     {
@@ -922,76 +990,9 @@ byte gridToCoord(byte grid, char eje) {
 byte totalGridToCoord(int grid, char eje) {
     byte z = grid/ (X_MAX*Y_MAX);
     byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
-    btye x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
+    byte x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
 
 }
-
-class Cuadro {
-    byte Estado;
-    bool Norte, Este, Sur, Oeste;
-    bool Mlx;
-
-    public: Cuadro() {
-        Estado  = NO_EXISTE;
-        Norte   = false;
-        Este    = false;
-        Sur     = false;
-        Oeste   = false;
-        Mlx     = false;
-    }
-
-    void setPared(char cSentido, bool bBool) {
-        switch(cSentido) {
-            case 'N':
-            Norte = bBool;
-            break;
-            case 'E':
-            Este = bBool;
-            break;
-            case 'S':
-            Sur = bBool;
-            break;
-            case 'O':
-            Oeste = bBool;
-            break;
-        }
-    }
-
-    void setEstado(int iEstado) {
-        Estado = iEstado;
-    }
-
-    void setMlx(bool b) {
-        Mlx = b;
-    }
-
-    bool getMlx() {
-        return Mlx;
-    }
-
-    bool getPared(char cSentido) {
-        switch(cSentido) {
-            case 'N':
-            return Norte;
-            break;
-            case 'E':
-            return Este;
-            break;
-            case 'S':
-            return Sur;
-            break;
-            case 'O':
-            return Oeste;
-            break;
-        }
-    }
-
-    int getEstado() {
-        return Estado;
-    }
-};
-
-Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
 
 //******************************************
 //---------------TCS3200------------------
