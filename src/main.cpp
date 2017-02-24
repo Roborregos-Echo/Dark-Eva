@@ -91,17 +91,13 @@ Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
 Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
 Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
 
-const int VEL_MOTOR_90 = 100;
-const int VEL_MOTOR_150 = 100;
+const int VEL_MOTOR_90  = 200;
+const int VEL_MOTOR_150 = 120;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
 unsigned long steps = 0;
 
-void addStep()
-{
-  steps++;
-}
 
 
 //******************************************
@@ -159,8 +155,12 @@ byte checkList2[GRID_MAX];
 #define interruptB 2
 #define interruptD 3
 
-
+void addStep()
+{
+  steps++;
+}
 //******************************************
+
 //--------------SERVO MOTOR-----------------
 #define servoPin 9 //PWM
 Servo servo;
@@ -242,15 +242,15 @@ void vueltaIzquierda() {
 void horizontalDerecha() {
     MotorAI -> run(FORWARD);
     MotorAD -> run(BACKWARD);
-    MotorCI -> run(FORWARD);
-    MotorCD -> run(BACKWARD);
+    MotorCI -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
 }
 
 void horizontalIzquierda() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(FORWARD);
-    MotorCI -> run(BACKWARD);
-    MotorCD -> run(FORWARD);
+    MotorCI -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
 }
 
 
@@ -425,10 +425,6 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void vueltavueltaIzquierda() {
-    avanzar();
-    delay(200);
-    detener();
-
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -506,10 +502,6 @@ void vueltavueltaIzquierda() {
 }
 
 void vueltavueltaDerecha() {
-    avanzar();
-    delay(200);
-    detener();
-
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -586,10 +578,6 @@ void vueltavueltaDerecha() {
 }
 
 void vueltaAtras() {
-    avanzar();
-    delay(200);
-    detener();
-
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -856,7 +844,7 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+        velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
     }
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
@@ -874,10 +862,10 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(162 + outIzq, 180 + outDer, 76 + outIzq, 156 + outDer);
+                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
-            velocidad(137, 152, 63, 130);
+            velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
         } else {
             inicio = millis();
             reversa();
@@ -892,7 +880,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
             }
         }
     } else if(vec.y() > 4.0) {
@@ -910,10 +898,10 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(135 + outIzq, 150 + outDer, 64 + outIzq, 131 + outDer);
+                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
-            velocidad(137, 152, 63, 130);
+            velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
         } else {
             inicio = millis();
             reversa();
@@ -928,7 +916,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
             }
         }
     } else {
@@ -944,7 +932,7 @@ void moverCuadro() {
                 inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+            velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
         }
     }
     inicio = millis();
@@ -959,14 +947,12 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(137 + outIzq, 152 + outDer, 64 + outIzq, 131 + outDer);
+        velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
     }
     detener();
     delay(1000);
     permisoRampa = true;
 }
-
-
 
 
 byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
@@ -1413,13 +1399,13 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
     int gridActual = coordToGrid(x_actual, y_actual);
 
-    for (int i=0; i<GRID_MAX; i++)
+    for (int i = 0; i<GRID_MAX; i++)
         openList[i] = 999;
 
-    for (int i=0; i<GRID_MAX; i++)
+    for (int i = 0; i<GRID_MAX; i++)
         closedList[i] = 999;
 
-    for (int i=0; i<GRID_MAX; i++)
+    for (int i = 0; i<GRID_MAX; i++)
         backList[i] = 999;
 
 
@@ -1435,7 +1421,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             Serial.println("Sali rapidamente");
         }
 
-        for (int i=0; i<4; i++)
+        for (int i = 0; i<4; i++)
             Neighbors[i] = 999;
 
         if(!firstLoop) {
@@ -1496,7 +1482,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             }
         }
 
-        for (int i=0; i<4; i++) {
+        for (int i = 0; i<4; i++) {
             if(Neighbors[i] < NeighborSortValue) {
                 neighbor_index = i;
                 NeighborSortValue = Neighbors[i];
@@ -1523,7 +1509,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 break;
             }
         } else {
-            for(int i=0; i<GRID_MAX; i++) {
+            for(int i = 0; i<GRID_MAX; i++) {
                 if(openList[i] < openSortValue) {
                     open_index = i;
                     openSortValue = openList[i];
@@ -1559,11 +1545,11 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         Serial.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino and y_path == y_destino) {
-                    /*for(int i=0; i<GRID_MAX; i++)
+                    /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     Serial.println("Open[" + String(i) + "] = " + String (openList[i]));
                 }
-                for(int i=0; i<GRID_MAX; i++)
+                for(int i = 0; i<GRID_MAX; i++)
                 {
                 Serial.println("Closed[" + String(i) + "] = " + String (closedList[i]));
             }*/
@@ -1575,7 +1561,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             Serial.println(y_back);*/
 
             while(!backFinished) {
-                for (int i=0; i<4; i++)
+                for (int i = 0; i<4; i++)
                 Neighbors[i] = 999;
 
                 NeighborSortValue = 999;
@@ -1613,7 +1599,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     }
                 }
 
-                for (int i=0; i<4; i++) {
+                for (int i = 0; i<4; i++) {
                     if(Neighbors[i] < NeighborSortValue) {
                         neighbor_index = i;
                         NeighborSortValue = Neighbors[i];
@@ -1666,7 +1652,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     backFinished = true;
 
                     if(ref == 255) {
-                        for(int i=0; i<GRID_MAX; i++) {
+                        for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
                                 if(gridActual-backList[i] == X_MAX) {
                                     Serial.println("Abajo");
@@ -1696,7 +1682,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                         x_actual = x_destino;
                         y_actual = y_destino;
                     } else {
-                        for(int i=0; i<GRID_MAX; i++) {
+                        for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999)
                             ref++;
                         }
@@ -2088,7 +2074,7 @@ void resolverLaberinto(){
 
             guardarCSR();
             if(ArrayCSR > 0) {
-                for (int i=0; i<ArrayCSR; i++) {
+                for (int i = 0; i<ArrayCSR; i++) {
                     byte var = 0;
                     Pathfinding(x_recorrer[i], y_recorrer[i], var);
                     if(var < LowestCSR) {
@@ -2250,7 +2236,7 @@ void LackOfProgress(){
   bool Mlx, S, E, N, O;
   int Num, Div, Mod;
 
-  for(int i=0; i<TOTAL_GRID_MAX; i++){
+  for(int i = 0; i<TOTAL_GRID_MAX; i++){
     x = totalGridToCoord(i, 'x');
     y = totalGridToCoord(i, 'y');
     z = totalGridToCoord(i, 'z');
@@ -2343,7 +2329,7 @@ void setup() {
     MotorAD -> run(RELEASE);
     MotorCI -> run(RELEASE);
     MotorCD -> run(RELEASE);
-    velocidad(137, 152, 63, 130);
+    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
     delay(200);
 
     izqPID.SetMode(AUTOMATIC);
@@ -2360,7 +2346,7 @@ void setup() {
         inDer = getAngulo();
 
     // Inicializa toda la matriz de checkpoint en 0
-    for(int i=0; i<GRID_MAX; i++)
+    for(int i = 0; i<GRID_MAX; i++)
     {
         checkList1[i] = 0;
         checkList2[i] = 0;
