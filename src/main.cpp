@@ -2337,23 +2337,23 @@ void checarMlx(){
 
 
 void funcionB(){
-  //vueltaIzq();
+  vueltaIzq();
   if(!cuadros[x_actual][y_actual][z_actual].getMlx())
   {
     servoMotor();
     cuadros[x_actual][y_actual][z_actual].setMlx(true);
   }
-  //vueltaDer();
+  vueltaDer();
 }
 
 void funcionD(){
-  //vueltaDer();
+  vueltaDer();
   if(!cuadros[x_actual][y_actual][z_actual].getMlx())
   {
     servoMotor();
     cuadros[x_actual][y_actual][z_actual].setMlx(true);
   }
-  //vueltaIzq();
+  vueltaIzq();
 }
 
 void LackOfProgress(){
@@ -2536,28 +2536,12 @@ void setup() {
 }
 
 void loop() {
-  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+ if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    checarParedes();
    resolverLaberinto();
 
-   /*Serial.print(getSharpCorta(SHARP_A));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B1));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B2));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_C));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_D1));
-    Serial.print("\t");
-    Serial.println(getSharpCorta(SHARP_D2));
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);*/
 
    //checarMlx();
    //alinear();
