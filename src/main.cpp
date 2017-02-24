@@ -2455,10 +2455,10 @@ void setup() {
 }
 
 void loop() {
-    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    checarParedes();
-   resolverLaberinto();*/
+   resolverLaberinto();
    alinear();
 }
