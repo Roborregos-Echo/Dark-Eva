@@ -993,7 +993,7 @@ byte totalGridToCoord(int grid, char eje) {
     byte x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
 
 }
-
+ 
 //******************************************
 //---------------TCS3200------------------
 
