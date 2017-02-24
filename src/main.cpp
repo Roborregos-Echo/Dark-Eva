@@ -2257,8 +2257,6 @@ void LackOfProgress(){
 
     Num = i;
 
-    
-
   }
 }
 
