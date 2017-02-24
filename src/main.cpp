@@ -2246,15 +2246,15 @@ void funcionD(){
 
 void LackOfProgress(){
 
-  byte x, y, z;
-  int Num, Div;
-  int list[5];
-  byte Count = 0;
-
   for(int i=0; i<TOTAL_GRID_MAX; i++){
-    x = totalGridToCoord(i, 'x');
-    y = totalGridToCoord(i, 'y');
-    z = totalGridToCoord(i, 'z');
+
+    int Num, Div;
+    int list[5];
+    byte Count = 0;
+
+    byte x = totalGridToCoord(i, 'x');
+    byte y = totalGridToCoord(i, 'y');
+    byte z = totalGridToCoord(i, 'z');
 
     Num = checkList1[i];
 
@@ -2290,6 +2290,38 @@ void LackOfProgress(){
     cuadros[x][y][z].setPared('O', true);
     else
     cuadros[x][y][z].setPared('O', false);
+
+    switch(checkList2[i])
+    {
+      case NO_EXISTE:
+      cuadros[x][y][z].setEstado(NO_EXISTE);
+      break;
+
+      case SIN_RECORRER:
+      cuadros[x][y][z].setEstado(SIN_RECORRER);
+      break;
+
+      case RECORRIDO:
+      cuadros[x][y][z].setEstado(RECORRIDO);
+      break;
+
+      case CHECKPOINT:
+      cuadros[x][y][z].setEstado(CHECKPOINT);
+      break;
+
+      case NEGRO:
+      cuadros[x][y][z].setEstado(NEGRO);
+      break;
+
+      case RAMPA:
+      cuadros[x][y][z].setEstado(RAMPA);
+      break;
+
+      case INICIO:
+      cuadros[x][y][z].setEstado(INICIO);
+      break;
+
+    }
 
   }
 }
