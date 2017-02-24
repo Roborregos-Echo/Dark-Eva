@@ -992,8 +992,26 @@ byte totalGridToCoord(int grid, char eje) {
     byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
     byte x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
 
+    switch (eje)
+    {
+      case 'x':
+      return x;
+      break;
+
+      case 'y':
+      return y;
+      break;
+
+      case 'z':
+      return z;
+      break;
+    }
 }
- 
+
+int totalCoordToGrid(byte x, byte y, byte z){
+  return x + (y * X_MAX) + (z * (X_MAX * Y_MAX));
+}
+
 //******************************************
 //---------------TCS3200------------------
 
@@ -1170,57 +1188,66 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 void checarCheckpoint(){
 
-    int Grid = coordToGrid(x_actual, y_actual);
-
-    if(cuadros[x_actual][y_actual][z_actual].getMlx())
-    checkList1[Grid] += 16;
-
-    if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-    checkList1[Grid] += 8;
-
-    if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-    checkList1[Grid] += 4;
-
-    if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-    checkList1[Grid] += 2;
-
-    if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-    checkList1[Grid] += 1;
-
-    switch(cuadros[x_actual][y_actual][z_actual].getEstado()){
-        case NO_EXISTE:
-        checkList2[Grid] = 0;
-        break;
-
-        case SIN_RECORRER:
-        checkList2[Grid] = 1;
-        break;
-
-        case RECORRIDO:
-        checkList2[Grid] = 2;
-        break;
-
-        case CHECKPOINT:
-        checkList2[Grid] = 3;
-        break;
-
-        case NEGRO:
-        checkList2[Grid] = 4;
-        break;
-
-        case RAMPA:
-        checkList2[Grid] = 5;
-        break;
-
-        case INICIO:
-        checkList2[Grid] = 6;
-        break;
-    }
-
+    int TotalGrid;
 
     if(checarCuadroColor(CHECKPOINT, 20))
     {
+      for(int z=0; z<Z_MAX; z++)
+      {
+        for(int y = 0; y < Y_MAX; y++)
+        {
+          for(int x = 0; x < X_MAX; x++)
+          {
+            TotalGrid = totalCoordToGrid(x, y, z);
 
+            if(cuadros[x][y][z].getMlx())
+            checkList1[TotalGrid] += 16;
+
+            if(cuadros[x][y][z].getPared('S'))
+            checkList1[TotalGrid] += 8;
+
+            if(cuadros[x][y][z].getPared('E'))
+            checkList1[TotalGrid] += 4;
+
+            if(cuadros[x][y][z].getPared('N'))
+            checkList1[TotalGrid] += 2;
+
+            if(cuadros[x][y][z].getPared('O'))
+            checkList1[TotalGrid] += 1;
+
+            switch(cuadros[x][y][z].getEstado()){
+                case NO_EXISTE:
+                checkList2[TotalGrid] = 0;
+                break;
+
+                case SIN_RECORRER:
+                checkList2[TotalGrid] = 1;
+                break;
+
+                case RECORRIDO:
+                checkList2[TotalGrid] = 2;
+                break;
+
+                case CHECKPOINT:
+                checkList2[TotalGrid] = 3;
+                break;
+
+                case NEGRO:
+                checkList2[TotalGrid] = 4;
+                break;
+
+                case RAMPA:
+                checkList2[TotalGrid] = 5;
+                break;
+
+                case INICIO:
+                checkList2[TotalGrid] = 6;
+                break;
+            }
+
+          }
+        }
+      }
     }
 
 }
@@ -2216,6 +2243,24 @@ void funcionB(){
 }
 
 void funcionD(){
+}
+
+void LackOfProgress(){
+
+  byte x, y, z;
+  bool Mlx, S, E, N, O;
+  int Num, Div, Mod;
+
+  for(int i=0; i<TOTAL_GRID_MAX; i++){
+    x = totalGridToCoord(i, 'x');
+    y = totalGridToCoord(i, 'y');
+    z = totalGridToCoord(i, 'z');
+
+    Num = i;
+
+    
+
+  }
 }
 
 //******************************************
