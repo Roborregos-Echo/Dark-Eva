@@ -91,8 +91,14 @@ Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
 Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
 Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
 
-const int VEL_MOTOR_90  = 200;
-const int VEL_MOTOR_150 = 120;
+const int VEL_MOTOR_90  = 181;
+const int VEL_MOTOR_150 = 110;
+
+const int VEL_MOTOR_90_VUELTA  = 128;
+const int VEL_MOTOR_150_VUELTA = 77;
+
+const int VEL_MOTOR_90_RAMPA  = 255;
+const int VEL_MOTOR_150_RAMPA = 155;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -105,24 +111,24 @@ unsigned long steps = 0;
 bool bajarRampa = false;
 bool subirRampa = false;
 bool permisoRampa = true;
-const float PRECISION_IMU = 3.0;
+const float PRECISION_IMU = 2.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
-PID izqPID(&inIzq, &outIzq, &setIzq, 13, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 13, 0, 0, REVERSE);
+PID izqPID(&inIzq, &outIzq, &setIzq, 0, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 0, 0, 0, REVERSE);
 
 
 //******************************************
 //----------- SHARP GP2Y0A21YK -------------
 const int SHARP_A   = 1;
-const int SHARP_B1  = 4;
-const int SHARP_B2  = 6;
+const int SHARP_B1  = 14;
+const int SHARP_B2  = 9;
 const int SHARP_C   = 2;
-const int SHARP_D1  = 5;
+const int SHARP_D1  = 13;
 const int SHARP_D2  = 7;
 const int SHARP_LA  = 0;
-const int SHARP_LC  = 3;
+const int SHARP_LC  = 11;
 
 //******************************************
 //------------- PATHFINDING ----------------
@@ -226,17 +232,17 @@ void detener() {
 }
 
 void vueltaDerecha() {
-    MotorAI -> run(FORWARD);
-    MotorAD -> run(BACKWARD);
-    MotorCI -> run(FORWARD);
-    MotorCD -> run(BACKWARD);
-}
-
-void vueltaIzquierda() {
     MotorAI -> run(BACKWARD);
     MotorAD -> run(FORWARD);
     MotorCI -> run(BACKWARD);
     MotorCD -> run(FORWARD);
+}
+
+void vueltaIzquierda() {
+    MotorAI -> run(FORWARD);
+    MotorAD -> run(BACKWARD);
+    MotorCI -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
 }
 
 void horizontalDerecha() {
@@ -309,52 +315,75 @@ float getSharpLarga(int iSharp) {
     return resultado;
 }
 
+void velocidad(int ai, int ad, int ci, int cd) {
+    if(ai >= 255)
+        MotorAI -> setSpeed(255);
+    else
+        MotorAI -> setSpeed(ai);
+
+    if(ad >= 255)
+        MotorAD -> setSpeed(255);
+    else
+        MotorAD -> setSpeed(ad);
+
+    if(ci >= 255)
+        MotorCI -> setSpeed(255);
+    else
+        MotorCI -> setSpeed(ci);
+
+    if(cd >= 255)
+        MotorCD -> setSpeed(255);
+    else
+        MotorCD -> setSpeed(cd);
+}
+
 
 void alinear() {
+    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
     if(getSharpCorta(SHARP_B1) < 20.0) {
-        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
-            while (getSharpCorta(SHARP_B1) < 6.5) {
+        while (!(getSharpCorta(SHARP_B1) > 7 && getSharpCorta(SHARP_B1) < 10)) {
+            while (getSharpCorta(SHARP_B1) < 7) {
                 horizontalIzquierda();
             }
-            while (getSharpCorta(SHARP_B1) > 8.5) {
+            while (getSharpCorta(SHARP_B1) > 10) {
                 horizontalDerecha();
             }
             detener();
         }
-        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 2.0 ) {
+        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 3.0 ) {
             while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
                 vueltaIzquierda();
             }
             detener();
-        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 2.0 ) {
+        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 3.0 ) {
             while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
                 vueltaDerecha();
             }
             detener();
         }
     } else if(getSharpCorta(SHARP_D1) < 20.0) {
-        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
-            while (getSharpCorta(SHARP_D1) < 6.5) {
+        while (!(getSharpCorta(SHARP_D1) > 7 && getSharpCorta(SHARP_D1) < 10)) {
+            while (getSharpCorta(SHARP_D1) < 7) {
                 horizontalDerecha();
             }
-            while (getSharpCorta(SHARP_D1) > 8.5) {
+            while (getSharpCorta(SHARP_D1) > 10) {
                 horizontalIzquierda();
             }
             detener();
         }
-        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 2.0 ) {
+        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 3.0 ) {
             while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
                 vueltaDerecha();
             }
             detener();
-        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 2.0 ) {
+        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 3.0 ) {
             while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
                 vueltaIzquierda();
             }
             detener();
         }
     }
-
+/*
     if (getSharpCorta(SHARP_A) < 20.0) {
         if (getSharpCorta(SHARP_A) < 4.0) {
             while (getSharpCorta(SHARP_A) < 5.5) {
@@ -399,32 +428,11 @@ void alinear() {
             reversa();
         }
         detener();
-    }
+    }*/
+    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
 }
 
-void velocidad(int ai, int ad, int ci, int cd) {
-    if(ai >= 255)
-        MotorAI -> setSpeed(255);
-    else
-        MotorAI -> setSpeed(ai);
-
-    if(ad >= 255)
-        MotorAD -> setSpeed(255);
-    else
-        MotorAD -> setSpeed(ad);
-
-    if(ci >= 255)
-        MotorCI -> setSpeed(255);
-    else
-        MotorCI -> setSpeed(ci);
-
-    if(cd >= 255)
-        MotorCD -> setSpeed(255);
-    else
-        MotorCD -> setSpeed(cd);
-}
-
-void vueltavueltaIzquierda() {
+void vueltaIzq() {
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -463,23 +471,27 @@ void vueltavueltaIzquierda() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-
+    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
     vueltaIzquierda();
 
-    if(limSup > limInf)
+    if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
             Serial.println(posFinal);
             Serial.println("\t");
             Serial.println(posInicial);
         }
-    else
+        detener();
+    } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
             Serial.println(posFinal);
             Serial.println("\t");
             Serial.println(posInicial);
         }
+        detener();
+    }
+    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
     detener();
 
     switch(iOrientacion) {
@@ -501,7 +513,7 @@ void vueltavueltaIzquierda() {
     }
 }
 
-void vueltavueltaDerecha() {
+void vueltaDer() {
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     switch(iOrientacion) {
@@ -540,22 +552,27 @@ void vueltavueltaDerecha() {
     else
         limSup = posFinal + PRECISION_IMU;
 
+    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
     vueltaDerecha();
 
-    if(limSup > limInf)
+    if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
             Serial.println(posFinal);
             Serial.println("\t");
             Serial.println(posInicial);
         }
-    else
+        detener();
+    } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
             Serial.println(posFinal);
             Serial.println("\t");
             Serial.println(posInicial);
         }
+        detener();
+    }
+    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
     detener();
 
     switch(iOrientacion) {
@@ -616,17 +633,18 @@ void vueltaAtras() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-
+    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
     vueltaDerecha();
 
-    if(limSup > limInf)
+    if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
             Serial.println(posFinal);
             Serial.println("\t");
             Serial.println(posInicial);
         }
-    else
+        detener();
+    } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
             Serial.println(posFinal);
@@ -634,6 +652,9 @@ void vueltaAtras() {
             Serial.println(posInicial);
         }
 
+        detener();
+    }
+    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
     detener();
 
     switch(iOrientacion) {
@@ -831,9 +852,10 @@ void checarRampa(){
 }
 
 void moverCuadro() {
-    unsigned long inicio = millis();
+    unsigned long inicio = 0;
+    steps = 0;
     avanzar();
-    while (millis() - inicio <= 1000) {
+    while (steps <= 3000) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -862,7 +884,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+                velocidad(VEL_MOTOR_90_RAMPA + outIzq, VEL_MOTOR_150_RAMPA + outDer, VEL_MOTOR_150_RAMPA + outIzq, VEL_MOTOR_90_RAMPA + outDer);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
@@ -898,7 +920,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+                velocidad(VEL_MOTOR_90_VUELTA + outIzq, VEL_MOTOR_150_VUELTA + outDer, VEL_MOTOR_150_VUELTA + outIzq, VEL_MOTOR_90_VUELTA + outDer);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
@@ -920,8 +942,9 @@ void moverCuadro() {
             }
         }
     } else {
-        inicio = millis();
-        while (millis() - inicio <= 450) {
+        steps = 0;
+        avanzar();
+        while (steps <= 1200) {
             if(getAngulo() > 320)
                 inIzq = - (360 - getAngulo());
             else
@@ -935,8 +958,9 @@ void moverCuadro() {
             velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
         }
     }
-    inicio = millis();
-    while (millis() - inicio <= 400) {
+    steps = 0;
+    avanzar();
+    while (steps <= 1500) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -1246,7 +1270,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            vueltavueltaDerecha();
+            vueltaDer();
             moverCuadro();
             break;
 
@@ -1256,7 +1280,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            vueltavueltaIzquierda();
+            vueltaIzq();
             moverCuadro();
             break;
         }
@@ -1265,7 +1289,7 @@ void absoluteMove(char cLado) {
         case B_NORTE:
         switch(cLado) {
             case 'N':
-            vueltavueltaDerecha();
+            vueltaDer();
             moverCuadro();
             break;
 
@@ -1275,7 +1299,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            vueltavueltaIzquierda();
+            vueltaIzq();
             moverCuadro();
             break;
 
@@ -1293,7 +1317,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            vueltavueltaIzquierda();
+            vueltaIzq();
             moverCuadro();
             break;
 
@@ -1302,7 +1326,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            vueltavueltaDerecha();
+            vueltaDer();
             moverCuadro();
             break;
         }
@@ -1311,7 +1335,7 @@ void absoluteMove(char cLado) {
         case D_NORTE:
         switch(cLado) {
             case 'N':
-            vueltavueltaIzquierda();
+            vueltaIzq();
             moverCuadro();
             break;
 
@@ -1320,7 +1344,7 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            vueltavueltaDerecha();
+            vueltaDer();
             moverCuadro();
             break;
 
@@ -1961,7 +1985,7 @@ void resolverLaberinto(){
                 LastMove = TO_NORTH;
                 break;
             }
-            vueltavueltaIzquierda();
+            vueltaIzq();
             moverCuadro();
             checarLasts();
         } else if(!A_wall) {
@@ -2012,7 +2036,7 @@ void resolverLaberinto(){
                 LastMove = TO_SOUTH;
                 break;
             }
-            vueltavueltaDerecha();
+            vueltaDer();
             moverCuadro();
             checarLasts();
         } else {
@@ -2381,13 +2405,14 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
-    /*pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
+    pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
     pinMode(S0, OUTPUT);         //Establece  pin de Salida
     pinMode(S1, OUTPUT);         //Establece  pin de Salida
     pinMode(S2, OUTPUT);         //Establece  pin de Salida
-    pinMode(S3, OUTPUT);         //Establece  pin de Salida*/
-    if(!bno.begin())
-        Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    pinMode(S3, OUTPUT);         //Establece  pin de Salida
+    if(!bno.begin()) {
+           Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    }
     bno.setExtCrystalUse(true);
 
     AFMS.begin();
@@ -2422,42 +2447,13 @@ void setup() {
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
-
-    Serial.println("wdddddwwewe");
 }
 
 void loop() {
     /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
-        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
-        checarArray();
-    checarParedes();
-    resolverLaberinto();*/
-
-    sensors_event_t event;
-    bno.getEvent(&event);
-
-    Serial.print(F("Orientation: "));
-    Serial.print((float)event.orientation.x);
-    Serial.print(F(" "));
-    Serial.print((float)event.orientation.y);
-    Serial.print(F(" "));
-    Serial.print((float)event.orientation.z);
-    Serial.println(F(""));
-
-    /* Also send calibration data for each sensor. */
-    uint8_t sys, gyro, accel, mag = 0;
-    bno.getCalibration(&sys, &gyro, &accel, &mag);
-    Serial.print(F("Calibration: "));
-    Serial.print(sys, DEC);
-    Serial.print(F(" "));
-    Serial.print(gyro, DEC);
-    Serial.print(F(" "));
-    Serial.print(accel, DEC);
-    Serial.print(F(" "));
-    Serial.println(mag, DEC);
-
-    Serial.println("wdwwewe");
-    LCD_Write("Ojala", "JALE");
-    delay(1000);
-
+       cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+   checarArray();
+   checarParedes();
+   resolverLaberinto();*/
+   alinear();
 }
