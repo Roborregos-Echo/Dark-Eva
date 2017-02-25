@@ -48,6 +48,9 @@ const byte TO_WEST  = 3;
 // iOrientacion
 const byte A_NORTE = 0;
 const byte B_NORTE = 1;
+
+
+
 const byte C_NORTE = 2;
 const byte D_NORTE = 3;
 
@@ -201,6 +204,8 @@ byte BotonColor;
 
 //********************************************
 //------------------- IMU -------------------
+
+
 float getAngulo() {
     sensors_event_t event;
     bno.getEvent(&event);
