@@ -2520,7 +2520,7 @@ void setup() {
 }
 
 void loop() {
-  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+  /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
    Serial.println("Last " + String(x_last) + "," + String(y_last));
@@ -2541,7 +2541,10 @@ void loop() {
 
    if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
    Serial.println("Pared O");
-   resolverLaberinto();
+   resolverLaberinto();*/
+
+   servoMotor();
+   delay(1000);
 
    /*Serial.print(getSharpCorta(SHARP_A));
     Serial.print("\t");
