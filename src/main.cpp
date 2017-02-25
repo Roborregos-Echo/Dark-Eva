@@ -444,7 +444,7 @@ void alinear() {
             }
             detener();
         }
-    } else if (getSharpCortaAlinear(SHARP_A) < 15.0) {
+    } /*else if (getSharpCortaAlinear(SHARP_A) < 15.0) {
         if (getSharpCorta(SHARP_A) < 5.0) {
             while (getSharpCortaAlinear(SHARP_A) < 5) {
                 reversa();
@@ -456,13 +456,13 @@ void alinear() {
             }
             detener();
         }
-    }
+    }*/
 }
 
 void compensacion() {
     steps = 0;
     avanzar();
-    while (steps <= 3300) {
+    while (steps <= 300) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -475,6 +475,7 @@ void compensacion() {
         derPID.Compute();
         velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
     }
+    alinear();
 }
 
 void vueltaIzq() {
@@ -1328,7 +1329,6 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -1350,7 +1350,6 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -1370,7 +1369,6 @@ void absoluteMove(char cLado) {
         case C_NORTE:
         switch(cLado) {
             case 'N':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -1412,7 +1410,6 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -2540,12 +2537,7 @@ void loop() {
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    checarParedes();
-   resolverLaberinto();
+   resolverLaberinto();*/
 
-
-   //checarMlx();
-   //alinear();*/
-
-
-
+   horizontalIzquierda();
 }
