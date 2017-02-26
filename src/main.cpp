@@ -444,7 +444,7 @@ void alinear() {
             }
             detener();
         }
-    } else if (getSharpCortaAlinear(SHARP_A) < 15.0) {
+    } /*else if (getSharpCortaAlinear(SHARP_A) < 15.0) {
         if (getSharpCorta(SHARP_A) < 5.0) {
             while (getSharpCortaAlinear(SHARP_A) < 5) {
                 reversa();
@@ -456,13 +456,13 @@ void alinear() {
             }
             detener();
         }
-    }
+    }*/
 }
 
 void compensacion() {
     steps = 0;
     avanzar();
-    while (steps <= 3300) {
+    while (steps <= 300) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -475,6 +475,7 @@ void compensacion() {
         derPID.Compute();
         velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
     }
+    alinear();
 }
 
 void vueltaIzq() {
@@ -522,11 +523,17 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            Serial.println(posFinal);
+            Serial.println("\t");
+            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            Serial.println(posFinal);
+            Serial.println("\t");
+            Serial.println(posInicial);
         }
         detener();
     }
@@ -599,11 +606,17 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            Serial.println(posFinal);
+            Serial.println("\t");
+            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            Serial.println(posFinal);
+            Serial.println("\t");
+            Serial.println(posInicial);
         }
         detener();
     }
@@ -676,11 +689,17 @@ void vueltaAtras() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            Serial.println(posFinal);
+            Serial.println("\t");
+            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            Serial.println(posFinal);
+            Serial.println("\t");
+            Serial.println(posInicial);
         }
 
         detener();
@@ -882,6 +901,46 @@ void checarRampa(){
             z_InicioC = z_actual;
         }
     }
+}
+
+//******************************************
+//******************************************
+//--------------SERVO MOTOR-----------------
+//******************************************
+//******************************************
+
+
+//Gira el servo 180 grados
+void servoMotor() {
+    if(servo.read() == 0)
+        servo.write(180);
+    else
+        servo.write(0);
+}
+
+void checarMlx(){
+  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
+  {
+    servoMotor();
+    cuadros[x_actual][y_actual][z_actual].setMlx(true);
+  }
+}
+
+
+//******************************************
+//******************************************
+//---------------INTERRUPTS-----------------
+//******************************************
+//******************************************
+
+bool inFire;
+
+void funcionB(){
+  inFire = true;
+}
+
+void funcionD(){
+  inFire = true;
 }
 
 void moverCuadro() {
@@ -1310,7 +1369,6 @@ void absoluteMove(char cLado) {
             break;
 
             case 'S':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -1332,7 +1390,6 @@ void absoluteMove(char cLado) {
             break;
 
             case 'E':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -1352,7 +1409,6 @@ void absoluteMove(char cLado) {
         case C_NORTE:
         switch(cLado) {
             case 'N':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -1394,7 +1450,6 @@ void absoluteMove(char cLado) {
             break;
 
             case 'O':
-            compensacion();
             vueltaAtras();
             moverCuadro();
             break;
@@ -2287,57 +2342,6 @@ void checarArray(){
     }
 }
 
-//******************************************
-//******************************************
-//--------------SERVO MOTOR-----------------
-//******************************************
-//******************************************
-
-
-//Gira el servo 180 grados
-void servoMotor() {
-    if(servo.read() == 0)
-        servo.write(180);
-    else
-        servo.write(0);
-}
-
-void checarMlx(){
-  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
-  {
-    servoMotor();
-    cuadros[x_actual][y_actual][z_actual].setMlx(true);
-  }
-}
-
-
-//******************************************
-//******************************************
-//---------------INTERRUPTS-----------------
-//******************************************
-//******************************************
-
-
-void funcionB(){
-  //vueltaIzq();
-  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
-  {
-    servoMotor();
-    cuadros[x_actual][y_actual][z_actual].setMlx(true);
-  }
-  //vueltaDer();
-}
-
-void funcionD(){
-  //vueltaDer();
-  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
-  {
-    servoMotor();
-    cuadros[x_actual][y_actual][z_actual].setMlx(true);
-  }
-  //vueltaIzq();
-}
-
 void LackOfProgress(){
 
   for(int i=0; i<TOTAL_GRID_MAX; i++){
@@ -2464,11 +2468,11 @@ void LCD_Blink(byte n) {
 
 void setup() {
     Serial.begin(9600);
-    //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    //pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    //attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
+    pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
@@ -2516,18 +2520,15 @@ void setup() {
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
-    delay(5000);
+    pinMode(13, OUTPUT);
+    pinMode(6, INPUT);
 }
 
 void loop() {
-  /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+ /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
-   Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
-   Serial.println("Last " + String(x_last) + "," + String(y_last));
-   Serial.println("Last2 " + String(x_last2) + "," + String(y_last2));
-   Serial.println("ORIENTACION: " + String(iOrientacion));
+
    checarArray();
-   Serial.println(String(x_actual) + "," + String(y_actual));
    checarParedes();
 
    if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
@@ -2543,8 +2544,17 @@ void loop() {
    Serial.println("Pared O");
    resolverLaberinto();*/
 
-   servoMotor();
-   delay(1000);
+   avanzar();
+   if(inFire)
+   {
+     detener();
+     vueltaIzq();
+     delay(2500);
+     servoMotor();
+     delay(2500);
+     vueltaDer();
+     inFire = false;
+   }
 
    /*Serial.print(getSharpCorta(SHARP_A));
     Serial.print("\t");
@@ -2565,4 +2575,5 @@ void loop() {
 
    //checarMlx();
    //alinear();
+
 }
