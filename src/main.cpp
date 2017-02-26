@@ -1,14 +1,20 @@
-//********************************************
-//********************************************
-//                  E V A
-//********************************************
-//-------------- VERSIÓN 1.0.6 ---------------
-//----------- 24 / FEBRERO / 2017 ------------
-//********************************************
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////                                         ///////////////////
+///////////////////                 E V A                   ///////////////////
+///////////////////                                         ///////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//------------------------------ VERSIÓN 1.0.6 --------------------------------
+//--------------------------- 26 / FEBRERO / 2017 -----------------------------
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
+//********************************************
 //********************************************
 //---------------- LIBRERÍAS ----------------
+//********************************************
 //********************************************
 #include <Arduino.h>
 #include <Adafruit_Sensor.h>
@@ -22,8 +28,11 @@
 #include <PID_v1.h>
 
 
+
+//********************************************
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
+//********************************************
 //********************************************
 
 
@@ -70,8 +79,10 @@ byte    x_last2 = 255;
 byte    y_last2 = 255;
 
 // Varias
+byte x_InicioB = 255;
+byte y_InicioB = 255;
+byte z_InicioB = 255;
 byte x_inicio, y_inicio, z_inicio;
-byte x_InicioB = 255; byte y_InicioB = 255; byte z_InicioB = 255;
 byte x_InicioC, y_InicioC, z_InicioC;
 bool shortMove, Last, Last2;
 bool A_wall, B_wall, C_wall, D_wall;
@@ -91,6 +102,10 @@ Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
 Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
 Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
 
+
+//******************************************
+//--------------- MOTORES ------------------
+
 const int VEL_MOTOR_90  = 153;
 const int VEL_MOTOR_150 = 93;
 
@@ -103,7 +118,6 @@ const int VEL_MOTOR_150_RAMPA = 155;
 const int ENC1   = 18;
 const int ENC2   = 19;
 unsigned long steps = 0;
-
 
 
 //******************************************
@@ -130,6 +144,7 @@ const int SHARP_D2  = 7;
 const int SHARP_LA  = 0;
 const int SHARP_LC  = 11;
 
+
 //******************************************
 //------------- PATHFINDING ----------------
 const int GRID_MAX = X_MAX * Y_MAX;
@@ -139,16 +154,20 @@ int closedList[GRID_MAX];
 int backList[GRID_MAX];
 int Neighbors[4];
 
+
 //******************************************
 //-------------RAMPA ALGORITHM--------------
-bool Piso1 = false; bool Piso2 = false; bool Piso3 = false;
-bool GridOriginal[GRID_MAX];
+bool Piso1 = false;
+bool Piso2 = false;
+bool Piso3 = false;
 bool Fusion = false;        // Cambiar a true cuando se junten los pisos
+bool GridOriginal[GRID_MAX];
 
 byte RampaDiff = 4;
 byte PisoReal  = 0;
 byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
+
 
 //******************************************
 //-------------- CHECKPOINT ----------------
@@ -156,17 +175,14 @@ const int TOTAL_GRID_MAX = X_MAX * Y_MAX * Z_MAX;
 byte checkList1[GRID_MAX];
 byte checkList2[GRID_MAX];
 
+
 //******************************************
 //---------------INTERRUPTS-----------------
 #define interruptB 2
 #define interruptD 3
 
-void addStep()
-{
-  steps++;
-}
-//******************************************
 
+//******************************************
 //--------------SERVO MOTOR-----------------
 #define servoPin 9 //PWM
 Servo servo;
@@ -196,8 +212,11 @@ byte BotonColor;
 
 
 //********************************************
+//********************************************
 //---------------- FUNCIONES ----------------
 //********************************************
+//********************************************
+
 
 //********************************************
 //------------------- IMU -------------------
@@ -209,7 +228,7 @@ float getAngulo() {
 
 
 //********************************************
-//---------------- MOVIMIENTO ----------------
+//----------------- MOTORES ------------------
 void avanzar() {
     MotorAI -> run(FORWARD);
     MotorAD -> run(FORWARD);
@@ -261,7 +280,7 @@ void horizontalIzquierda() {
 
 
 //******************************************
-//----------- SHARP GP2Y0A21YK -------------
+//----------------- SHARP ------------------
 float getSharpCorta(int iSharp) {
     //int sharp = 2316.6 *(0.985 / analogRead(A7));
     float sharpRead[8];
@@ -316,58 +335,15 @@ float getSharpLarga(int iSharp) {
 }
 
 
-float getSharpCortaAlinear(int iSharp) {
-    //int sharp = 2316.6 *(0.985 / analogRead(A7));
-    float sharpRead[8];
-    float resultado;
-    for(int i = 0; i < 8; i++) {
-        sharpRead[i] = analogRead(iSharp);
-    }
-
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
-            int temp;
-            if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
-                sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = temp;
-            }
-        }
-    }
-
-    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
-        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
-    else
-        resultado = 30;
-    return resultado;
-}
-
-float getSharpLargaAlinear(int iSharp) {
-    float sharpRead[8];
-    float resultado;
-    for(int i = 0; i < 8; i++) {
-        sharpRead[i] = analogRead(iSharp);
-    }
-
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
-            int temp;
-            if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
-                sharpRead[i + 1] = sharpRead[i];
-                sharpRead[i] = temp;
-            }
-        }
-    }
-
-    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
-        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
-    else
-        resultado = -1;
-    return resultado;
+//******************************************
+//---------------- ENCODER -----------------
+void addStep(){
+  steps++;
 }
 
 
+//******************************************
+//--------------- MOVIMIENTO ---------------
 void velocidad(int ai, int ad, int ci, int cd) {
     if(ai >= 255)
         MotorAI -> setSpeed(255);
@@ -392,66 +368,66 @@ void velocidad(int ai, int ad, int ci, int cd) {
 
 void alinear() {
     velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
-    if(getSharpCortaAlinear(SHARP_B1) < 15.0 && getSharpCortaAlinear(SHARP_D1) < 15.0) {
-        while (abs(getSharpCortaAlinear(SHARP_B1) - getSharpCortaAlinear(SHARP_D1)) > 1) {
-            while(getSharpCortaAlinear(SHARP_B1) - getSharpCortaAlinear(SHARP_D1) > 1)
+    if(getSharpCorta(SHARP_B1) < 15.0 && getSharpCorta(SHARP_D1) < 15.0) {
+        while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
+            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1)
                 horizontalDerecha();
             detener();
-            while(getSharpCortaAlinear(SHARP_D1) - getSharpCortaAlinear(SHARP_B1) > 1)
+            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1)
                 horizontalIzquierda();
             detener();
         }
-    } else if(getSharpCortaAlinear(SHARP_B1) < 15.0) {
-        while (!(getSharpCortaAlinear(SHARP_B1) > 6.0 && getSharpCortaAlinear(SHARP_B1) < 7.0)) {
-            while (getSharpCortaAlinear(SHARP_B1) < 6.0) {
+    } else if(getSharpCorta(SHARP_B1) < 15.0) {
+        while (!(getSharpCorta(SHARP_B1) > 6.0 && getSharpCorta(SHARP_B1) < 7.0)) {
+            while (getSharpCorta(SHARP_B1) < 6.0) {
                 horizontalIzquierda();
             }
             detener();
-            while (getSharpCortaAlinear(SHARP_B1) > 7.0) {
+            while (getSharpCorta(SHARP_B1) > 7.0) {
                 horizontalDerecha();
             }
             detener();
         }
-        if (getSharpCortaAlinear(SHARP_B1) - getSharpCortaAlinear(SHARP_B2) > 1 ) {
-            while (getSharpCortaAlinear(SHARP_B2) + 0.5 > getSharpCortaAlinear(SHARP_B1)) {
+        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 1 ) {
+            while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
                 vueltaIzquierda();
             }
             detener();
-        } else if (getSharpCortaAlinear(SHARP_B2) - getSharpCortaAlinear(SHARP_B1) > 1 ) {
-            while (getSharpCortaAlinear(SHARP_B1) + 0.5 > getSharpCortaAlinear(SHARP_B2)) {
+        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 1 ) {
+            while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
                 vueltaDerecha();
             }
             detener();
         }
-    } else if(getSharpCortaAlinear(SHARP_D1) < 15.0) {
-        while (!(getSharpCortaAlinear(SHARP_D1) > 6.0 && getSharpCortaAlinear(SHARP_D1) < 7.0)) {
-            while (getSharpCortaAlinear(SHARP_D1) < 6.0) {
+    } else if(getSharpCorta(SHARP_D1) < 15.0) {
+        while (!(getSharpCorta(SHARP_D1) > 6.0 && getSharpCorta(SHARP_D1) < 7.0)) {
+            while (getSharpCorta(SHARP_D1) < 6.0) {
                 horizontalDerecha();
             }
-            while (getSharpCortaAlinear(SHARP_D1) > 7.0) {
+            while (getSharpCorta(SHARP_D1) > 7.0) {
                 horizontalIzquierda();
             }
             detener();
         }
-        if (getSharpCortaAlinear(SHARP_D1) - getSharpCortaAlinear(SHARP_D2) > 1 ) {
-            while (getSharpCortaAlinear(SHARP_D2) + 0.5 > getSharpCortaAlinear(SHARP_D1)) {
+        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 1 ) {
+            while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
                 vueltaDerecha();
             }
             detener();
-        } else if (getSharpCortaAlinear(SHARP_D2) - getSharpCortaAlinear(SHARP_D1) > 1 ) {
-            while (getSharpCortaAlinear(SHARP_D1) + 0.5 > getSharpCortaAlinear(SHARP_D2)) {
+        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 1 ) {
+            while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
                 vueltaIzquierda();
             }
             detener();
         }
-    } /*else if (getSharpCortaAlinear(SHARP_A) < 15.0) {
+    } /*else if (getSharpCorta(SHARP_A) < 15.0) {
         if (getSharpCorta(SHARP_A) < 5.0) {
-            while (getSharpCortaAlinear(SHARP_A) < 5) {
+            while (getSharpCorta(SHARP_A) < 5) {
                 reversa();
             }
             detener();
-        } else if (getSharpCortaAlinear(SHARP_A) > 7 && getSharpCortaAlinear(SHARP_A) < 15.0) {
-            while (getSharpCortaAlinear(SHARP_A) > 7) {
+        } else if (getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 15.0) {
+            while (getSharpCorta(SHARP_A) > 7) {
                 avanzar();
             }
             detener();
