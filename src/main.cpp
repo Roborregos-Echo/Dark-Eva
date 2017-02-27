@@ -10,7 +10,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-    
+void resolverLaberinto();
+
+
 //********************************************
 //********************************************
 //---------------- LIBRERÍAS ----------------
@@ -157,12 +159,15 @@ int Neighbors[4];
 
 //******************************************
 //-------------RAMPA ALGORITHM--------------
+const byte ABAJO = 1; const byte ARRIBA = 2;
+
 bool Piso1 = false;
 bool Piso2 = false;
 bool Piso3 = false;
 bool Fusion = false;        // Cambiar a true cuando se junten los pisos
 bool GridOriginal[GRID_MAX];
 
+byte firstFloor = 0;
 byte RampaDiff = 4;
 byte PisoReal  = 0;
 byte MoveL1, MoveL2;
@@ -771,10 +776,44 @@ class Cuadro {
 
 Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
 
+void setWall(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+        C_wall = true;
+        break;
+
+        case TO_EAST:
+        cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+        C_wall = true;
+        break;
+
+        case TO_SOUTH:
+        cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+        C_wall = true;
+        break;
+
+        case TO_WEST:
+        cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+        C_wall = true;
+        break;
+    }
+}
+
 
 void checarRampa(){
     if(subirRampa or bajarRampa)
     {
+        if(firstFloor == 0)
+        {
+            if(subirRampa)
+            firstFloor = ABAJO;
+
+            if(bajarRampa)
+            firstFloor = ARRIBA;
+        }
+
         switch(LastMove)
         {
             case TO_NORTH:
@@ -794,130 +833,22 @@ void checarRampa(){
             break;
         }
 
-        if(subirRampa)
+        if(firstFloor == ABAJO)
         {
-            if(Piso3 and Fusion)
-            z_actual++;
-            else
-            if(Piso3 and !Fusion)
-            z_actual--;
-            else
-            z_actual++;
-
-            PisoReal++;
-            subirRampa = false;
-        }
-        else
-        if(bajarRampa)
-        {
-            if(Piso2 or Piso3)
-            z_actual--;
-            else
-            z_actual++;
-        }
-
-        if(z_actual == 0)
-        {
-            switch(LastMove)
+            if(subirRampa)
             {
-                case TO_NORTH:
-                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
-                break;
-
-                case TO_EAST:
-                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
-                break;
-
-                case TO_SOUTH:
-                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-                break;
-
-                case TO_WEST:
-                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-                break;
-            }
-        }
-        else
-        if(z_actual == 1)
-        {
-            if(z_InicioB == 255)
-            {
-                x_InicioB = x_actual;
-                y_InicioB = y_actual;
-                z_InicioB = z_actual;
-                MoveL1 = LastMove;
-            }
-            else
-            {
-                switch(LastMove)
+                if(Piso3 and !Fusion)
                 {
-                    case TO_NORTH:
-                    cuadros[x_actual][y_actual][z_actual].setPared('S', true);
-                    break;
-
-                    case TO_EAST:
-                    cuadros[x_actual][y_actual][z_actual].setPared('O', true);
-                    break;
-
-                    case TO_SOUTH:
-                    cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-                    break;
-
-                    case TO_WEST:
-                    cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-                    break;
+                    z_actual++;
+                    setWall();
+                    resolverLaberinto();
                 }
             }
         }
-        else
-        if(z_actual == 2)
-        {
-            x_InicioC = x_actual;
-            y_InicioC = y_actual;
-            z_InicioC = z_actual;
-        }
+
     }
 }
 
-//******************************************
-//******************************************
-//--------------SERVO MOTOR-----------------
-//******************************************
-//******************************************
-
-
-//Gira el servo 180 grados
-void servoMotor() {
-    if(servo.read() == 0)
-        servo.write(180);
-    else
-        servo.write(0);
-}
-
-void checarMlx(){
-  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
-  {
-    servoMotor();
-    cuadros[x_actual][y_actual][z_actual].setMlx(true);
-  }
-}
-
-
-//******************************************
-//******************************************
-//---------------INTERRUPTS-----------------
-//******************************************
-//******************************************
-
-bool inFire;
-
-void funcionB(){
-  inFire = true;
-}
-
-void funcionD(){
-  inFire = true;
-}
 
 void moverCuadro() {
     unsigned long inicio = 0;
@@ -1047,288 +978,6 @@ void moverCuadro() {
     permisoRampa = true;
 }
 
-
-byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
-    return fabs(x_final - x_inicial) + fabs(y_final - y_inicial);
-}
-
-//Formula para identificar un cuadro (x,y) en una de las listas
-int coordToGrid(byte x, byte y) {
-    return x + (y * X_MAX);
-}
-
-//Formula para identificar un 'num' en un cuadro (x,y)
-byte gridToCoord(byte grid, char eje) {
-    if(eje == 'x')
-    return grid % X_MAX;
-    else if(eje == 'y')
-    return grid / X_MAX;
-}
-
-byte totalGridToCoord(int grid, char eje) {
-    byte z = grid/ (X_MAX*Y_MAX);
-    byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
-    byte x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
-
-    switch (eje)
-    {
-      case 'x':
-      return x;
-      break;
-
-      case 'y':
-      return y;
-      break;
-
-      case 'z':
-      return z;
-      break;
-    }
-}
-
-int totalCoordToGrid(byte x, byte y, byte z){
-  return x + (y * X_MAX) + (z * (X_MAX * Y_MAX));
-}
-
-//******************************************
-//---------------TCS3200------------------
-
-/* Cambia la frecuencia del sensor:
-*  0 = filtro apagado
-*  2 = filtro del 2%
-*  20 = filtro del 20%
-*  100 = filtro del 100%
-*/
-void setFrecuencia(byte frecuencia){
-    switch(frecuencia) {
-        case 0:
-        digitalWrite(S0, LOW);
-        digitalWrite(S1, LOW);
-        break;
-
-        case 2:
-        digitalWrite(S0, LOW);
-        digitalWrite(S1, HIGH);
-        break;
-
-        case 20:
-        digitalWrite(S0, HIGH);
-        digitalWrite(S1, LOW);
-        break;
-
-        case 100:
-        digitalWrite(S0, HIGH);
-        digitalWrite(S1, HIGH);
-        break;
-    }
-}
-
-
-/* Cambia el filtro del sensor:
-*  'N' = Sin filtro
-*  'R' = Filtro rojo
-*  'G' = Filtro verde
-*  'B' = Filtro azul
-*/
-void setFiltro(char filtro){
-    switch(filtro) {
-        case 'N':
-        digitalWrite(S2, HIGH);
-        digitalWrite(S3, LOW);
-        break;
-
-        case 'R':
-        digitalWrite(S2, LOW);
-        digitalWrite(S3, LOW);
-        break;
-
-        case 'G':
-        digitalWrite(S2, HIGH);
-        digitalWrite(S3, HIGH);
-        break;
-
-        case 'B':
-        digitalWrite(S2, LOW);
-        digitalWrite(S3, HIGH);
-        break;
-    }
-}
-
-// Valor que retorna el sensor
-int getColor(){
-    return (pulseIn(sensorOut, LOW));
-}
-
-// Funcion para calibrar los colores que se usaran
-void calibrarColor(){
-    while(EstadoColor == ESTADO_OFF) {
-        Serial.println("Calibrar...");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            //*Limpia la pantalla
-            EstadoColor = ESTADO_NEGRO;
-            delay(1000);
-        }
-    }
-
-    while(EstadoColor == ESTADO_NEGRO) {
-        Serial.println("Calibrar Negro");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            setFiltro('N');
-            iN_NEGRO = getColor();
-
-            setFiltro('R');
-            iR_NEGRO = getColor();
-
-            setFiltro('G');
-            iV_NEGRO = getColor();
-
-            setFiltro('B');
-            iA_NEGRO = getColor();
-
-            //*Limpia la pantalla
-            delay(1000);
-            EstadoColor = ESTADO_CHECKPOINT;
-        }
-    }
-
-    while(EstadoColor == ESTADO_CHECKPOINT) {
-        Serial.println("Calibrar Checkpoint");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            setFiltro('N');
-            iN_CHECKPOINT = getColor();
-
-            setFiltro('R');
-            iR_CHECKPOINT = getColor();
-
-            setFiltro('G');
-            iV_CHECKPOINT = getColor();
-
-            setFiltro('B');
-            iA_CHECKPOINT = getColor();
-
-            //*Limpia la pantalla
-            EstadoColor = ESTADO_LISTO;
-            delay(1000);
-        }
-    }
-
-    while(EstadoColor == ESTADO_LISTO) {
-        Serial.println("Listo...");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            //*Limpia la pantalla
-            EstadoColor++;
-            //*Pasa al siguiente estado
-        }
-    }
-}
-
-// Regresa true si el sensor detecta el color que declares en el parametro
-// respetando el margen elegido
-bool checarCuadroColor(byte cuadro, byte margen) {
-    setFiltro('N');
-    iNone = getColor();
-
-    setFiltro('R');
-    iRojo = getColor();
-
-    setFiltro('G');
-    iVerde = getColor();
-
-    setFiltro('B');
-    iAzul = getColor();
-
-    switch (cuadro) {
-        case COLOR_NEGRO:
-        if(iNone <= iN_NEGRO+margen and iNone >= iN_NEGRO-margen and iRojo <= iR_NEGRO+margen and iRojo >= iR_NEGRO-margen
-        and iVerde <= iV_NEGRO+margen and iVerde >= iV_NEGRO-margen and iAzul <= iA_NEGRO+margen and iAzul >= iA_NEGRO-margen)
-            return true;
-        else
-            return false;
-        break;
-
-        case COLOR_CHECKPOINT:
-        if(iNone <= iN_CHECKPOINT+margen and iNone >= iN_CHECKPOINT-margen and iRojo <= iR_CHECKPOINT+margen and iRojo >= iR_CHECKPOINT-margen
-        and iVerde <= iV_CHECKPOINT+margen and iVerde >= iV_CHECKPOINT-margen and iAzul <= iA_CHECKPOINT+margen and iAzul >= iA_CHECKPOINT-margen)
-            return true;
-        else
-            return false;
-        break;
-
-        default:
-        return false;
-    }
-}
-
-
-void checarCheckpoint(){
-
-    int TotalGrid;
-
-    if(checarCuadroColor(CHECKPOINT, 20))
-    {
-      for(int z=0; z<Z_MAX; z++)
-      {
-        for(int y = 0; y < Y_MAX; y++)
-        {
-          for(int x = 0; x < X_MAX; x++)
-          {
-            TotalGrid = totalCoordToGrid(x, y, z);
-
-            if(cuadros[x][y][z].getMlx())
-            checkList1[TotalGrid] += 16;
-
-            if(cuadros[x][y][z].getPared('S'))
-            checkList1[TotalGrid] += 8;
-
-            if(cuadros[x][y][z].getPared('E'))
-            checkList1[TotalGrid] += 4;
-
-            if(cuadros[x][y][z].getPared('N'))
-            checkList1[TotalGrid] += 2;
-
-            if(cuadros[x][y][z].getPared('O'))
-            checkList1[TotalGrid] += 1;
-
-            switch(cuadros[x][y][z].getEstado()){
-                case NO_EXISTE:
-                checkList2[TotalGrid] = 0;
-                break;
-
-                case SIN_RECORRER:
-                checkList2[TotalGrid] = 1;
-                break;
-
-                case RECORRIDO:
-                checkList2[TotalGrid] = 2;
-                break;
-
-                case CHECKPOINT:
-                checkList2[TotalGrid] = 3;
-                break;
-
-                case NEGRO:
-                checkList2[TotalGrid] = 4;
-                break;
-
-                case RAMPA:
-                checkList2[TotalGrid] = 5;
-                break;
-
-                case INICIO:
-                checkList2[TotalGrid] = 6;
-                break;
-            }
-
-          }
-        }
-      }
-    }
-
-}
 
 void absoluteMove(char cLado) {
     switch (iOrientacion) {
@@ -1468,6 +1117,48 @@ void agregarLast(char cSentido){
         break;
     }
     Last = true;
+}
+
+//Formula para identificar un cuadro (x,y) en una de las listas
+int coordToGrid(byte x, byte y) {
+    return x + (y * X_MAX);
+}
+
+//Formula para identificar un 'num' en un cuadro (x,y)
+byte gridToCoord(byte grid, char eje) {
+    if(eje == 'x')
+    return grid % X_MAX;
+    else if(eje == 'y')
+    return grid / X_MAX;
+}
+
+byte totalGridToCoord(int grid, char eje) {
+    byte z = grid/ (X_MAX*Y_MAX);
+    byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
+    byte x = ( grid - ((X_MAX*Y_MAX)*z) ) % X_MAX;
+
+    switch (eje)
+    {
+      case 'x':
+      return x;
+      break;
+
+      case 'y':
+      return y;
+      break;
+
+      case 'z':
+      return z;
+      break;
+    }
+}
+
+int totalCoordToGrid(byte x, byte y, byte z){
+  return x + (y * X_MAX) + (z * (X_MAX * Y_MAX));
+}
+
+byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
+    return fabs(x_final - x_inicial) + fabs(y_final - y_inicial);
 }
 
 //******************************************
@@ -2036,6 +1727,75 @@ void checarLasts(){
 }
 
 
+//Verificar si en el for i es i>1 o i>0 (probar)
+void recorrerX(){
+    Serial.println("Recorrer X");
+    for(int k=0; k<Z_MAX; k++){
+        for(int j=0; j<Y_MAX; j++) {
+            for(int i=X_MAX-1; i>0; i--) {
+                cuadros[i][j][k].setEstado(cuadros[i-1][j][k].getEstado());
+                cuadros[i][j][k].setPared('N', cuadros[i-1][j][k].getPared('N'));
+                cuadros[i][j][k].setPared('E', cuadros[i-1][j][k].getPared('E'));
+                cuadros[i][j][k].setPared('S', cuadros[i-1][j][k].getPared('S'));
+                cuadros[i][j][k].setPared('O', cuadros[i-1][j][k].getPared('O'));
+                cuadros[i][j][k].setMlx(cuadros[i-1][j][k].getMlx());
+            }
+            cuadros[0][j][k].setEstado(NO_EXISTE);
+            cuadros[0][j][k].setPared('N', false);
+            cuadros[0][j][k].setPared('E', false);
+            cuadros[0][j][k].setPared('S', false);
+            cuadros[0][j][k].setPared('O', false);
+            cuadros[0][j][k].setMlx(false);
+        }
+    }
+
+    x_actual++;
+    x_inicio++;
+    x_InicioB++;
+    x_InicioC++;
+
+    if(x_last != 255 and y_last != 255)
+        x_last++;
+
+    if(x_last2 != 255 and y_last2 != 255)
+        x_last2++;
+    //boolRecorrerX = true;
+}
+
+void recorrerY(){
+    Serial.println("Recorrer Y");
+    for(int k=0; k<Z_MAX; k++){
+        for(int j=0; j<X_MAX; j++) {
+            for(int i=Y_MAX-1; i>0; i--){
+                cuadros[j][i][k].setEstado(cuadros[j][i-1][k].getEstado());
+                cuadros[j][i][k].setPared('N', cuadros[j][i-1][k].getPared('N'));
+                cuadros[j][i][k].setPared('E', cuadros[j][i-1][k].getPared('E'));
+                cuadros[j][i][k].setPared('S', cuadros[j][i-1][k].getPared('S'));
+                cuadros[j][i][k].setPared('O', cuadros[j][i-1][k].getPared('O'));
+                cuadros[j][i][k].setMlx(cuadros[i-1][j][k].getMlx());
+            }
+            cuadros[j][0][k].setEstado(NO_EXISTE);
+            cuadros[j][0][k].setPared('N', false);
+            cuadros[j][0][k].setPared('E', false);
+            cuadros[j][0][k].setPared('S', false);
+            cuadros[j][0][k].setPared('O', false);
+            cuadros[j][0][k].setMlx(false);
+        }
+    }
+
+    y_actual++;
+    y_inicio++;
+    y_InicioB++;
+    y_InicioC++;
+
+    if(x_last != 255 and y_last != 255)
+        y_last++;
+
+    if(x_last2 != 255 and y_last2 != 255)
+        y_last2++;
+    //boolRecorrerY = true;
+}
+
 void resolverLaberinto(){
     if(shortMove) {
         Serial.println("ENTRE AL SHORTMOVE");
@@ -2240,73 +2000,285 @@ void resolverLaberinto(){
 }
 
 
-//Verificar si en el for i es i>1 o i>0 (probar)
-void recorrerX(){
-    Serial.println("Recorrer X");
-    for(int k=0; k<Z_MAX; k++){
-        for(int j=0; j<Y_MAX; j++) {
-            for(int i=X_MAX-1; i>0; i--) {
-                cuadros[i][j][k].setEstado(cuadros[i-1][j][k].getEstado());
-                cuadros[i][j][k].setPared('N', cuadros[i-1][j][k].getPared('N'));
-                cuadros[i][j][k].setPared('E', cuadros[i-1][j][k].getPared('E'));
-                cuadros[i][j][k].setPared('S', cuadros[i-1][j][k].getPared('S'));
-                cuadros[i][j][k].setPared('O', cuadros[i-1][j][k].getPared('O'));
-                cuadros[i][j][k].setMlx(cuadros[i-1][j][k].getMlx());
-            }
-            cuadros[0][j][k].setEstado(NO_EXISTE);
-            cuadros[0][j][k].setPared('N', false);
-            cuadros[0][j][k].setPared('E', false);
-            cuadros[0][j][k].setPared('S', false);
-            cuadros[0][j][k].setPared('O', false);
-            cuadros[0][j][k].setMlx(false);
-        }
-    }
+//******************************************
+//******************************************
+//--------------SERVO MOTOR-----------------
+//******************************************
+//******************************************
 
-    x_actual++;
-    x_inicio++;
-    x_InicioB++;
-    x_InicioC++;
 
-    if(x_last != 255 and y_last != 255)
-        x_last++;
-
-    if(x_last2 != 255 and y_last2 != 255)
-        x_last2++;
-    //boolRecorrerX = true;
+//Gira el servo 180 grados
+void servoMotor() {
+    if(servo.read() == 0)
+        servo.write(180);
+    else
+        servo.write(0);
 }
 
-void recorrerY(){
-    Serial.println("Recorrer Y");
-    for(int k=0; k<Z_MAX; k++){
-        for(int j=0; j<X_MAX; j++) {
-            for(int i=Y_MAX-1; i>0; i--){
-                cuadros[j][i][k].setEstado(cuadros[j][i-1][k].getEstado());
-                cuadros[j][i][k].setPared('N', cuadros[j][i-1][k].getPared('N'));
-                cuadros[j][i][k].setPared('E', cuadros[j][i-1][k].getPared('E'));
-                cuadros[j][i][k].setPared('S', cuadros[j][i-1][k].getPared('S'));
-                cuadros[j][i][k].setPared('O', cuadros[j][i-1][k].getPared('O'));
-                cuadros[j][i][k].setMlx(cuadros[i-1][j][k].getMlx());
-            }
-            cuadros[j][0][k].setEstado(NO_EXISTE);
-            cuadros[j][0][k].setPared('N', false);
-            cuadros[j][0][k].setPared('E', false);
-            cuadros[j][0][k].setPared('S', false);
-            cuadros[j][0][k].setPared('O', false);
-            cuadros[j][0][k].setMlx(false);
+void checarMlx(){
+  if(!cuadros[x_actual][y_actual][z_actual].getMlx())
+  {
+    servoMotor();
+    cuadros[x_actual][y_actual][z_actual].setMlx(true);
+  }
+}
+
+
+//******************************************
+//******************************************
+//---------------INTERRUPTS-----------------
+//******************************************
+//******************************************
+
+bool inFire;
+
+void funcionB(){
+  inFire = true;
+}
+
+void funcionD(){
+  inFire = true;
+}
+
+
+//******************************************
+//---------------TCS3200------------------
+
+/* Cambia la frecuencia del sensor:
+*  0 = filtro apagado
+*  2 = filtro del 2%
+*  20 = filtro del 20%
+*  100 = filtro del 100%
+*/
+void setFrecuencia(byte frecuencia){
+    switch(frecuencia) {
+        case 0:
+        digitalWrite(S0, LOW);
+        digitalWrite(S1, LOW);
+        break;
+
+        case 2:
+        digitalWrite(S0, LOW);
+        digitalWrite(S1, HIGH);
+        break;
+
+        case 20:
+        digitalWrite(S0, HIGH);
+        digitalWrite(S1, LOW);
+        break;
+
+        case 100:
+        digitalWrite(S0, HIGH);
+        digitalWrite(S1, HIGH);
+        break;
+    }
+}
+
+
+/* Cambia el filtro del sensor:
+*  'N' = Sin filtro
+*  'R' = Filtro rojo
+*  'G' = Filtro verde
+*  'B' = Filtro azul
+*/
+void setFiltro(char filtro){
+    switch(filtro) {
+        case 'N':
+        digitalWrite(S2, HIGH);
+        digitalWrite(S3, LOW);
+        break;
+
+        case 'R':
+        digitalWrite(S2, LOW);
+        digitalWrite(S3, LOW);
+        break;
+
+        case 'G':
+        digitalWrite(S2, HIGH);
+        digitalWrite(S3, HIGH);
+        break;
+
+        case 'B':
+        digitalWrite(S2, LOW);
+        digitalWrite(S3, HIGH);
+        break;
+    }
+}
+
+// Valor que retorna el sensor
+int getColor(){
+    return (pulseIn(sensorOut, LOW));
+}
+
+// Funcion para calibrar los colores que se usaran
+void calibrarColor(){
+    while(EstadoColor == ESTADO_OFF) {
+        Serial.println("Calibrar...");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            //*Limpia la pantalla
+            EstadoColor = ESTADO_NEGRO;
+            delay(1000);
         }
     }
 
-    y_actual++;
-    y_inicio++;
-    y_InicioB++;
-    y_InicioC++;
+    while(EstadoColor == ESTADO_NEGRO) {
+        Serial.println("Calibrar Negro");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            setFiltro('N');
+            iN_NEGRO = getColor();
 
-    if(x_last != 255 and y_last != 255)
-        y_last++;
+            setFiltro('R');
+            iR_NEGRO = getColor();
 
-    if(x_last2 != 255 and y_last2 != 255)
-        y_last2++;
-    //boolRecorrerY = true;
+            setFiltro('G');
+            iV_NEGRO = getColor();
+
+            setFiltro('B');
+            iA_NEGRO = getColor();
+
+            //*Limpia la pantalla
+            delay(1000);
+            EstadoColor = ESTADO_CHECKPOINT;
+        }
+    }
+
+    while(EstadoColor == ESTADO_CHECKPOINT) {
+        Serial.println("Calibrar Checkpoint");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            setFiltro('N');
+            iN_CHECKPOINT = getColor();
+
+            setFiltro('R');
+            iR_CHECKPOINT = getColor();
+
+            setFiltro('G');
+            iV_CHECKPOINT = getColor();
+
+            setFiltro('B');
+            iA_CHECKPOINT = getColor();
+
+            //*Limpia la pantalla
+            EstadoColor = ESTADO_LISTO;
+            delay(1000);
+        }
+    }
+
+    while(EstadoColor == ESTADO_LISTO) {
+        Serial.println("Listo...");
+        BotonColor = digitalRead(BOTON_COLOR);
+        if(BotonColor == 1) {
+            //*Limpia la pantalla
+            EstadoColor++;
+            //*Pasa al siguiente estado
+        }
+    }
+}
+
+// Regresa true si el sensor detecta el color que declares en el parametro
+// respetando el margen elegido
+bool checarCuadroColor(byte cuadro, byte margen) {
+    setFiltro('N');
+    iNone = getColor();
+
+    setFiltro('R');
+    iRojo = getColor();
+
+    setFiltro('G');
+    iVerde = getColor();
+
+    setFiltro('B');
+    iAzul = getColor();
+
+    switch (cuadro) {
+        case COLOR_NEGRO:
+        if(iNone <= iN_NEGRO+margen and iNone >= iN_NEGRO-margen and iRojo <= iR_NEGRO+margen and iRojo >= iR_NEGRO-margen
+        and iVerde <= iV_NEGRO+margen and iVerde >= iV_NEGRO-margen and iAzul <= iA_NEGRO+margen and iAzul >= iA_NEGRO-margen)
+            return true;
+        else
+            return false;
+        break;
+
+        case COLOR_CHECKPOINT:
+        if(iNone <= iN_CHECKPOINT+margen and iNone >= iN_CHECKPOINT-margen and iRojo <= iR_CHECKPOINT+margen and iRojo >= iR_CHECKPOINT-margen
+        and iVerde <= iV_CHECKPOINT+margen and iVerde >= iV_CHECKPOINT-margen and iAzul <= iA_CHECKPOINT+margen and iAzul >= iA_CHECKPOINT-margen)
+            return true;
+        else
+            return false;
+        break;
+
+        default:
+        return false;
+    }
+}
+
+
+void checarCheckpoint(){
+
+    int TotalGrid;
+
+    if(checarCuadroColor(CHECKPOINT, 20))
+    {
+      for(int z=0; z<Z_MAX; z++)
+      {
+        for(int y = 0; y < Y_MAX; y++)
+        {
+          for(int x = 0; x < X_MAX; x++)
+          {
+            TotalGrid = totalCoordToGrid(x, y, z);
+
+            if(cuadros[x][y][z].getMlx())
+            checkList1[TotalGrid] += 16;
+
+            if(cuadros[x][y][z].getPared('S'))
+            checkList1[TotalGrid] += 8;
+
+            if(cuadros[x][y][z].getPared('E'))
+            checkList1[TotalGrid] += 4;
+
+            if(cuadros[x][y][z].getPared('N'))
+            checkList1[TotalGrid] += 2;
+
+            if(cuadros[x][y][z].getPared('O'))
+            checkList1[TotalGrid] += 1;
+
+            switch(cuadros[x][y][z].getEstado()){
+                case NO_EXISTE:
+                checkList2[TotalGrid] = 0;
+                break;
+
+                case SIN_RECORRER:
+                checkList2[TotalGrid] = 1;
+                break;
+
+                case RECORRIDO:
+                checkList2[TotalGrid] = 2;
+                break;
+
+                case CHECKPOINT:
+                checkList2[TotalGrid] = 3;
+                break;
+
+                case NEGRO:
+                checkList2[TotalGrid] = 4;
+                break;
+
+                case RAMPA:
+                checkList2[TotalGrid] = 5;
+                break;
+
+                case INICIO:
+                checkList2[TotalGrid] = 6;
+                break;
+            }
+
+          }
+        }
+      }
+    }
+
 }
 
 // Si el array esta a punto de salir de los parametros, mueve la matriz una linea completa
