@@ -863,7 +863,7 @@ void moverCuadro() {
     unsigned long inicio = 0;
     steps = 0;
     avanzar();
-    while (steps <= 3600) {
+    while (steps <= 3000) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -2483,6 +2483,7 @@ void setup() {
 
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
+    delay(2000);
 }
 
 void loop() {
