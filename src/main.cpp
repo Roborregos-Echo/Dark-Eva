@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-    
+
 //********************************************
 //********************************************
 //---------------- LIBRERÍAS ----------------
@@ -20,10 +20,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-#include <LiquidCrystal_I2C.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 #include <Servo.h>
 #include <PID_v1.h>
 
@@ -34,6 +34,10 @@
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
 //********************************************
+
+//******************************************
+//--------------PANTALLA LCD----------------
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 
 //******************************************
@@ -129,8 +133,8 @@ const float PRECISION_IMU = 2.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
-PID izqPID(&inIzq, &outIzq, &setIzq, 0, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 0, 0, 0, REVERSE);
+PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
 
 
 //******************************************
@@ -287,7 +291,6 @@ float getSharpCorta(int iSharp) {
     float resultado;
     for(int i = 0; i < 8; i++) {
         sharpRead[i] = analogRead(iSharp);
-        delay(15);
     }
 
     for (int j = 0; j < 8; j++) {
@@ -313,7 +316,6 @@ float getSharpLarga(int iSharp) {
     float resultado;
     for(int i = 0; i < 8; i++) {
         sharpRead[i] = analogRead(iSharp);
-        delay(15);
     }
 
     for (int j = 0; j < 8; j++) {
@@ -438,7 +440,7 @@ void alinear() {
 void compensacion() {
     steps = 0;
     avanzar();
-    while (steps <= 300) {
+    while (steps <= 0) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -449,7 +451,7 @@ void compensacion() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
     }
     alinear();
 }
@@ -457,6 +459,8 @@ void compensacion() {
 void vueltaIzq() {
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
+    lcd.setCursor(8, 1);
+    lcd.print("Vuel Izq");
     switch(iOrientacion) {
         case A_NORTE:
         posFinal = 270;
@@ -539,6 +543,8 @@ void vueltaIzq() {
 
 void vueltaDer() {
     float posInicial, posFinal, limInf, limSup;
+    lcd.setCursor(8, 1);
+    lcd.print("Vuel Der");
     posInicial = getAngulo();
     switch(iOrientacion) {
         case A_NORTE:
@@ -623,6 +629,8 @@ void vueltaDer() {
 void vueltaAtras() {
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
+    lcd.setCursor(8, 1);
+    lcd.print("Vuel Atr");
     switch(iOrientacion) {
         case A_NORTE:
         posFinal = 180;
@@ -934,7 +942,19 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+        lcd.setCursor(0, 1);
+        lcd.print(steps);
+        /*if(inFire)
+         {
+           detener();
+           vueltaIzq();
+           delay(2500);
+           servoMotor();
+           delay(2500);
+           vueltaDer();
+           inFire = false;
+       }*/
     }
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
@@ -952,8 +972,9 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90_RAMPA + outIzq, VEL_MOTOR_150_RAMPA + outDer, VEL_MOTOR_150_RAMPA + outIzq, VEL_MOTOR_90_RAMPA + outDer);
+                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+
             }
             velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
         } else {
@@ -970,7 +991,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
             }
         }
     } else if(vec.y() > 4.0) {
@@ -988,7 +1009,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90_VUELTA + outIzq, VEL_MOTOR_150_VUELTA + outDer, VEL_MOTOR_150_VUELTA + outIzq, VEL_MOTOR_90_VUELTA + outDer);
+                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
@@ -1006,7 +1027,17 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                if(inFire)
+                 {
+                   detener();
+                   vueltaIzq();
+                   delay(2500);
+                   servoMotor();
+                   delay(2500);
+                   vueltaDer();
+                   inFire = false;
+               }
             }
         }
     } else {
@@ -1023,7 +1054,19 @@ void moverCuadro() {
                 inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+            velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+            lcd.setCursor(0, 1);
+            lcd.print(steps);
+            /*if(inFire)
+             {
+               detener();
+               vueltaIzq();
+               delay(2500);
+               servoMotor();
+               delay(2500);
+               vueltaDer();
+               inFire = false;
+           }*/
         }
     }
     steps = 0;
@@ -1039,7 +1082,9 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_90 + outDer);
+        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+        lcd.setCursor(0, 1);
+        lcd.print(steps);
     }
     detener();
     alinear();
@@ -2401,47 +2446,6 @@ void LackOfProgress(){
 }
 
 
-//******************************************
-//******************************************
-//--------------PANTALLA LCD----------------
-//******************************************
-//******************************************
-
-// El 0x27 es la direccion del i2c
-LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-
-// Escribe "str" en la primera linea
-void LCD_Write(String str) {
-    lcd.setCursor(0, 0);
-    lcd.print(str);
-}
-
-// Escribe "str1" en la primera linea y "str2" en la segunda
-void LCD_Write(String str1, String str2) {
-    lcd.setCursor(0, 0);
-    lcd.print(str1);
-    lcd.setCursor(0, 1);
-    lcd.print(str2);
-}
-
-// Limpia la pantalla lcd
-void LCD_Clear() {
-    lcd.clear();
-}
-
-// Parpadea n veces
-void LCD_Blink(byte n) {
-    for(int i = 0; i< n; i++) {
-        lcd.backlight();
-        delay(250);
-        lcd.noBacklight();
-        delay(250);
-    }
-    lcd.backlight();
-}
-
-
-
 void setup() {
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
@@ -2469,6 +2473,14 @@ void setup() {
     MotorCI -> run(RELEASE);
     MotorCD -> run(RELEASE);
     velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+
+    lcd.begin();
+    lcd.backlight();
+    lcd.print("   ROBORREGOS");
+    lcd.setCursor(0, 1);
+    lcd.print("     E V A");
+
+
     delay(200);
 
     izqPID.SetMode(AUTOMATIC);
@@ -2501,38 +2513,34 @@ void setup() {
 }
 
 void loop() {
- /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    lcd.clear();
+ if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
-
-   checarArray();
+       checarArray();
    checarParedes();
 
-   if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-   Serial.println("Pared S");
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-   Serial.println("Pared E");
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-   Serial.println("Pared N");
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-   Serial.println("Pared O");
-   resolverLaberinto();*/
-
-   avanzar();
-   if(inFire)
-   {
-     detener();
-     vueltaIzq();
-     delay(2500);
-     servoMotor();
-     delay(2500);
-     vueltaDer();
-     inFire = false;
+   if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
+       lcd.home();
+       lcd.print("S");
    }
 
-   /*Serial.print(getSharpCorta(SHARP_A));
+   if(cuadros[x_actual][y_actual][z_actual].getPared('E')){
+       lcd.setCursor(2, 0);
+       lcd.print("E");
+   }
+
+   if(cuadros[x_actual][y_actual][z_actual].getPared('N')){
+       lcd.setCursor(5, 0);
+       lcd.print("N");
+   }
+
+   if(cuadros[x_actual][y_actual][z_actual].getPared('O')){
+       lcd.setCursor(8, 0);
+       lcd.print("O");
+   }
+
+   resolverLaberinto();
+/*  Serial.print(getSharpCorta(SHARP_A));
     Serial.print("\t");
     Serial.print(getSharpCorta(SHARP_B1));
     Serial.print("\t");
@@ -2548,8 +2556,4 @@ void loop() {
     Serial.println(getSharpLarga(SHARP_LC));
     Serial.println("");
     delay(500);*/
-
-   //checarMlx();
-   //alinear();
-
 }
