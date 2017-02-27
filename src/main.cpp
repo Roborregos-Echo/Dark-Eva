@@ -776,31 +776,87 @@ class Cuadro {
 
 Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
 
-void setWall(){
+void setWall(byte x, byte y, byte z){
     switch(LastMove)
     {
         case TO_NORTH:
-        cuadros[x_actual][y_actual][z_actual].setPared('S', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('S', true);
         break;
 
         case TO_EAST:
-        cuadros[x_actual][y_actual][z_actual].setPared('O', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('O', true);
         break;
 
         case TO_SOUTH:
-        cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('N', true);
         break;
 
         case TO_WEST:
-        cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('E', true);
         break;
     }
 }
 
+void setInicioB(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        x_InicioB = x_actual;
+        y_InicioB = y_actual-1;
+        break;
+
+        case TO_EAST:
+        x_InicioB = x_actual-1;
+        y_InicioB = y_actual;
+        break;
+
+        case TO_SOUTH:
+        x_InicioB = x_actual;
+        y_InicioB = y_actual+1;
+        break;
+
+        case TO_WEST:
+        x_InicioB = x_actual+1;
+        y_InicioB = y_actual;
+        break;
+
+    }
+
+    z_InicioB = z_actual;
+}
+
+void setInicioC(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        x_InicioC = x_actual;
+        y_InicioC = y_actual-1;
+        break;
+
+        case TO_EAST:
+        x_InicioC = x_actual-1;
+        y_InicioC = y_actual;
+        break;
+
+        case TO_SOUTH:
+        x_InicioC = x_actual;
+        y_InicioC = y_actual+1;
+        break;
+
+        case TO_WEST:
+        x_InicioC = x_actual+1;
+        y_InicioC = y_actual;
+        break;
+
+    }
+
+    z_InicioC = z_actual;
+
+}
+
+void setRampa(byte x, byte y, byte z){
+    cuadros[x][y][z].setEstado(RAMPA);
+}
 
 void checarRampa(){
     if(subirRampa or bajarRampa)
@@ -817,19 +873,23 @@ void checarRampa(){
         switch(LastMove)
         {
             case TO_NORTH:
-            y_actual += (RampaDiff-1);
+            setRampa(x_actual, y_actual +1, z_actual);
+            y_actual += (RampaDiff+1);
             break;
 
             case TO_EAST:
-            x_actual += (RampaDiff-1);
+            setRampa(x_actual +1, y_actual, z_actual);
+            x_actual += (RampaDiff+1);
             break;
 
             case TO_SOUTH:
-            y_actual -= (RampaDiff-1);
+            setRampa(x_actual, y_actual -1, z_actual);
+            y_actual -= (RampaDiff+1);
             break;
 
             case TO_WEST:
-            x_actual -= (RampaDiff-1);
+            setRampa(x_actual -1, y_actual, z_actual);
+            x_actual -= (RampaDiff+1);
             break;
         }
 
@@ -839,8 +899,126 @@ void checarRampa(){
             {
                 if(Piso3 and !Fusion)
                 {
+                    z_actual--;
+                    setWall(x_actual, y_actual, z_actual);
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+                else
+                if(Fusion)
+                {
                     z_actual++;
-                    setWall();
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+                else
+                {
+                    z_actual++;
+                    setInicioB();
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+            }
+            else
+            if(bajarRampa)
+            {
+                if(!Piso2)
+                {
+                    z_actual++;
+                    setInicioC();
+                    //setWall arriba
+                    switch(LastMove)
+                    {
+                        case TO_NORTH:
+                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual-1);
+                        break;
+
+                        case TO_EAST:
+                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual-1);
+                        break;
+
+                        case TO_SOUTH:
+                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
+                        break;
+
+                        case TO_WEST:
+                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
+                        break;
+                    }
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+                else
+                {
+                    z_actual--;
+                    setWall(x_actual, y_actual, z_actual);
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+            }
+
+        }
+        else
+        if(firstFloor == ARRIBA)
+        {
+            if(bajarRampa)
+            {
+                if(Piso2)
+                {
+                    z_actual += 2;
+                    setInicioC();
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+                else
+                {
+                    z_actual++;
+                    setInicioB();
+                    C_wall = true;
+                    resolverLaberinto();
+                }
+            }
+            else
+            if(subirRampa)
+            {
+                if(z_actual == 1 and Piso2)
+                {
+                    z_actual--;
+                    setWall(x_actual, y_actual, z_actual);
+                    resolverLaberinto();
+                }
+                else
+                if(z_actual == 1 and !Piso2)
+                {
+                    permisoRampa = false;
+                    setInicioC();
+                    switch(LastMove)
+                    {
+                        case TO_NORTH:
+                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
+                        break;
+
+                        case TO_EAST:
+                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
+                        break;
+
+                        case TO_SOUTH:
+                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual);
+                        break;
+
+                        case TO_WEST:
+                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual);
+                        break;
+                    }
+                    A_wall = true;
+                    resolverLaberinto();
+                }
+                else
+                if(z_actual == 2)
+                {
+                    z_actual -= 2;
+                    setWall(x_actual, y_actual, z_actual);
+                    C_wall = true;
                     resolverLaberinto();
                 }
             }
