@@ -310,7 +310,7 @@ float getSharpCorta(int iSharp) {
         }
     }
 
-    if (sharpRead[3] >= 99 and sharpRead[3] <= 530)
+    if (sharpRead[3] >= 99 and sharpRead[3] <= 620)
         resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
     else
         resultado = 30;
@@ -2484,10 +2484,11 @@ void setup() {
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
     delay(2000);
+    lcd.clear();
 }
 
 void loop() {
-    lcd.clear();
+/*    lcd.clear();
  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
        checarArray();
@@ -2513,21 +2514,16 @@ void loop() {
        lcd.print("O");
    }
 
-   resolverLaberinto();
-/*  Serial.print(getSharpCorta(SHARP_A));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B1));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B2));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_C));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_D1));
-    Serial.print("\t");
-    Serial.println(getSharpCorta(SHARP_D2));
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);*/
+   resolverLaberinto();*/
+   lcd.home();
+   lcd.print(analogRead(SHARP_LA));
+   lcd.setCursor(0, 1);
+   lcd.print(getSharpLarga(SHARP_LA));
+
+   lcd.setCursor(9, 0);
+   lcd.print(analogRead(SHARP_LC));
+   lcd.setCursor(9, 1);
+   lcd.print(getSharpLarga(SHARP_LC));
+   delay(40);
+
 }
