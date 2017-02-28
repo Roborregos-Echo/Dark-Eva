@@ -179,6 +179,7 @@ byte RampaDiff = 4;
 byte PisoReal  = 0;
 byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
+byte RampaLastMove;
 
 
 //******************************************
@@ -511,17 +512,11 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     }
@@ -596,17 +591,11 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     }
@@ -681,17 +670,11 @@ void vueltaAtras() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
 
         detener();
@@ -872,6 +855,8 @@ void setRampa(byte x, byte y, byte z){
 void checarRampa(){
     if(subirRampa or bajarRampa)
     {
+        lcd.clear();
+        lcd.print("RAMPA");
         if(firstFloor == 0)
         {
             if(subirRampa)
@@ -886,21 +871,25 @@ void checarRampa(){
             case TO_NORTH:
             setRampa(x_actual, y_actual +1, z_actual);
             y_actual += (RampaDiff+1);
+            RampaLastMove = TO_NORTH;
             break;
 
             case TO_EAST:
             setRampa(x_actual +1, y_actual, z_actual);
             x_actual += (RampaDiff+1);
+            RampaLastMove = TO_EAST;
             break;
 
             case TO_SOUTH:
             setRampa(x_actual, y_actual -1, z_actual);
             y_actual -= (RampaDiff+1);
+            RampaLastMove = TO_SOUTH;
             break;
 
             case TO_WEST:
             setRampa(x_actual -1, y_actual, z_actual);
             x_actual -= (RampaDiff+1);
+            RampaLastMove = TO_WEST;
             break;
         }
 
@@ -913,21 +902,21 @@ void checarRampa(){
                     z_actual--;
                     setWall(x_actual, y_actual, z_actual);
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
                 else
                 if(Fusion)
                 {
                     z_actual++;
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
                 else
                 {
                     z_actual++;
                     setInicioB();
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
             }
             else
@@ -957,14 +946,14 @@ void checarRampa(){
                         break;
                     }
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
                 else
                 {
                     z_actual--;
                     setWall(x_actual, y_actual, z_actual);
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
             }
 
@@ -979,14 +968,14 @@ void checarRampa(){
                     z_actual += 2;
                     setInicioC();
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
                 else
                 {
                     z_actual++;
                     setInicioB();
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
             }
             else
@@ -996,7 +985,7 @@ void checarRampa(){
                 {
                     z_actual--;
                     setWall(x_actual, y_actual, z_actual);
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
                 else
                 if(z_actual == 1 and !Piso2)
@@ -1022,7 +1011,7 @@ void checarRampa(){
                         break;
                     }
                     A_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
                 else
                 if(z_actual == 2)
@@ -1030,11 +1019,29 @@ void checarRampa(){
                     z_actual -= 2;
                     setWall(x_actual, y_actual, z_actual);
                     C_wall = true;
-                    resolverLaberinto();
+                    //resolverLaberinto();
                 }
             }
         }
 
+        switch(LastMove)
+        {
+            case TO_NORTH:
+            setRampa(x_actual, y_actual -1, z_actual);
+            break;
+
+            case TO_EAST:
+            setRampa(x_actual -1, y_actual, z_actual);
+            break;
+
+            case TO_SOUTH:
+            setRampa(x_actual, y_actual +1, z_actual);
+            break;
+
+            case TO_WEST:
+            setRampa(x_actual +1, y_actual, z_actual);
+            break;
+        }
     }
 }
 
@@ -1043,7 +1050,7 @@ void moverCuadro() {
     unsigned long inicio = 0;
     steps = 0;
     avanzar();
-    while (steps <= 3000) {
+    while (steps <= 2400) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -2068,8 +2075,27 @@ void gotoInicio(byte x_final, byte y_final){
         byte var = 255;
         Pathfinding(x_final, y_final,  var);
     }
-    Serial.println("MARI PUTISIMO, YA LLEGUE");
-    delay(20000);
+}
+
+void RampaMoveX(){
+    switch(RampaLastMove)
+    {
+        case TO_NORTH:
+        y_actual++;
+        break;
+
+        case TO_EAST:
+        x_actual++;
+        break;
+
+        case TO_SOUTH:
+        y_actual--;
+        break;
+
+        case TO_WEST:
+        x_actual--;
+        break;
+    }
 }
 
 void resolverLaberinto(){
@@ -2182,6 +2208,8 @@ void resolverLaberinto(){
     } else {
         if(Last) {
             Serial.println("LAST");
+            lcd.clear();
+            lcd.print("GOTO LAST");
             /*Serial.print(x_last);
             Serial.print(" | ");
             Serial.println(y_last);*/
@@ -2206,6 +2234,8 @@ void resolverLaberinto(){
             //gotoLast
         } else {
             Serial.println("GOTO-SR");
+            lcd.clear();
+            lcd.print("GOTO SR");
             int LowestCSR = 999;
             int iCSR;
 
@@ -2223,26 +2253,41 @@ void resolverLaberinto(){
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
                 Serial.println("GOTO-INICIO");
+                lcd.clear();
 
-                if(z_actual == 3)
-                {
-                    gotoInicio(x_InicioC, y_InicioC);
-                    Piso3 = true;
-                }
-                else
                 if(z_actual == 2)
                 {
+                    lcd.print("GOTO INICIO C");
+                    delay(500);
+                    gotoInicio(x_InicioC, y_InicioC);
+                    Piso3 = true;
+                    RampaMoveX();
+                }
+                else
+                if(z_actual == 1)
+                {
+                    lcd.print("GOTO INICIO B");
+                    delay(500);
                     gotoInicio(x_InicioB, y_InicioB);
                     Piso2 = true;
+                    RampaMoveX();
                 }
                 else
                 if(!Piso2)
                 {
+                    lcd.print("GOTO INICIO C");
+                    delay(500);
                     gotoInicio(x_InicioC, y_InicioC);
+                    RampaMoveX();
                 }
                 else
                 {
+                    lcd.print("GOTO INICIO");
+                    delay(500);
                     gotoInicio(x_inicio, y_inicio);
+
+                    Serial.println("MARI PUTISIMO, YA LLEGUE");
+                    delay(20000);
                 }
             }
             //gotoSR
@@ -2693,6 +2738,8 @@ void setup() {
 
 void loop() {
     lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("Z = " + String(z_actual));
  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
        checarArray();
@@ -2717,20 +2764,18 @@ void loop() {
        lcd.setCursor(8, 0);
        lcd.print("O");
    }
-   
+
 
    resolverLaberinto();
-/*  Serial.print(getSharpCorta(SHARP_A));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B1));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B2));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_C));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_D1));
-    Serial.print("\t");
-    Serial.println(getSharpCorta(SHARP_D2));
+
+   /*Serial.println("SHARP_A " + String(getSharpCorta(SHARP_A)));
+   Serial.println("SHARP_B1 " + String(getSharpCorta(SHARP_B1)));
+   Serial.println("SHARP_B2 " + String(getSharpCorta(SHARP_B2)));
+   Serial.println("SHARP_C " + String(getSharpCorta(SHARP_C)));
+   Serial.println("SHARP_D1 " + String(getSharpCorta(SHARP_D1)));
+   Serial.println("SHARP_D2 " + String(getSharpCorta(SHARP_D2)));
+   Serial.println();
+   delay(1000);
     Serial.print(getSharpLarga(SHARP_LA));
     Serial.print("\t\t\t");
     Serial.println(getSharpLarga(SHARP_LC));
