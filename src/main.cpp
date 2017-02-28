@@ -2717,6 +2717,7 @@ void loop() {
        lcd.setCursor(8, 0);
        lcd.print("O");
    }
+   
 
    resolverLaberinto();
 /*  Serial.print(getSharpCorta(SHARP_A));
