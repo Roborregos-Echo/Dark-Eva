@@ -89,8 +89,10 @@ byte    y_last2 = 255;
 byte x_InicioB = 255;
 byte y_InicioB = 255;
 byte z_InicioB = 255;
+byte x_InicioC = 255;
+byte y_InicioC = 255;
+byte z_InicioC = 255;
 byte x_inicio, y_inicio, z_inicio;
-byte x_InicioC, y_InicioC, z_InicioC;
 bool shortMove, Last, Last2;
 bool A_wall, B_wall, C_wall, D_wall;
 
@@ -177,6 +179,7 @@ byte RampaDiff = 4;
 byte PisoReal  = 0;
 byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
+byte RampaLastMove;
 
 
 //******************************************
@@ -509,17 +512,11 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     }
@@ -594,17 +591,11 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     }
@@ -679,17 +670,11 @@ void vueltaAtras() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            Serial.println(posFinal);
-            Serial.println("\t");
-            Serial.println(posInicial);
         }
 
         detener();
@@ -785,35 +770,93 @@ class Cuadro {
 
 Cuadro cuadros[X_MAX][Y_MAX][Z_MAX];
 
-void setWall(){
+void setWall(byte x, byte y, byte z){
     switch(LastMove)
     {
         case TO_NORTH:
-        cuadros[x_actual][y_actual][z_actual].setPared('S', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('S', true);
         break;
 
         case TO_EAST:
-        cuadros[x_actual][y_actual][z_actual].setPared('O', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('O', true);
         break;
 
         case TO_SOUTH:
-        cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('N', true);
         break;
 
         case TO_WEST:
-        cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-        C_wall = true;
+        cuadros[x][y][z].setPared('E', true);
         break;
     }
 }
 
+void setInicioB(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        x_InicioB = x_actual;
+        y_InicioB = y_actual-1;
+        break;
+
+        case TO_EAST:
+        x_InicioB = x_actual-1;
+        y_InicioB = y_actual;
+        break;
+
+        case TO_SOUTH:
+        x_InicioB = x_actual;
+        y_InicioB = y_actual+1;
+        break;
+
+        case TO_WEST:
+        x_InicioB = x_actual+1;
+        y_InicioB = y_actual;
+        break;
+
+    }
+
+    z_InicioB = z_actual;
+}
+
+void setInicioC(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        x_InicioC = x_actual;
+        y_InicioC = y_actual-1;
+        break;
+
+        case TO_EAST:
+        x_InicioC = x_actual-1;
+        y_InicioC = y_actual;
+        break;
+
+        case TO_SOUTH:
+        x_InicioC = x_actual;
+        y_InicioC = y_actual+1;
+        break;
+
+        case TO_WEST:
+        x_InicioC = x_actual+1;
+        y_InicioC = y_actual;
+        break;
+
+    }
+
+    z_InicioC = z_actual;
+
+}
+
+void setRampa(byte x, byte y, byte z){
+    cuadros[x][y][z].setEstado(RAMPA);
+}
 
 void checarRampa(){
     if(subirRampa or bajarRampa)
     {
+        lcd.clear();
+        lcd.print("RAMPA");
         if(firstFloor == 0)
         {
             if(subirRampa)
@@ -826,19 +869,27 @@ void checarRampa(){
         switch(LastMove)
         {
             case TO_NORTH:
-            y_actual += (RampaDiff-1);
+            setRampa(x_actual, y_actual +1, z_actual);
+            y_actual += (RampaDiff+1);
+            RampaLastMove = TO_NORTH;
             break;
 
             case TO_EAST:
-            x_actual += (RampaDiff-1);
+            setRampa(x_actual +1, y_actual, z_actual);
+            x_actual += (RampaDiff+1);
+            RampaLastMove = TO_EAST;
             break;
 
             case TO_SOUTH:
-            y_actual -= (RampaDiff-1);
+            setRampa(x_actual, y_actual -1, z_actual);
+            y_actual -= (RampaDiff+1);
+            RampaLastMove = TO_SOUTH;
             break;
 
             case TO_WEST:
-            x_actual -= (RampaDiff-1);
+            setRampa(x_actual -1, y_actual, z_actual);
+            x_actual -= (RampaDiff+1);
+            RampaLastMove = TO_WEST;
             break;
         }
 
@@ -848,13 +899,149 @@ void checarRampa(){
             {
                 if(Piso3 and !Fusion)
                 {
+                    z_actual--;
+                    setWall(x_actual, y_actual, z_actual);
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+                else
+                if(Fusion)
+                {
                     z_actual++;
-                    setWall();
-                    resolverLaberinto();
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+                else
+                {
+                    z_actual++;
+                    setInicioB();
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+            }
+            else
+            if(bajarRampa)
+            {
+                if(!Piso2)
+                {
+                    z_actual++;
+                    setInicioC();
+                    //setWall arriba
+                    switch(LastMove)
+                    {
+                        case TO_NORTH:
+                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual-1);
+                        break;
+
+                        case TO_EAST:
+                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual-1);
+                        break;
+
+                        case TO_SOUTH:
+                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
+                        break;
+
+                        case TO_WEST:
+                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
+                        break;
+                    }
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+                else
+                {
+                    z_actual--;
+                    setWall(x_actual, y_actual, z_actual);
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+            }
+
+        }
+        else
+        if(firstFloor == ARRIBA)
+        {
+            if(bajarRampa)
+            {
+                if(Piso2)
+                {
+                    z_actual += 2;
+                    setInicioC();
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+                else
+                {
+                    z_actual++;
+                    setInicioB();
+                    C_wall = true;
+                    //resolverLaberinto();
+                }
+            }
+            else
+            if(subirRampa)
+            {
+                if(z_actual == 1 and Piso2)
+                {
+                    z_actual--;
+                    setWall(x_actual, y_actual, z_actual);
+                    //resolverLaberinto();
+                }
+                else
+                if(z_actual == 1 and !Piso2)
+                {
+                    permisoRampa = false;
+                    setInicioC();
+                    switch(LastMove)
+                    {
+                        case TO_NORTH:
+                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
+                        break;
+
+                        case TO_EAST:
+                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
+                        break;
+
+                        case TO_SOUTH:
+                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual);
+                        break;
+
+                        case TO_WEST:
+                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual);
+                        break;
+                    }
+                    A_wall = true;
+                    //resolverLaberinto();
+                }
+                else
+                if(z_actual == 2)
+                {
+                    z_actual -= 2;
+                    setWall(x_actual, y_actual, z_actual);
+                    C_wall = true;
+                    //resolverLaberinto();
                 }
             }
         }
 
+        switch(LastMove)
+        {
+            case TO_NORTH:
+            setRampa(x_actual, y_actual -1, z_actual);
+            break;
+
+            case TO_EAST:
+            setRampa(x_actual -1, y_actual, z_actual);
+            break;
+
+            case TO_SOUTH:
+            setRampa(x_actual, y_actual +1, z_actual);
+            break;
+
+            case TO_WEST:
+            setRampa(x_actual +1, y_actual, z_actual);
+            break;
+        }
     }
 }
 
@@ -863,7 +1050,7 @@ void moverCuadro() {
     unsigned long inicio = 0;
     steps = 0;
     avanzar();
-    while (steps <= 3000) {
+    while (steps <= 2400) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -1842,6 +2029,75 @@ void recorrerY(){
     //boolRecorrerY = true;
 }
 
+void gotoInicio(byte x_final, byte y_final){
+
+    byte nearInicio = pathway(x_actual, y_actual, x_final, y_final);
+    bool boolInicio = false;
+
+    if(nearInicio == 1) {
+        Serial.println("Entre a nearInicio");
+        Serial.println("Inicio " + String(x_final) + "," + String(y_final));
+        Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
+        int xInicio = x_final - x_actual;
+        int yInicio = y_final - y_actual;
+
+        if(xInicio == 1) {
+            Serial.println("Inicio E");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('E')) {
+                absoluteMove('E');
+                boolInicio = true;
+            }
+        }
+        else if(xInicio == -1) {
+            Serial.println("Inicio O");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('O')) {
+                absoluteMove('O');
+                boolInicio = true;
+            }
+        }
+        else if(yInicio == 1) {
+            Serial.println("Inicio N");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('N')) {
+                absoluteMove('N');
+                boolInicio = true;
+            }
+        }
+        else if(yInicio == -1) {
+            Serial.println("Inicio S");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('S')) {
+                absoluteMove('S');
+                boolInicio = true;
+            }
+        }
+    }
+
+    if(!boolInicio) {
+        byte var = 255;
+        Pathfinding(x_final, y_final,  var);
+    }
+}
+
+void RampaMoveX(){
+    switch(RampaLastMove)
+    {
+        case TO_NORTH:
+        y_actual++;
+        break;
+
+        case TO_EAST:
+        x_actual++;
+        break;
+
+        case TO_SOUTH:
+        y_actual--;
+        break;
+
+        case TO_WEST:
+        x_actual--;
+        break;
+    }
+}
+
 void resolverLaberinto(){
     if(shortMove) {
         Serial.println("ENTRE AL SHORTMOVE");
@@ -1952,6 +2208,8 @@ void resolverLaberinto(){
     } else {
         if(Last) {
             Serial.println("LAST");
+            lcd.clear();
+            lcd.print("GOTO LAST");
             /*Serial.print(x_last);
             Serial.print(" | ");
             Serial.println(y_last);*/
@@ -1976,6 +2234,8 @@ void resolverLaberinto(){
             //gotoLast
         } else {
             Serial.println("GOTO-SR");
+            lcd.clear();
+            lcd.print("GOTO SR");
             int LowestCSR = 999;
             int iCSR;
 
@@ -1993,52 +2253,42 @@ void resolverLaberinto(){
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
                 Serial.println("GOTO-INICIO");
-                byte nearInicio = pathway(x_actual, y_actual, x_inicio, y_inicio);
-                bool boolInicio = false;
+                lcd.clear();
 
-                if(nearInicio == 1) {
-                    Serial.println("Entre a nearInicio");
-                    Serial.println("Inicio " + String(x_inicio) + "," + String(y_inicio));
-                    Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
-                    int xInicio = x_inicio - x_actual;
-                    int yInicio = y_inicio - y_actual;
-
-                    if(xInicio == 1) {
-                        Serial.println("Inicio E");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('E')) {
-                            absoluteMove('E');
-                            boolInicio = true;
-                        }
-                    }
-                    else if(xInicio == -1) {
-                        Serial.println("Inicio O");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('O')) {
-                            absoluteMove('O');
-                            boolInicio = true;
-                        }
-                    }
-                    else if(yInicio == 1) {
-                        Serial.println("Inicio N");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('N')) {
-                            absoluteMove('N');
-                            boolInicio = true;
-                        }
-                    }
-                    else if(yInicio == -1) {
-                        Serial.println("Inicio S");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('S')) {
-                            absoluteMove('S');
-                            boolInicio = true;
-                        }
-                    }
+                if(z_actual == 2)
+                {
+                    lcd.print("GOTO INICIO C");
+                    delay(500);
+                    gotoInicio(x_InicioC, y_InicioC);
+                    Piso3 = true;
+                    RampaMoveX();
                 }
-
-                if(!boolInicio) {
-                    byte var = 255;
-                    Pathfinding(x_inicio, y_inicio,  var);
+                else
+                if(z_actual == 1)
+                {
+                    lcd.print("GOTO INICIO B");
+                    delay(500);
+                    gotoInicio(x_InicioB, y_InicioB);
+                    Piso2 = true;
+                    RampaMoveX();
                 }
-                Serial.println("MARI PUTISIMO, YA LLEGUE");
-                delay(20000);
+                else
+                if(!Piso2)
+                {
+                    lcd.print("GOTO INICIO C");
+                    delay(500);
+                    gotoInicio(x_InicioC, y_InicioC);
+                    RampaMoveX();
+                }
+                else
+                {
+                    lcd.print("GOTO INICIO");
+                    delay(500);
+                    gotoInicio(x_inicio, y_inicio);
+
+                    Serial.println("MARI PUTISIMO, YA LLEGUE");
+                    delay(20000);
+                }
             }
             //gotoSR
         }
@@ -2488,8 +2738,7 @@ void setup() {
 }
 
 void loop() {
-/*    lcd.clear();
- if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+/*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
        checarArray();
    checarParedes();
@@ -2526,4 +2775,17 @@ void loop() {
    lcd.print(getSharpLarga(SHARP_LC));
    delay(40);
 
+   /*Serial.println("SHARP_A " + String(getSharpCorta(SHARP_A)));
+   Serial.println("SHARP_B1 " + String(getSharpCorta(SHARP_B1)));
+   Serial.println("SHARP_B2 " + String(getSharpCorta(SHARP_B2)));
+   Serial.println("SHARP_C " + String(getSharpCorta(SHARP_C)));
+   Serial.println("SHARP_D1 " + String(getSharpCorta(SHARP_D1)));
+   Serial.println("SHARP_D2 " + String(getSharpCorta(SHARP_D2)));
+   Serial.println();
+   delay(1000);
+    Serial.print(getSharpLarga(SHARP_LA));
+    Serial.print("\t\t\t");
+    Serial.println(getSharpLarga(SHARP_LC));
+    Serial.println("");
+    delay(500);*/
 }
