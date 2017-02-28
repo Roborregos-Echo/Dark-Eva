@@ -84,8 +84,10 @@ byte    y_last2 = 255;
 byte x_InicioB = 255;
 byte y_InicioB = 255;
 byte z_InicioB = 255;
+byte x_InicioC = 255;
+byte y_InicioC = 255;
+byte z_InicioC = 255;
 byte x_inicio, y_inicio, z_inicio;
-byte x_InicioC, y_InicioC, z_InicioC;
 bool shortMove, Last, Last2;
 bool A_wall, B_wall, C_wall, D_wall;
 
@@ -1974,6 +1976,56 @@ void recorrerY(){
     //boolRecorrerY = true;
 }
 
+void gotoInicio(byte x_final, byte y_final){
+
+    byte nearInicio = pathway(x_actual, y_actual, x_final, y_final);
+    bool boolInicio = false;
+
+    if(nearInicio == 1) {
+        Serial.println("Entre a nearInicio");
+        Serial.println("Inicio " + String(x_final) + "," + String(y_final));
+        Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
+        int xInicio = x_final - x_actual;
+        int yInicio = y_final - y_actual;
+
+        if(xInicio == 1) {
+            Serial.println("Inicio E");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('E')) {
+                absoluteMove('E');
+                boolInicio = true;
+            }
+        }
+        else if(xInicio == -1) {
+            Serial.println("Inicio O");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('O')) {
+                absoluteMove('O');
+                boolInicio = true;
+            }
+        }
+        else if(yInicio == 1) {
+            Serial.println("Inicio N");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('N')) {
+                absoluteMove('N');
+                boolInicio = true;
+            }
+        }
+        else if(yInicio == -1) {
+            Serial.println("Inicio S");
+            if(!cuadros[x_actual][y_actual][z_actual].getPared('S')) {
+                absoluteMove('S');
+                boolInicio = true;
+            }
+        }
+    }
+
+    if(!boolInicio) {
+        byte var = 255;
+        Pathfinding(x_final, y_final,  var);
+    }
+    Serial.println("MARI PUTISIMO, YA LLEGUE");
+    delay(20000);
+}
+
 void resolverLaberinto(){
     if(shortMove) {
         Serial.println("ENTRE AL SHORTMOVE");
@@ -2125,52 +2177,27 @@ void resolverLaberinto(){
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
                 Serial.println("GOTO-INICIO");
-                byte nearInicio = pathway(x_actual, y_actual, x_inicio, y_inicio);
-                bool boolInicio = false;
 
-                if(nearInicio == 1) {
-                    Serial.println("Entre a nearInicio");
-                    Serial.println("Inicio " + String(x_inicio) + "," + String(y_inicio));
-                    Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
-                    int xInicio = x_inicio - x_actual;
-                    int yInicio = y_inicio - y_actual;
-
-                    if(xInicio == 1) {
-                        Serial.println("Inicio E");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('E')) {
-                            absoluteMove('E');
-                            boolInicio = true;
-                        }
-                    }
-                    else if(xInicio == -1) {
-                        Serial.println("Inicio O");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('O')) {
-                            absoluteMove('O');
-                            boolInicio = true;
-                        }
-                    }
-                    else if(yInicio == 1) {
-                        Serial.println("Inicio N");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('N')) {
-                            absoluteMove('N');
-                            boolInicio = true;
-                        }
-                    }
-                    else if(yInicio == -1) {
-                        Serial.println("Inicio S");
-                        if(!cuadros[x_actual][y_actual][z_actual].getPared('S')) {
-                            absoluteMove('S');
-                            boolInicio = true;
-                        }
-                    }
+                if(z_actual == 3)
+                {
+                    gotoInicio(x_InicioC, y_InicioC);
+                    Piso3 = true;
                 }
-
-                if(!boolInicio) {
-                    byte var = 255;
-                    Pathfinding(x_inicio, y_inicio,  var);
+                else
+                if(z_actual == 2)
+                {
+                    gotoInicio(x_InicioB, y_InicioB);
+                    Piso2 = true;
                 }
-                Serial.println("MARI PUTISIMO, YA LLEGUE");
-                delay(20000);
+                else
+                if(!Piso2)
+                {
+                    gotoInicio(x_InicioC, y_InicioC);
+                }
+                else
+                {
+                    gotoInicio(x_inicio, y_inicio);
+                }
             }
             //gotoSR
         }
