@@ -37,7 +37,7 @@ void servoMotor();
 #include <PID_v1.h>
 
 
-    
+
 //********************************************
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
@@ -122,8 +122,8 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //--------------- MOTORES ------------------
 
 const int VEL_MOTOR         =   180;
-const int VEL_MOTOR_VUELTA  =   255;
-const int VEL_MOTOR_ENCODER  =   240;
+const int VEL_MOTOR_VUELTA  =   150;
+const int VEL_MOTOR_ENCODER  =   145;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -464,7 +464,7 @@ void compensacion() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
     }
-    alinear();
+    //alinear();
 }
 
 void vueltaIzq() {
@@ -543,7 +543,7 @@ void vueltaIzq() {
         break;
     }
     delay(400);
-    alinear();
+    //alinear();
 }
 
 void vueltaDer() {
@@ -622,7 +622,7 @@ void vueltaDer() {
         break;
     }
     delay(400);
-    alinear();
+    //alinear();
 }
 
 void vueltaAtras() {
@@ -702,7 +702,7 @@ void vueltaAtras() {
         break;
     }
     delay(400);
-    alinear();
+    //alinear();
 }
 
 class Cuadro {
@@ -1276,7 +1276,7 @@ void moverCuadro() {
 
     }
     detener();
-    alinear();
+    //alinear();
     delay(1000);
     permisoRampa = true;
 }
@@ -2583,10 +2583,15 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 void checarCheckpoint(){
 
-    int TotalGrid;
-
-    if(checarCuadroColor(CHECKPOINT, 20))
+    if(checarCuadroColor(COLOR_NEGRO, 80))
     {
+        
+    }
+
+    if(checarCuadroColor(COLOR_CHECKPOINT, 40))
+    {
+      int TotalGrid;
+
       for(int z=0; z<Z_MAX; z++)
       {
         for(int y = 0; y < Y_MAX; y++)
