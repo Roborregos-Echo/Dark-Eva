@@ -2585,7 +2585,7 @@ void checarCheckpoint(){
 
     if(checarCuadroColor(COLOR_NEGRO, 80))
     {
-        
+
     }
 
     if(checarCuadroColor(COLOR_CHECKPOINT, 40))
