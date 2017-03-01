@@ -5,12 +5,17 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.0.6 --------------------------------
-//--------------------------- 26 / FEBRERO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.0.7 --------------------------------
+//--------------------------- 01 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 
+//********************************************
+//********************************************
+//------------------ HEADERS -----------------
+//********************************************
+//********************************************
 void resolverLaberinto();
 void servoMotor();
 
@@ -32,7 +37,7 @@ void servoMotor();
 #include <PID_v1.h>
 
 
-
+    
 //********************************************
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
@@ -107,23 +112,18 @@ byte y_recorrer[50];
 //----------- SHIELD ADAFRUIT --------------
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
-Adafruit_DCMotor *MotorAI = AFMS.getMotor(3);
-Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
-Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
-Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
+Adafruit_DCMotor *MotorAI = AFMS.getMotor(1);
+Adafruit_DCMotor *MotorAD = AFMS.getMotor(4);
+Adafruit_DCMotor *MotorCI = AFMS.getMotor(2);
+Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 
 
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR_90  = 150;
-const int VEL_MOTOR_150 = 150;
-
-const int VEL_MOTOR_90_VUELTA  = 102;
-const int VEL_MOTOR_150_VUELTA = 62;
-
-const int VEL_MOTOR_90_RAMPA  = 255;
-const int VEL_MOTOR_150_RAMPA = 155;
+const int VEL_MOTOR         =   180;
+const int VEL_MOTOR_VUELTA  =   255;
+const int VEL_MOTOR_ENCODER  =   240;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -138,9 +138,10 @@ bool permisoRampa = true;
 const float PRECISION_IMU = 2.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
-double setIzq, setDer, inIzq, inDer, outIzq, outDer;
-PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
+double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
+PID izqPID(&inIzq, &outIzq, &setIzq, 15, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 20, 0, 0, REVERSE);
+PID ramPID(&inRam, &outRam, &setRam, 60, 0, 0, REVERSE);
 
 
 //******************************************
@@ -265,17 +266,17 @@ void detener() {
 }
 
 void vueltaDerecha() {
-    MotorAI -> run(BACKWARD);
-    MotorAD -> run(FORWARD);
-    MotorCI -> run(BACKWARD);
-    MotorCD -> run(FORWARD);
-}
-
-void vueltaIzquierda() {
     MotorAI -> run(FORWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(FORWARD);
     MotorCD -> run(BACKWARD);
+}
+
+void vueltaIzquierda() {
+    MotorAI -> run(BACKWARD);
+    MotorAD -> run(FORWARD);
+    MotorCI -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
 }
 
 void horizontalDerecha() {
@@ -315,7 +316,7 @@ float getSharpCorta(int iSharp) {
     }
 
     if (sharpRead[3] >= 99 and sharpRead[3] <= 620)
-        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
+        resultado = 3582.4 * (pow(sharpRead[3], -1.047));//3742.4 * (1 / pow(sharpRead[3], 1.081));
     else
         resultado = 30;
     return resultado;
@@ -339,8 +340,8 @@ float getSharpLarga(int iSharp) {
         }
     }
 
-    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
-        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
+    if (sharpRead[3] >= 90 and sharpRead[3] <= 680)
+        resultado = 20472 * pow(sharpRead[3], -1.045);
     else
         resultado = -1;
     return resultado;
@@ -379,7 +380,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void alinear() {
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     if(getSharpCorta(SHARP_B1) < 15.0 && getSharpCorta(SHARP_D1) < 15.0) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1)
@@ -461,7 +462,7 @@ void compensacion() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
     }
     alinear();
 }
@@ -507,7 +508,7 @@ void vueltaIzq() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaIzquierda();
 
     if(limSup > limInf) {
@@ -521,7 +522,7 @@ void vueltaIzq() {
         }
         detener();
     }
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     detener();
 
     switch(iOrientacion) {
@@ -586,7 +587,7 @@ void vueltaDer() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
     if(limSup > limInf) {
@@ -600,7 +601,7 @@ void vueltaDer() {
         }
         detener();
     }
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     detener();
 
     switch(iOrientacion) {
@@ -665,7 +666,7 @@ void vueltaAtras() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
     if(limSup > limInf) {
@@ -680,7 +681,7 @@ void vueltaAtras() {
 
         detener();
     }
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     detener();
 
     switch(iOrientacion) {
@@ -1106,27 +1107,27 @@ void funcionD(){
 
 
 void moverCuadro() {
-    unsigned long inicio = 0;
+    float pos = 0;
     steps = 0;
     avanzar();
-    while (steps <= 2400) {
+    while (steps <= 2500) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
             inIzq = getAngulo();
+
         if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
         else
             inDer = getAngulo();
+
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
-        lcd.setCursor(0, 1);
-        lcd.print(steps);
-        if(inFireB)
-        {
+        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+        /*pos = steps;
+        if(inFireB) {
            detener();
-           delay(2000);
+           delay(1000);
            vueltaIzq();
            servoMotor();
            delay(1000);
@@ -1135,10 +1136,9 @@ void moverCuadro() {
            inFireB = false;
         }
 
-       if(inFireD)
-       {
+       if(inFireD) {
            detener();
-           delay(2000);
+           delay(1000);
            vueltaDer();
            servoMotor();
            delay(1000);
@@ -1146,12 +1146,15 @@ void moverCuadro() {
            delay(2000);
            inFireD = false;
        }
+       steps = pos;*/
     }
+
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
         subirRampa = true;
         checarRampa();
         if (permisoRampa) {
+            setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
             while (vec.y() < -4.0) {
                 if(getAngulo() > 320)
                     inIzq = - (360 - getAngulo());
@@ -1161,29 +1164,17 @@ void moverCuadro() {
                     inDer = - (360 - getAngulo());
                 else
                     inDer = getAngulo();
+                inRam = getSharpCorta(SHARP_D1);
+                ramPID.Compute();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                if (outRam > 4)
+                    velocidad(VEL_MOTOR, VEL_MOTOR + outRam, VEL_MOTOR, VEL_MOTOR + outRam);
+                else
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer + outRam, VEL_MOTOR + outIzq, VEL_MOTOR + outDer + outRam);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-
             }
-            velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
-        } else {
-            inicio = millis();
-            reversa();
-            while (millis() - inicio <= 1000) {
-                if(getAngulo() > 320)
-                    inIzq = - (360 - getAngulo());
-                else
-                    inIzq = getAngulo();
-                if(getAngulo() > 320)
-                    inDer = - (360 - getAngulo());
-                else
-                    inDer = getAngulo();
-                izqPID.Compute();
-                derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
-            }
+            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         }
     } else if(vec.y() > 4.0) {
         bajarRampa = true;
@@ -1200,53 +1191,15 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
-            velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
-        } else {
-            inicio = millis();
-            reversa();
-            while (millis() - inicio <= 1000) {
-                if(getAngulo() > 320)
-                    inIzq = - (360 - getAngulo());
-                else
-                    inIzq = getAngulo();
-                if(getAngulo() > 320)
-                    inDer = - (360 - getAngulo());
-                else
-                    inDer = getAngulo();
-                izqPID.Compute();
-                derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
-
-                if(inFireB)
-                {
-                   detener();
-                   delay(2500);
-                   vueltaIzq();
-                   servoMotor();
-                   vueltaDer();
-                   delay(2500);
-                   inFireB = false;
-                }
-
-               if(inFireD)
-               {
-                   detener();
-                   delay(2500);
-                   vueltaDer();
-                   servoMotor();
-                   vueltaIzq();
-                   delay(2500);
-                   inFireD = false;
-               }
-            }
+            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         }
     } else {
         steps = 0;
         avanzar();
-        while (steps <= 1200) {
+        while (steps <= 1500) {
             if(getAngulo() > 320)
                 inIzq = - (360 - getAngulo());
             else
@@ -1257,11 +1210,12 @@ void moverCuadro() {
                 inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+            velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
             lcd.setCursor(0, 1);
             lcd.print(steps);
-            if(inFireB)
-            {
+
+            /*pos = steps;
+            if(inFireB) {
                detener();
                delay(2500);
                vueltaIzq();
@@ -1271,8 +1225,7 @@ void moverCuadro() {
                inFireB = false;
             }
 
-           if(inFireD)
-           {
+           if(inFireD) {
                detener();
                delay(2500);
                vueltaDer();
@@ -1281,6 +1234,7 @@ void moverCuadro() {
                delay(2500);
                inFireD = false;
            }
+           steps = pos;*/
         }
     }
     steps = 0;
@@ -1296,12 +1250,33 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
-        lcd.setCursor(0, 1);
-        lcd.print(steps);
+        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+
+        /*pos = steps;
+        if(inFireB) {
+           detener();
+           delay(2500);
+           vueltaIzq();
+           servoMotor();
+           vueltaDer();
+           delay(2500);
+           inFireB = false;
+        }
+
+       if(inFireD) {
+           detener();
+           delay(2500);
+           vueltaDer();
+           servoMotor();
+           vueltaIzq();
+           delay(2500);
+           inFireD = false;
+       }
+       steps = pos;*/
+
     }
     detener();
-    //alinear();
+    alinear();
     delay(1000);
     permisoRampa = true;
 }
@@ -2759,10 +2734,8 @@ void LackOfProgress(){
       break;
 
     }
-
   }
 }
-
 
 void setup() {
     Serial.begin(9600);
@@ -2780,9 +2753,8 @@ void setup() {
     pinMode(S1, OUTPUT);         //Establece  pin de Salida
     pinMode(S2, OUTPUT);         //Establece  pin de Salida
     pinMode(S3, OUTPUT);         //Establece  pin de Salida
-    if(!bno.begin()) {
+    if(!bno.begin())
            Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    }
     bno.setExtCrystalUse(true);
 
     AFMS.begin();
@@ -2790,7 +2762,7 @@ void setup() {
     MotorAD -> run(RELEASE);
     MotorCI -> run(RELEASE);
     MotorCD -> run(RELEASE);
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
     lcd.begin();
     lcd.backlight();
@@ -2798,11 +2770,10 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("     E V A");
 
-
     delay(200);
-
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
+    ramPID.SetMode(AUTOMATIC);
     setIzq = 0;
     setDer = 0;
     if(getAngulo() > 300)
@@ -2815,8 +2786,7 @@ void setup() {
         inDer = getAngulo();
 
     // Inicializa toda la matriz de checkpoint en 0
-    for(int i = 0; i<GRID_MAX; i++)
-    {
+    for(int i = 0; i<GRID_MAX; i++) {
         checkList1[i] = 0;
         checkList2[i] = 0;
     }
@@ -2828,7 +2798,7 @@ void setup() {
 
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
-    delay(2000);
+    //delay(2000);
     lcd.clear();
 }
 
