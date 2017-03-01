@@ -857,14 +857,21 @@ void checarRampa(){
     if(subirRampa or bajarRampa)
     {
         lcd.clear();
-        lcd.print("     RAMPA");
         if(firstFloor == 0)
         {
             if(subirRampa)
-            firstFloor = ABAJO;
+            {
+                firstFloor = ABAJO;
+                lcd.print("   ABAJO");
+                delay(500);
+            }
 
             if(bajarRampa)
-            firstFloor = ARRIBA;
+            {
+                firstFloor = ARRIBA;
+                lcd.print("   ARRIBA");
+                delay(500);
+            }
         }
 
         switch(LastMove)
@@ -906,6 +913,8 @@ void checarRampa(){
         {
             if(subirRampa)
             {
+                lcd.setCursor(0, 0);
+                lcd.print(" SUBIENDO RAMPA");
                 if(Piso3 and !Fusion)
                 {
                     z_actual--;
@@ -931,6 +940,8 @@ void checarRampa(){
             else
             if(bajarRampa)
             {
+                lcd.setCursor(0, 0);
+                lcd.print("  BAJANDO RAMPA");
                 if(!Piso2)
                 {
                     z_actual++;
@@ -972,6 +983,8 @@ void checarRampa(){
         {
             if(bajarRampa)
             {
+                lcd.setCursor(0, 0);
+                lcd.print("  BAJANDO RAMPA");
                 if(Piso2)
                 {
                     z_actual += 2;
@@ -990,6 +1003,8 @@ void checarRampa(){
             else
             if(subirRampa)
             {
+                lcd.setCursor(0, 0);
+                lcd.print(" SUBIENDO RAMPA");
                 if(z_actual == 1 and Piso2)
                 {
                     z_actual--;
@@ -2818,16 +2833,11 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
-
- /*lcd.clear();
+ lcd.clear();
  if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
-=======
-/*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
->>>>>>> 5c450e08c528a5a1da2cd099c13a2dc23592b85d
-       cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
-       checarArray();
-   checarParedes();
+ cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+    checarArray();
+    checarParedes();
 
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.home();
@@ -2849,13 +2859,12 @@ void loop() {
        lcd.print("O");
    }
 
-<<<<<<< HEAD
    lcd.setCursor(0, 1);
    lcd.print(" X=" + String(x_actual) + " Y=" + String(y_actual) + " Z=" +String(z_actual));
 
-   resolverLaberinto();*/
+   resolverLaberinto();
 
-   moverCuadro();
+   //moverCuadro();
    /*resolverLaberinto();
    lcd.home();
    lcd.print(analogRead(SHARP_LA));
