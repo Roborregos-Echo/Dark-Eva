@@ -1267,6 +1267,28 @@ void moverCuadro() {
 }
 
 
+
+void revesaCuadro() {
+    steps = 0;
+    reversa();
+    while (steps <= 4500) {
+        if(getAngulo() > 320)
+            inDer = - (360 - getAngulo());
+        else
+            inDer = getAngulo();
+
+        if(getAngulo() > 320)
+            inIzq = - (360 - getAngulo());
+        else
+            inIzq = getAngulo();
+
+        izqPID.Compute();
+        derPID.Compute();
+        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+    }
+}
+
+
 void absoluteMove(char cLado) {
     switch (iOrientacion) {
         case A_NORTE:
