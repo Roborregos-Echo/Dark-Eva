@@ -106,23 +106,17 @@ byte y_recorrer[50];
 //----------- SHIELD ADAFRUIT --------------
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
-Adafruit_DCMotor *MotorAI = AFMS.getMotor(3);
-Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
-Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
-Adafruit_DCMotor *MotorCD = AFMS.getMotor(1);
+Adafruit_DCMotor *MotorAI = AFMS.getMotor(1);
+Adafruit_DCMotor *MotorAD = AFMS.getMotor(4);
+Adafruit_DCMotor *MotorCI = AFMS.getMotor(2);
+Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 
 
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR_90  = 153;
-const int VEL_MOTOR_150 = 93;
-
-const int VEL_MOTOR_90_VUELTA  = 102;
-const int VEL_MOTOR_150_VUELTA = 62;
-
-const int VEL_MOTOR_90_RAMPA  = 255;
-const int VEL_MOTOR_150_RAMPA = 155;
+const int VEL_MOTOR         =   180;
+const int VEL_MOTOR_VUELTA  =   102;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -137,9 +131,10 @@ bool permisoRampa = true;
 const float PRECISION_IMU = 2.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
-double setIzq, setDer, inIzq, inDer, outIzq, outDer;
-PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
+double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
+PID izqPID(&inIzq, &outIzq, &setIzq, 15, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 20, 0, 0, REVERSE);
+PID ramPID(&inRam, &outRam, &setRam, 60, 0, 0, REVERSE);
 
 
 //******************************************
@@ -314,7 +309,7 @@ float getSharpCorta(int iSharp) {
     }
 
     if (sharpRead[3] >= 99 and sharpRead[3] <= 620)
-        resultado = 3742.4 * (1 / pow(sharpRead[3], 1.081));
+        resultado = 3582.4 * (pow(sharpRead[3], -1.047));//3742.4 * (1 / pow(sharpRead[3], 1.081));
     else
         resultado = 30;
     return resultado;
@@ -338,8 +333,8 @@ float getSharpLarga(int iSharp) {
         }
     }
 
-    if (sharpRead[3] >= 90 and sharpRead[3] <= 490)
-        resultado = 60.374 * pow(sharpRead[3] * 0.0048828125, -1.16);
+    if (sharpRead[3] >= 90 and sharpRead[3] <= 680)
+        resultado = 20472 * pow(sharpRead[3], -1.045);
     else
         resultado = -1;
     return resultado;
@@ -378,7 +373,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void alinear() {
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     if(getSharpCorta(SHARP_B1) < 15.0 && getSharpCorta(SHARP_D1) < 15.0) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1)
@@ -460,7 +455,7 @@ void compensacion() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+        velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
     }
     alinear();
 }
@@ -506,7 +501,7 @@ void vueltaIzq() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaIzquierda();
 
     if(limSup > limInf) {
@@ -520,7 +515,7 @@ void vueltaIzq() {
         }
         detener();
     }
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     detener();
 
     switch(iOrientacion) {
@@ -585,7 +580,7 @@ void vueltaDer() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
     if(limSup > limInf) {
@@ -599,7 +594,7 @@ void vueltaDer() {
         }
         detener();
     }
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     detener();
 
     switch(iOrientacion) {
@@ -664,7 +659,7 @@ void vueltaAtras() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-    velocidad(VEL_MOTOR_90_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_150_VUELTA, VEL_MOTOR_90_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
     if(limSup > limInf) {
@@ -679,7 +674,7 @@ void vueltaAtras() {
 
         detener();
     }
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     detener();
 
     switch(iOrientacion) {
@@ -1061,7 +1056,7 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+        velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
         lcd.setCursor(0, 1);
         lcd.print(steps);
         /*if(inFire)
@@ -1091,11 +1086,11 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
 
             }
-            velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         } else {
             inicio = millis();
             reversa();
@@ -1110,7 +1105,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
             }
         }
     } else if(vec.y() > 4.0) {
@@ -1128,10 +1123,10 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
-            velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         } else {
             inicio = millis();
             reversa();
@@ -1146,7 +1141,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+                velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
                 /*if(inFire)
                  {
                    detener();
@@ -1173,7 +1168,7 @@ void moverCuadro() {
                 inDer = getAngulo();
             izqPID.Compute();
             derPID.Compute();
-            velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+            velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
             lcd.setCursor(0, 1);
             lcd.print(steps);
             /*if(inFire)
@@ -1201,7 +1196,7 @@ void moverCuadro() {
             inDer = getAngulo();
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR_90 + outDer, VEL_MOTOR_150 + outIzq, VEL_MOTOR_150 + outDer, VEL_MOTOR_90 + outIzq);
+        velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
         lcd.setCursor(0, 1);
         lcd.print(steps);
     }
@@ -2664,10 +2659,8 @@ void LackOfProgress(){
       break;
 
     }
-
   }
 }
-
 
 void setup() {
     Serial.begin(9600);
@@ -2695,7 +2688,7 @@ void setup() {
     MotorAD -> run(RELEASE);
     MotorCI -> run(RELEASE);
     MotorCD -> run(RELEASE);
-    velocidad(VEL_MOTOR_90, VEL_MOTOR_150, VEL_MOTOR_150, VEL_MOTOR_90);
+    velocidad(200, VEL_MOTOR, 200, VEL_MOTOR);
 
     lcd.begin();
     lcd.backlight();
@@ -2708,6 +2701,7 @@ void setup() {
 
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
+    ramPID.SetMode(AUTOMATIC);
     setIzq = 0;
     setDer = 0;
     if(getAngulo() > 300)
@@ -2735,9 +2729,37 @@ void setup() {
     pinMode(6, INPUT);
     delay(2000);
     lcd.clear();
+    /*MotorAI -> run(FORWARD);
+    MotorAD -> run(RELEASE);
+    MotorCI -> run(RELEASE);
+    MotorCD -> run(FORWARD);*/
+    avanzar();
+    setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
 }
 
 void loop() {
+    if(getAngulo() > 320)
+        inIzq = - (360 - getAngulo());
+    else
+        inIzq = getAngulo();
+    if(getAngulo() > 320)
+        inDer = - (360 - getAngulo());
+    else
+        inDer = getAngulo();
+    inRam = getSharpCorta(SHARP_D1);
+    ramPID.Compute();
+    izqPID.Compute();
+    derPID.Compute();
+    if (outRam > 4)
+        velocidad(VEL_MOTOR, VEL_MOTOR + outRam, VEL_MOTOR, VEL_MOTOR + outRam);
+    else
+        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer + outRam, VEL_MOTOR + outIzq, VEL_MOTOR + outDer + outRam);
+    lcd.setCursor(0, 1);
+    lcd.print(getSharpCorta(SHARP_D1));
+    lcd.setCursor(8, 1);
+    lcd.print(getSharpCorta(SHARP_D2));
+    lcd.setCursor(0, 0);
+    lcd.print(outRam);
 /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
        checarArray();
@@ -2764,16 +2786,15 @@ void loop() {
    }
 
    resolverLaberinto();*/
-   lcd.home();
-   lcd.print(analogRead(SHARP_LA));
+   /*lcd.home();
+   lcd.print(analogRead(SHARP_A));
    lcd.setCursor(0, 1);
-   lcd.print(getSharpLarga(SHARP_LA));
+   lcd.print(getSharpCorta(SHARP_A));
 
    lcd.setCursor(9, 0);
-   lcd.print(analogRead(SHARP_LC));
+   lcd.print(analogRead(SHARP_C));
    lcd.setCursor(9, 1);
-   lcd.print(getSharpLarga(SHARP_LC));
-   delay(40);
+   lcd.print(getSharpCorta(SHARP_C));*/
 
    /*Serial.println("SHARP_A " + String(getSharpCorta(SHARP_A)));
    Serial.println("SHARP_B1 " + String(getSharpCorta(SHARP_B1)));
