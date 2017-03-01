@@ -12,6 +12,7 @@
 
 
 void resolverLaberinto();
+void servoMotor();
 
 
 //********************************************
@@ -851,7 +852,7 @@ void checarRampa(){
     if(subirRampa or bajarRampa)
     {
         lcd.clear();
-        lcd.print("RAMPA");
+        lcd.print("     RAMPA");
         if(firstFloor == 0)
         {
             if(subirRampa)
@@ -864,26 +865,34 @@ void checarRampa(){
         switch(LastMove)
         {
             case TO_NORTH:
+            lcd.setCursor(0,1);
+            lcd.print("TO_NORTH");
             setRampa(x_actual, y_actual +1, z_actual);
-            y_actual += (RampaDiff+1);
+            y_actual += (RampaDiff);
             RampaLastMove = TO_NORTH;
             break;
 
             case TO_EAST:
+            lcd.setCursor(0,1);
+            lcd.print("TO_EAST");
             setRampa(x_actual +1, y_actual, z_actual);
-            x_actual += (RampaDiff+1);
+            x_actual += (RampaDiff);
             RampaLastMove = TO_EAST;
             break;
 
             case TO_SOUTH:
+            lcd.setCursor(0,1);
+            lcd.print("TO_SOUTH");
             setRampa(x_actual, y_actual -1, z_actual);
-            y_actual -= (RampaDiff+1);
+            y_actual -= (RampaDiff);
             RampaLastMove = TO_SOUTH;
             break;
 
             case TO_WEST:
+            lcd.setCursor(0,1);
+            lcd.print("TO_WEST");
             setRampa(x_actual -1, y_actual, z_actual);
-            x_actual -= (RampaDiff+1);
+            x_actual -= (RampaDiff);
             RampaLastMove = TO_WEST;
             break;
         }
@@ -1038,6 +1047,41 @@ void checarRampa(){
             break;
         }
     }
+    subirRampa = false;
+    bajarRampa = false;
+}
+
+//******************************************
+//******************************************
+//---------------INTERRUPTS-----------------
+//******************************************
+//******************************************
+
+bool inFireB = false;
+bool inFireD = false;
+bool firstFireB = true;
+bool firstFireD = true;
+
+void funcionB(){
+  if(firstFireB)
+  {
+      firstFireB = false;
+  }
+  else
+  {
+      inFireB = true;
+  }
+}
+
+void funcionD(){
+    if(firstFireD)
+    {
+        firstFireD = false;
+    }
+    else
+    {
+        inFireD = true;
+    }
 }
 
 
@@ -1059,16 +1103,29 @@ void moverCuadro() {
         velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
         lcd.setCursor(0, 1);
         lcd.print(steps);
-        /*if(inFire)
-         {
+        if(inFireB)
+        {
            detener();
+           delay(2000);
            vueltaIzq();
-           delay(2500);
            servoMotor();
-           delay(2500);
+           delay(1000);
            vueltaDer();
-           inFire = false;
-       }*/
+           delay(2000);
+           inFireB = false;
+        }
+
+       if(inFireD)
+       {
+           detener();
+           delay(2000);
+           vueltaDer();
+           servoMotor();
+           delay(1000);
+           vueltaIzq();
+           delay(2000);
+           inFireD = false;
+       }
     }
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -4.0) {
@@ -1142,20 +1199,30 @@ void moverCuadro() {
                 izqPID.Compute();
                 derPID.Compute();
                 velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
-                /*if(inFire)
-                 {
+
+                if(inFireB) {
                    detener();
-                   vueltaIzq();
                    delay(2500);
+                   vueltaIzq();
                    servoMotor();
+                   vueltaDer();
+                   delay(2500);
+                   inFireB = false;
+                }
+
+               if(inFireD) {
+                   detener();
                    delay(2500);
                    vueltaDer();
-                   inFire = false;
-               }*/
+                   servoMotor();
+                   vueltaIzq();
+                   delay(2500);
+                   inFireD = false;
+               }
             }
         }
     } else {
-        steps = 0;
+            steps = 0;
         avanzar();
         while (steps <= 1200) {
             if(getAngulo() > 320)
@@ -1171,16 +1238,27 @@ void moverCuadro() {
             velocidad(VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq);
             lcd.setCursor(0, 1);
             lcd.print(steps);
-            /*if(inFire)
-             {
+            if(inFireB)
+            {
                detener();
-               vueltaIzq();
                delay(2500);
+               vueltaIzq();
                servoMotor();
+               vueltaDer();
+               delay(2500);
+               inFireB = false;
+            }
+
+           if(inFireD)
+           {
+               detener();
                delay(2500);
                vueltaDer();
-               inFire = false;
-           }*/
+               servoMotor();
+               vueltaIzq();
+               delay(2500);
+               inFireD = false;
+           }
         }
     }
     steps = 0;
@@ -1201,7 +1279,7 @@ void moverCuadro() {
         lcd.print(steps);
     }
     detener();
-    alinear();
+    //alinear();
     delay(1000);
     permisoRampa = true;
 }
@@ -1212,21 +1290,25 @@ void absoluteMove(char cLado) {
         case A_NORTE:
         switch(cLado) {
             case 'N':
+            LastMove = TO_NORTH;
             moverCuadro();
             break;
 
             case 'E':
+            LastMove = TO_EAST;
             compensacion();
             vueltaDer();
             moverCuadro();
             break;
 
             case 'S':
+            LastMove = TO_SOUTH;
             vueltaAtras();
             moverCuadro();
             break;
 
             case 'O':
+            LastMove = TO_WEST;
             compensacion();
             vueltaIzq();
             moverCuadro();
@@ -1237,23 +1319,27 @@ void absoluteMove(char cLado) {
         case B_NORTE:
         switch(cLado) {
             case 'N':
+            LastMove = TO_NORTH;
             compensacion();
             vueltaDer();
             moverCuadro();
             break;
 
             case 'E':
+            LastMove = TO_EAST;
             vueltaAtras();
             moverCuadro();
             break;
 
             case 'S':
+            LastMove = TO_SOUTH;
             compensacion();
             vueltaIzq();
             moverCuadro();
             break;
 
             case 'O':
+            LastMove = TO_WEST;
             moverCuadro();
             break;
         }
@@ -1262,21 +1348,25 @@ void absoluteMove(char cLado) {
         case C_NORTE:
         switch(cLado) {
             case 'N':
+            LastMove = TO_NORTH;
             vueltaAtras();
             moverCuadro();
             break;
 
             case 'E':
+            LastMove = TO_EAST;
             compensacion();
             vueltaIzq();
             moverCuadro();
             break;
 
             case 'S':
+            LastMove = TO_SOUTH;
             moverCuadro();
             break;
 
             case 'O':
+            LastMove = TO_WEST;
             compensacion();
             vueltaDer();
             moverCuadro();
@@ -1287,22 +1377,26 @@ void absoluteMove(char cLado) {
         case D_NORTE:
         switch(cLado) {
             case 'N':
+            LastMove = TO_NORTH;
             compensacion();
             vueltaIzq();
             moverCuadro();
             break;
 
             case 'E':
+            LastMove = TO_EAST;
             moverCuadro();
             break;
 
             case 'S':
+            LastMove = TO_SOUTH;
             compensacion();
             vueltaDer();
             moverCuadro();
             break;
 
             case 'O':
+            LastMove = TO_WEST;
             vueltaAtras();
             moverCuadro();
             break;
@@ -2254,8 +2348,8 @@ void resolverLaberinto(){
                 {
                     lcd.print("GOTO INICIO C");
                     delay(500);
-                    gotoInicio(x_InicioC, y_InicioC);
                     Piso3 = true;
+                    gotoInicio(x_InicioC, y_InicioC);
                     RampaMoveX();
                 }
                 else
@@ -2263,8 +2357,8 @@ void resolverLaberinto(){
                 {
                     lcd.print("GOTO INICIO B");
                     delay(500);
-                    gotoInicio(x_InicioB, y_InicioB);
                     Piso2 = true;
+                    gotoInicio(x_InicioB, y_InicioB);
                     RampaMoveX();
                 }
                 else
@@ -2282,6 +2376,7 @@ void resolverLaberinto(){
                     gotoInicio(x_inicio, y_inicio);
 
                     Serial.println("MARI PUTISIMO, YA LLEGUE");
+                    lcd.print("  LLEGUE");
                     delay(20000);
                 }
             }
@@ -2312,23 +2407,6 @@ void checarMlx(){
     servoMotor();
     cuadros[x_actual][y_actual][z_actual].setMlx(true);
   }
-}
-
-
-//******************************************
-//******************************************
-//---------------INTERRUPTS-----------------
-//******************************************
-//******************************************
-
-bool inFire;
-
-void funcionB(){
-  inFire = true;
-}
-
-void funcionD(){
-  inFire = true;
 }
 
 
@@ -2760,7 +2838,10 @@ void loop() {
     lcd.print(getSharpCorta(SHARP_D2));
     lcd.setCursor(0, 0);
     lcd.print(outRam);
-/*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+
+
+ /*lcd.clear();
+ if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
        checarArray();
    checarParedes();
@@ -2782,31 +2863,5 @@ void loop() {
 
    if(cuadros[x_actual][y_actual][z_actual].getPared('O')){
        lcd.setCursor(8, 0);
-       lcd.print("O");
-   }
-
-   resolverLaberinto();*/
-   /*lcd.home();
-   lcd.print(analogRead(SHARP_A));
-   lcd.setCursor(0, 1);
-   lcd.print(getSharpCorta(SHARP_A));
-
-   lcd.setCursor(9, 0);
-   lcd.print(analogRead(SHARP_C));
-   lcd.setCursor(9, 1);
-   lcd.print(getSharpCorta(SHARP_C));*/
-
-   /*Serial.println("SHARP_A " + String(getSharpCorta(SHARP_A)));
-   Serial.println("SHARP_B1 " + String(getSharpCorta(SHARP_B1)));
-   Serial.println("SHARP_B2 " + String(getSharpCorta(SHARP_B2)));
-   Serial.println("SHARP_C " + String(getSharpCorta(SHARP_C)));
-   Serial.println("SHARP_D1 " + String(getSharpCorta(SHARP_D1)));
-   Serial.println("SHARP_D2 " + String(getSharpCorta(SHARP_D2)));
-   Serial.println();
-   delay(1000);
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);*/
+       lcd.print("O");*/
 }
