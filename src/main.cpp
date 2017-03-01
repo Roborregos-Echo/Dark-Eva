@@ -5,12 +5,17 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.0.6 --------------------------------
-//--------------------------- 26 / FEBRERO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.0.7 --------------------------------
+//--------------------------- 01 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
 
+//********************************************
+//********************************************
+//------------------ HEADERS -----------------
+//********************************************
+//********************************************
 void resolverLaberinto();
 void servoMotor();
 
@@ -2766,7 +2771,7 @@ void setup() {
     MotorAD -> run(RELEASE);
     MotorCI -> run(RELEASE);
     MotorCD -> run(RELEASE);
-    velocidad(200, VEL_MOTOR, 200, VEL_MOTOR);
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
     lcd.begin();
     lcd.backlight();
@@ -2792,8 +2797,7 @@ void setup() {
         inDer = getAngulo();
 
     // Inicializa toda la matriz de checkpoint en 0
-    for(int i = 0; i<GRID_MAX; i++)
-    {
+    for(int i = 0; i<GRID_MAX; i++) {
         checkList1[i] = 0;
         checkList2[i] = 0;
     }
@@ -2807,12 +2811,8 @@ void setup() {
     pinMode(6, INPUT);
     delay(2000);
     lcd.clear();
-    /*MotorAI -> run(FORWARD);
-    MotorAD -> run(RELEASE);
-    MotorCI -> run(RELEASE);
-    MotorCD -> run(FORWARD);*/
-    avanzar();
-    setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
+
+    //setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
 }
 
 void loop() {
