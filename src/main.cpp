@@ -122,8 +122,8 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //--------------- MOTORES ------------------
 
 const int VEL_MOTOR         =   180;
-const int VEL_MOTOR_VUELTA  =   150;
-const int VEL_MOTOR_ENCODER  =   145;
+const int VEL_MOTOR_VUELTA  =   255;
+const int VEL_MOTOR_ENCODER  =   240;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -464,7 +464,7 @@ void compensacion() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
     }
-    //alinear();
+    alinear();
 }
 
 void vueltaIzq() {
@@ -543,7 +543,7 @@ void vueltaIzq() {
         break;
     }
     delay(400);
-    //alinear();
+    alinear();
 }
 
 void vueltaDer() {
@@ -622,7 +622,7 @@ void vueltaDer() {
         break;
     }
     delay(400);
-    //alinear();
+    alinear();
 }
 
 void vueltaAtras() {
@@ -702,7 +702,7 @@ void vueltaAtras() {
         break;
     }
     delay(400);
-    //alinear();
+    alinear();
 }
 
 class Cuadro {
@@ -858,21 +858,14 @@ void checarRampa(){
     if(subirRampa or bajarRampa)
     {
         lcd.clear();
+        lcd.print("     RAMPA");
         if(firstFloor == 0)
         {
             if(subirRampa)
-            {
-                firstFloor = ABAJO;
-                lcd.print("   ABAJO");
-                delay(500);
-            }
+            firstFloor = ABAJO;
 
             if(bajarRampa)
-            {
-                firstFloor = ARRIBA;
-                lcd.print("   ARRIBA");
-                delay(500);
-            }
+            firstFloor = ARRIBA;
         }
 
         switch(LastMove)
@@ -914,8 +907,6 @@ void checarRampa(){
         {
             if(subirRampa)
             {
-                lcd.setCursor(0, 0);
-                lcd.print(" SUBIENDO RAMPA");
                 if(Piso3 and !Fusion)
                 {
                     z_actual--;
@@ -941,8 +932,6 @@ void checarRampa(){
             else
             if(bajarRampa)
             {
-                lcd.setCursor(0, 0);
-                lcd.print("  BAJANDO RAMPA");
                 if(!Piso2)
                 {
                     z_actual++;
@@ -984,8 +973,6 @@ void checarRampa(){
         {
             if(bajarRampa)
             {
-                lcd.setCursor(0, 0);
-                lcd.print("  BAJANDO RAMPA");
                 if(Piso2)
                 {
                     z_actual += 2;
@@ -1004,8 +991,6 @@ void checarRampa(){
             else
             if(subirRampa)
             {
-                lcd.setCursor(0, 0);
-                lcd.print(" SUBIENDO RAMPA");
                 if(z_actual == 1 and Piso2)
                 {
                     z_actual--;
@@ -1276,7 +1261,7 @@ void moverCuadro() {
 
     }
     detener();
-    //alinear();
+    alinear();
     delay(1000);
     permisoRampa = true;
 }
@@ -2583,15 +2568,10 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 void checarCheckpoint(){
 
-    if(checarCuadroColor(COLOR_NEGRO, 80))
-    {
-        
-    }
+    int TotalGrid;
 
-    if(checarCuadroColor(COLOR_CHECKPOINT, 40))
+    if(checarCuadroColor(CHECKPOINT, 20))
     {
-      int TotalGrid;
-
       for(int z=0; z<Z_MAX; z++)
       {
         for(int y = 0; y < Y_MAX; y++)
@@ -2808,61 +2788,5 @@ void setup() {
 }
 
 void loop() {
- lcd.clear();
- if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
- cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
-    checarArray();
-    checarParedes();
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
-       lcd.home();
-       lcd.print("S");
-   }
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('E')){
-       lcd.setCursor(2, 0);
-       lcd.print("E");
-   }
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('N')){
-       lcd.setCursor(5, 0);
-       lcd.print("N");
-   }
-
-   if(cuadros[x_actual][y_actual][z_actual].getPared('O')){
-       lcd.setCursor(8, 0);
-       lcd.print("O");
-   }
-
-   lcd.setCursor(0, 1);
-   lcd.print(" X=" + String(x_actual) + " Y=" + String(y_actual) + " Z=" +String(z_actual));
-
-   resolverLaberinto();
-
-   //moverCuadro();
-   /*resolverLaberinto();
-   lcd.home();
-   lcd.print(analogRead(SHARP_LA));
-   lcd.setCursor(0, 1);
-   lcd.print(getSharpLarga(SHARP_LA));
-
-   lcd.setCursor(9, 0);
-   lcd.print(analogRead(SHARP_LC));
-   lcd.setCursor(9, 1);
-   lcd.print(getSharpLarga(SHARP_LC));
-   delay(40);*/
-
-   /*Serial.println("SHARP_A " + String(getSharpCorta(SHARP_A)));
-   Serial.println("SHARP_B1 " + String(getSharpCorta(SHARP_B1)));
-   Serial.println("SHARP_B2 " + String(getSharpCorta(SHARP_B2)));
-   Serial.println("SHARP_C " + String(getSharpCorta(SHARP_C)));
-   Serial.println("SHARP_D1 " + String(getSharpCorta(SHARP_D1)));
-   Serial.println("SHARP_D2 " + String(getSharpCorta(SHARP_D2)));
-   Serial.println();
-   delay(1000);
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);*/
+    horizontalDerecha();
 }
