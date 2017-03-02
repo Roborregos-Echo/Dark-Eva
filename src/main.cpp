@@ -1110,7 +1110,7 @@ void moverCuadro() {
         izqPID.Compute();
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-        if(inFireB) {
+        /*if(inFireB) {
             pos = steps;
            detener();
            delay(500);
@@ -1134,7 +1134,7 @@ void moverCuadro() {
            delay(500);
            inFireD = false;
            steps = pos;
-       }
+       }*/
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1202,7 +1202,7 @@ void moverCuadro() {
             lcd.setCursor(0, 1);
             lcd.print(steps);
 
-            if(inFireB) {
+            /*if(inFireB) {
                 pos = steps;
                detener();
                delay(500);
@@ -1226,7 +1226,7 @@ void moverCuadro() {
                delay(500);
                inFireD = false;
                steps = pos;
-           }
+           }*/
         }
     }
     steps = 0;
@@ -1244,7 +1244,7 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
 
-        if(inFireB) {
+        /*if(inFireB) {
             pos = steps;
            detener();
            delay(500);
@@ -1268,7 +1268,7 @@ void moverCuadro() {
            delay(500);
            inFireD = false;
            steps = pos;
-       }
+       }*/
 
     }
     detener();
@@ -2834,7 +2834,7 @@ void setup() {
 
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
-    delay(1500);
+    delay(1000);
     lcd.clear();
 }
 
@@ -2843,13 +2843,21 @@ void loop() {
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    checarParedes();
-   if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-   Serial.println("Pared S");
-   if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-   Serial.println("Pared E");
-   if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-   Serial.println("Pared N");
-   if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-   Serial.println("Pared O");
+   if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
+       lcd.setCursor(0, 0);
+       lcd.print("S");
+   }
+   if(cuadros[x_actual][y_actual][z_actual].getPared('E')) {
+       lcd.setCursor(2, 0);
+       lcd.print("E");
+   }
+   if(cuadros[x_actual][y_actual][z_actual].getPared('N')) {
+       lcd.setCursor(4, 0);
+       lcd.print("N");
+   }
+   if(cuadros[x_actual][y_actual][z_actual].getPared('O')) {
+       lcd.setCursor(6, 0);
+       lcd.print("O");
+   }
    resolverLaberinto();
 }
