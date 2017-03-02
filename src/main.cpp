@@ -858,6 +858,22 @@ void setRampa(byte x, byte y, byte z){
 void checarRampa(){
     if(subirRampa or bajarRampa)
     {
+
+        if(x_last != 255 and y_last != 255)
+        {
+            cuadros[x_last][y_last][z_actual].setEstado(SIN_RECORRER);
+            x_last = 255;
+            y_last = 255;
+            Last = false;
+        }
+
+        if(x_last2 != 255 and y_last2 != 255)
+        {
+            cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
+            x_last2 = 255;
+            y_last2 = 255;
+            Last2 = false;
+        }
         lcd.clear();
         lcd.print("     RAMPA");
         if(firstFloor == 0)
@@ -1197,7 +1213,7 @@ void moverCuadro() {
             lcd.setCursor(0, 1);
             lcd.print(steps);
 
-            if(inFireB == true) {
+            /*if(inFireB == true) {
                 iCounter++;
                 lcd.clear();
                 lcd.setCursor(0, 0);
@@ -1229,7 +1245,7 @@ void moverCuadro() {
                delay(500);
                inFireD = false;
                steps = pos;
-           }
+           }*/
         }
     }
     steps = 0;
@@ -1515,6 +1531,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     Serial.println("Estoy en PathFinding");
     Serial.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     Serial.println("Destino = " + String(x_destino)+ "," + String(y_destino));
+    lcd.setCursor(0, 1);
+    lcd.print("    " + String(x_destino) + "," + String(y_destino));
     //delay(500);
     bool pathFinished = false;
     int Grid;
@@ -2377,7 +2395,7 @@ void resolverLaberinto(){
                     delay(200);
                     Piso3 = true;
                     gotoInicio(x_InicioC, y_InicioC);
-                    RampaMoveX();
+                    //RampaMoveX();
                 }
                 else
                 if(z_actual == 1)
@@ -2386,7 +2404,7 @@ void resolverLaberinto(){
                     delay(200);
                     Piso2 = true;
                     gotoInicio(x_InicioB, y_InicioB);
-                    RampaMoveX();
+                    //RampaMoveX();
                 }
                 else
                 if(!Piso2)
@@ -2394,7 +2412,7 @@ void resolverLaberinto(){
                     lcd.print("GOTO INICIO C");
                     delay(200);
                     gotoInicio(x_InicioC, y_InicioC);
-                    RampaMoveX();
+                    //RampaMoveX();
                 }
                 else
                 {
@@ -2785,7 +2803,7 @@ void LackOfProgress(){
 
 
 void setup() {
-    delay(2000);
+    delay(1000);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
@@ -2851,9 +2869,13 @@ void setup() {
 }
 
 void loop() {
+    lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
+   lcd.setCursor(0,1);
+   lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
+   delay(500);
    checarParedes();
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
