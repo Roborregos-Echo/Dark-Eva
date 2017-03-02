@@ -1070,27 +1070,14 @@ bool firstFireB = true;
 bool firstFireD = true;
 
 void funcionB(){
-  if(firstFireB)
-  {
-      firstFireB = false;
-  }
-  else
-  {
-      inFireB = true;
-  }
+     inFireB = true;
 }
 
 void funcionD(){
-    if(firstFireD)
-    {
-        firstFireD = false;
-    }
-    else
-    {
-        inFireD = true;
-    }
+    inFireD = true;
 }
 
+int iCounter = 0;
 
 void moverCuadro() {
     float pos = 0;
@@ -1110,7 +1097,11 @@ void moverCuadro() {
         izqPID.Compute();
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-        /*if(inFireB) {
+        /*if(inFireB == true) {
+            iCounter++;
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Contador " + String(iCounter));
             pos = steps;
            detener();
            delay(500);
@@ -1123,7 +1114,11 @@ void moverCuadro() {
            steps = pos;
         }
 
-       if(inFireD) {
+       if(inFireD == true) {
+           iCounter++;
+           lcd.clear();
+           lcd.setCursor(0, 0);
+           lcd.print("Contador " + String(iCounter));
            pos = steps;
            detener();
            delay(500);
@@ -1202,7 +1197,11 @@ void moverCuadro() {
             lcd.setCursor(0, 1);
             lcd.print(steps);
 
-            /*if(inFireB) {
+            if(inFireB == true) {
+                iCounter++;
+                lcd.clear();
+                lcd.setCursor(0, 0);
+                lcd.print("Contador " + String(iCounter));
                 pos = steps;
                detener();
                delay(500);
@@ -1215,7 +1214,11 @@ void moverCuadro() {
                steps = pos;
             }
 
-           if(inFireD) {
+           if(inFireD == true) {
+               iCounter++;
+               lcd.clear();
+               lcd.setCursor(0, 0);
+               lcd.print("Contador " + String(iCounter));
                pos = steps;
                detener();
                delay(500);
@@ -1226,7 +1229,7 @@ void moverCuadro() {
                delay(500);
                inFireD = false;
                steps = pos;
-           }*/
+           }
         }
     }
     steps = 0;
@@ -1244,7 +1247,11 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
 
-        /*if(inFireB) {
+        /*if(inFireB == true) {
+            iCounter++;
+            lcd.clear();
+            lcd.setCursor(0, 0);
+            lcd.print("Contador " + String(iCounter));
             pos = steps;
            detener();
            delay(500);
@@ -1257,7 +1264,11 @@ void moverCuadro() {
            steps = pos;
         }
 
-       if(inFireD) {
+       if(inFireD == true) {
+           iCounter++;
+           lcd.clear();
+           lcd.setCursor(0, 0);
+           lcd.print("Contador " + String(iCounter));
            pos = steps;
            detener();
            delay(500);
@@ -2774,6 +2785,7 @@ void LackOfProgress(){
 
 
 void setup() {
+    delay(2000);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
