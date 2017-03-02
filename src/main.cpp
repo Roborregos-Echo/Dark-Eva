@@ -121,9 +121,9 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR         =   180;
-const int VEL_MOTOR_VUELTA  =   255;
-const int VEL_MOTOR_ENCODER  =   240;
+const int VEL_MOTOR         =   150;
+const int VEL_MOTOR_VUELTA  =   120;
+const int VEL_MOTOR_ENCODER  =   115;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -205,12 +205,12 @@ Servo servo;
 
 //******************************************
 //-----------------TCS3200------------------
-#define S0 6
-#define S1 7
-#define S2 4
-#define S3 5
-#define sensorOut 3
-#define BOTON_COLOR 8
+#define S0 7
+#define S1 8
+#define S2 5
+#define S3 4
+#define sensorOut 6
+#define BOTON_COLOR 0
 
 const byte ESTADO_OFF           = 0;
 const byte ESTADO_NEGRO         = 1;
@@ -391,12 +391,12 @@ void alinear() {
             detener();
         }
     } else if(getSharpCorta(SHARP_B1) < 15.0) {
-        while (!(getSharpCorta(SHARP_B1) > 6.0 && getSharpCorta(SHARP_B1) < 7.0)) {
-            while (getSharpCorta(SHARP_B1) < 6.0) {
+        while (!(getSharpCorta(SHARP_B1) > 9.0 && getSharpCorta(SHARP_B1) < 10.0)) {
+            while (getSharpCorta(SHARP_B1) < 9.0) {
                 horizontalIzquierda();
             }
             detener();
-            while (getSharpCorta(SHARP_B1) > 7.0) {
+            while (getSharpCorta(SHARP_B1) > 10.0) {
                 horizontalDerecha();
             }
             detener();
@@ -413,11 +413,11 @@ void alinear() {
             detener();
         }
     } else if(getSharpCorta(SHARP_D1) < 15.0) {
-        while (!(getSharpCorta(SHARP_D1) > 6.0 && getSharpCorta(SHARP_D1) < 7.0)) {
-            while (getSharpCorta(SHARP_D1) < 6.0) {
+        while (!(getSharpCorta(SHARP_D1) > 9.0 && getSharpCorta(SHARP_D1) < 10.0)) {
+            while (getSharpCorta(SHARP_D1) < 9.0) {
                 horizontalDerecha();
             }
-            while (getSharpCorta(SHARP_D1) > 7.0) {
+            while (getSharpCorta(SHARP_D1) > 10.0) {
                 horizontalIzquierda();
             }
             detener();
@@ -433,14 +433,15 @@ void alinear() {
             }
             detener();
         }
-    } /*else if (getSharpCorta(SHARP_A) < 15.0) {
-        if (getSharpCorta(SHARP_A) < 5.0) {
-            while (getSharpCorta(SHARP_A) < 5) {
+    }
+    /*if (getSharpCorta(SHARP_A) < 25.0) {
+        if (getSharpCorta(SHARP_A) < 8.0) {
+            while (getSharpCorta(SHARP_A) < 8) {
                 reversa();
             }
             detener();
-        } else if (getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 15.0) {
-            while (getSharpCorta(SHARP_A) > 7) {
+        } else if (getSharpCorta(SHARP_A) > 12 && getSharpCorta(SHARP_A) < 16.0) {
+            while (getSharpCorta(SHARP_A) > 12) {
                 avanzar();
             }
             detener();
@@ -542,7 +543,7 @@ void vueltaIzq() {
         iOrientacion = A_NORTE;
         break;
     }
-    delay(400);
+    delay(200);
     alinear();
 }
 
@@ -621,7 +622,7 @@ void vueltaDer() {
         iOrientacion = C_NORTE;
         break;
     }
-    delay(400);
+    delay(200);
     alinear();
 }
 
@@ -701,7 +702,7 @@ void vueltaAtras() {
         iOrientacion = B_NORTE;
         break;
     }
-    delay(400);
+    delay(200);
     alinear();
 }
 
@@ -1095,7 +1096,7 @@ void moverCuadro() {
     float pos = 0;
     steps = 0;
     avanzar();
-    while (steps <= 2500) {
+    while (steps <= 2700) {
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -1109,29 +1110,31 @@ void moverCuadro() {
         izqPID.Compute();
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-        /*pos = steps;
         if(inFireB) {
+            pos = steps;
            detener();
-           delay(1000);
+           delay(500);
            vueltaIzq();
            servoMotor();
-           delay(1000);
+           delay(500);
            vueltaDer();
-           delay(2000);
+           delay(500);
            inFireB = false;
+           steps = pos;
         }
 
        if(inFireD) {
+           pos = steps;
            detener();
-           delay(1000);
+           delay(500);
            vueltaDer();
            servoMotor();
-           delay(1000);
+           delay(500);
            vueltaIzq();
-           delay(2000);
+           delay(500);
            inFireD = false;
+           steps = pos;
        }
-       steps = pos;*/
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1199,27 +1202,31 @@ void moverCuadro() {
             lcd.setCursor(0, 1);
             lcd.print(steps);
 
-            /*pos = steps;
             if(inFireB) {
+                pos = steps;
                detener();
-               delay(2500);
+               delay(500);
                vueltaIzq();
                servoMotor();
+               delay(500);
                vueltaDer();
-               delay(2500);
+               delay(500);
                inFireB = false;
+               steps = pos;
             }
 
            if(inFireD) {
+               pos = steps;
                detener();
-               delay(2500);
+               delay(500);
                vueltaDer();
                servoMotor();
+               delay(500);
                vueltaIzq();
-               delay(2500);
+               delay(500);
                inFireD = false;
+               steps = pos;
            }
-           steps = pos;*/
         }
     }
     steps = 0;
@@ -1237,32 +1244,36 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
 
-        /*pos = steps;
         if(inFireB) {
+            pos = steps;
            detener();
-           delay(2500);
+           delay(500);
            vueltaIzq();
            servoMotor();
+           delay(500);
            vueltaDer();
-           delay(2500);
+           delay(500);
            inFireB = false;
+           steps = pos;
         }
 
        if(inFireD) {
+           pos = steps;
            detener();
-           delay(2500);
+           delay(500);
            vueltaDer();
            servoMotor();
+           delay(500);
            vueltaIzq();
-           delay(2500);
+           delay(500);
            inFireD = false;
+           steps = pos;
        }
-       steps = pos;*/
 
     }
     detener();
     alinear();
-    delay(1000);
+    delay(200);
     permisoRampa = true;
 }
 
@@ -2352,7 +2363,7 @@ void resolverLaberinto(){
                 if(z_actual == 2)
                 {
                     lcd.print("GOTO INICIO C");
-                    delay(500);
+                    delay(200);
                     Piso3 = true;
                     gotoInicio(x_InicioC, y_InicioC);
                     RampaMoveX();
@@ -2361,7 +2372,7 @@ void resolverLaberinto(){
                 if(z_actual == 1)
                 {
                     lcd.print("GOTO INICIO B");
-                    delay(500);
+                    delay(200);
                     Piso2 = true;
                     gotoInicio(x_InicioB, y_InicioB);
                     RampaMoveX();
@@ -2370,14 +2381,14 @@ void resolverLaberinto(){
                 if(!Piso2)
                 {
                     lcd.print("GOTO INICIO C");
-                    delay(500);
+                    delay(200);
                     gotoInicio(x_InicioC, y_InicioC);
                     RampaMoveX();
                 }
                 else
                 {
                     lcd.print("GOTO INICIO");
-                    delay(500);
+                    delay(200);
                     gotoInicio(x_inicio, y_inicio);
 
                     Serial.println("MARI PUTISIMO, YA LLEGUE");
@@ -2823,10 +2834,22 @@ void setup() {
 
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
-    //delay(2000);
+    delay(1500);
     lcd.clear();
 }
 
 void loop() {
-    horizontalDerecha();
+    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+       cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+   checarArray();
+   checarParedes();
+   if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
+   Serial.println("Pared S");
+   if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
+   Serial.println("Pared E");
+   if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
+   Serial.println("Pared N");
+   if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
+   Serial.println("Pared O");
+   resolverLaberinto();
 }
