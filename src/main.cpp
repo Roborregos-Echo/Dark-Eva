@@ -2665,7 +2665,6 @@ void checarColor(){
 // Si el array esta a punto de salir de los parametros, mueve la matriz una linea completa
 void checarArray(){
 
-
     if (x_actual < 1) {
         for(int i = x_actual; i<1; i++)
         {
