@@ -1769,6 +1769,9 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     //Dar ordenes de movimiento para llegar
                     backFinished = true;
 
+                    x_actual = x_destino;
+                    y_actual = y_destino;
+
                     if(ref == 255) {
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
@@ -1797,8 +1800,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                 }
                             }
                         }
-                        x_actual = x_destino;
-                        y_actual = y_destino;
                     } else {
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999)
@@ -2663,12 +2664,22 @@ void checarColor(){
 
 // Si el array esta a punto de salir de los parametros, mueve la matriz una linea completa
 void checarArray(){
-    if (x_actual == 0) {
-        recorrerX();
-    } else if(y_actual == 0) {
-        recorrerY();
+
+
+    if (x_actual < 1) {
+        for(int i = x_actual; i<1; i++)
+        {
+            recorrerX();
+        }
+    } else
+    if(y_actual < 1) {
+        for(int i = y_actual; i<1; i++)
+        {
+            recorrerY();
+        }
     }
 }
+
 
 void LackOfProgress(){
 
@@ -2750,6 +2761,7 @@ void LackOfProgress(){
     }
   }
 }
+
 
 void setup() {
     Serial.begin(9600);
