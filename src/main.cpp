@@ -2537,10 +2537,10 @@ void calibrarColor(){
         }
     }
 
+    lcd.clear();
+    lcd.print("    Negro...");
     while(EstadoColor == ESTADO_NEGRO) {
         Serial.println("Calibrar Negro");
-        lcd.clear();
-        lcd.print("    Negro...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2561,10 +2561,10 @@ void calibrarColor(){
         }
     }
 
+    lcd.clear();
+    lcd.print("  Checkpoint...");
     while(EstadoColor == ESTADO_CHECKPOINT) {
         Serial.println("Calibrar Checkpoint");
-        lcd.clear();
-        lcd.print("  Checkpoint...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2585,10 +2585,10 @@ void calibrarColor(){
         }
     }
 
+    lcd.clear();
+    lcd.print("   LISTO... ");
     while(EstadoColor == ESTADO_LISTO) {
         Serial.println("Listo...");
-        lcd.clear();
-        lcd.print("   LISTO... ");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //*Limpia la pantalla
@@ -2648,6 +2648,23 @@ void checarColor(){
         cuadros[x_actual][y_actual-1][z_actual].setPared('N', true);
         cuadros[x_actual][y_actual][z_actual].setEstado(NEGRO);
         reversaCuadro();
+        switch (iOrientacion) {
+            case A_NORTE:
+            y_actual--;
+            break;
+
+            case B_NORTE:
+            x_actual++;
+            break;
+
+            case C_NORTE:
+            y_actual++;
+            break;
+
+            case D_NORTE:
+            x_actual--;
+            break;
+        }
         A_wall = true;
     }
 
