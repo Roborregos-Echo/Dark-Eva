@@ -1576,6 +1576,9 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if(x_destino == x_actual and y_destino == y_actual) {
             pathFinished = true;
+            lcd.setCursor(0, 1);
+            lcd.print("Sali rapido");
+            delay(500);
             Serial.println("Sali rapidamente");
         }
 
@@ -2528,6 +2531,8 @@ int getColor(){
 void calibrarColor(){
     while(EstadoColor == ESTADO_OFF) {
         Serial.println("Calibrar...");
+        lcd.setCursor(2, 0);
+        lcd.print("Calibrar...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //*Limpia la pantalla
@@ -2538,6 +2543,8 @@ void calibrarColor(){
 
     while(EstadoColor == ESTADO_NEGRO) {
         Serial.println("Calibrar Negro");
+        lcd.setCursor(2, 0);
+        lcd.print("Calibrar Negro");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2866,6 +2873,7 @@ void setup() {
     pinMode(6, INPUT);
     delay(1000);
     lcd.clear();
+    calibrarColor();
 }
 
 void loop() {
