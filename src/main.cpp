@@ -2534,10 +2534,10 @@ void calibrarColor(){
         }
     }
 
+    lcd.clear();
+    lcd.print("    Negro...");
     while(EstadoColor == ESTADO_NEGRO) {
         Serial.println("Calibrar Negro");
-        lcd.clear();
-        lcd.print("    Negro...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2558,10 +2558,10 @@ void calibrarColor(){
         }
     }
 
+    lcd.clear();
+    lcd.print("  Checkpoint...");
     while(EstadoColor == ESTADO_CHECKPOINT) {
         Serial.println("Calibrar Checkpoint");
-        lcd.clear();
-        lcd.print("  Checkpoint...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2582,10 +2582,10 @@ void calibrarColor(){
         }
     }
 
+    lcd.clear();
+    lcd.print("   LISTO... ");
     while(EstadoColor == ESTADO_LISTO) {
         Serial.println("Listo...");
-        lcd.clear();
-        lcd.print("   LISTO... ");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //*Limpia la pantalla
@@ -2664,7 +2664,7 @@ void checarColor(){
         }
         A_wall = true;
     }
-    
+
 /*
     if(checarCuadroColor(CHECKPOINT, 20))
     {
