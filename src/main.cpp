@@ -431,7 +431,7 @@ void alinear() {
     }
 
 
-    if (getSharpCorta(SHARP_A) < 20) {
+    /*if (getSharpCorta(SHARP_A) < 20) {
         //lcd.clear();
         //lcd.home();
         //lcd.print("SHARP A");
@@ -475,8 +475,8 @@ void alinear() {
             detener();
             lcd.home();
             lcd.print("3");
-        }*/
-    }
+        }
+    }*/
 }
 
 void compensacion() {
@@ -2803,10 +2803,10 @@ void setup() {
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    /*attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);*/
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
@@ -2866,10 +2866,8 @@ void setup() {
 }
 
 void loop() {
-    moverCuadro();
-    delay(500);
     lcd.clear();
-    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
@@ -2892,6 +2890,6 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-   resolverLaberinto();*/
+   resolverLaberinto();
    //checarColor();
 }
