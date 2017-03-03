@@ -1529,7 +1529,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     Serial.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
     lcd.print("    " + String(x_destino) + "," + String(y_destino));
-    //delay(500);
     bool pathFinished = false;
     int Grid;
     byte x_path = x_actual;
@@ -1808,10 +1807,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     //Dar ordenes de movimiento para llegar
                     backFinished = true;
 
-                    x_actual = x_destino;
-                    y_actual = y_destino;
-
                     if(ref == 255) {
+                        x_actual = x_destino;
+                        y_actual = y_destino;
+
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
                                 if(gridActual-backList[i] == X_MAX) {
