@@ -1114,10 +1114,6 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         /*if(inFireB == true) {
-            iCounter++;
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Contador " + String(iCounter));
             pos = steps;
            detener();
            delay(500);
@@ -1131,10 +1127,6 @@ void moverCuadro() {
         }
 
        if(inFireD == true) {
-           iCounter++;
-           lcd.clear();
-           lcd.setCursor(0, 0);
-           lcd.print("Contador " + String(iCounter));
            pos = steps;
            detener();
            delay(500);
