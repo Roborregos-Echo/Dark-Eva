@@ -300,14 +300,14 @@ float getSharpCorta(int iSharp) {
     //int sharp = 2316.6 *(0.985 / analogRead(A7));  viejo
     //3742.4 * (1 / pow(sharpRead[3], 1.081)); osvaldo
     //3582.4 * (pow(sharpRead[3], -1.047)); neto
-    int sharpRead[9];
+    int sharpRead[20];
     float resultado;
-    for(int i = 0; i < 9; i++) {
+    for(int i = 0; i < 20; i++) {
         sharpRead[i] = analogRead(iSharp);
     }
 
-    for (int j = 0; j < 9; j++) {
-        for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 20; j++) {
+        for (int i = 0; i < 19; i++) {
             int temp;
             if(sharpRead[i] > sharpRead[i + 1]) {
                 temp = sharpRead[i + 1];
@@ -317,8 +317,8 @@ float getSharpCorta(int iSharp) {
         }
     }
 
-    if (sharpRead[4] >= 75 && sharpRead[4] <= 550)
-        resultado = 2429 * (pow(sharpRead[4], -1.004));
+    if (sharpRead[10] >= 75 && sharpRead[10] <= 580)
+        resultado = 2429 * (pow(sharpRead[10], -1.004));
     else
         resultado = 30;
 
@@ -326,14 +326,15 @@ float getSharpCorta(int iSharp) {
 }
 
 float getSharpLarga(int iSharp) {
-    int sharpRead[8];
+    // resultado = 20472 * pow(sharpRead[4], -1.045
+    int sharpRead[30];
     float resultado;
-    for(int i = 0; i < 9; i++) {
+    for(int i = 0; i < 30; i++) {
         sharpRead[i] = analogRead(iSharp);
     }
 
-    for (int j = 0; j < 9; j++) {
-        for (int i = 0; i < 8; i++) {
+    for (int j = 0; j < 29; j++) {
+        for (int i = 0; i < 28; i++) {
             int temp;
             if(sharpRead[i] > sharpRead[i + 1]) {
                 temp = sharpRead[i + 1];
@@ -343,8 +344,8 @@ float getSharpLarga(int iSharp) {
         }
     }
 
-    if (sharpRead[4] >= 90 and sharpRead[4] <= 680)
-        resultado = 20472 * pow(sharpRead[4], -1.045);
+    if (sharpRead[15] >= 100 and sharpRead[15] <= 500)
+        resultado = 17921 * pow(sharpRead[15], -1.072);
     else
         resultado = -1;
 
@@ -430,36 +431,29 @@ void alinear() {
         }
     }
 
-/*
+
     if (getSharpCorta(SHARP_A) < 20) {
->>>>>>> 20e6a03f2d98d9a46b0ede2d4423fa94646fd5bd
-        //lcd.clear();
-        //lcd.home();
-        //lcd.print("SHARP A");
-        while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5)) {
-            //lcd.home();
-            //lcd.print("1");
+        unsigned long inicio = millis();
+        while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5 && getSharpLarga(SHARP_LA) < 60)) {
             while (getSharpCorta(SHARP_A) < 8.5)
                 reversa();
             detener();
-            //lcd.home();
-            //lcd.print("2");
-            while (getSharpCorta(SHARP_A) > 9.5)
+            while (getSharpCorta(SHARP_A) > 9.5 && getSharpLarga(SHARP_LA) < 60)
                 avanzar();
             detener();
-            //lcd.home();
-            //lcd.print("3");
+            lcd.home();
+            lcd.print("ALINEAR AVANZAR");
+            if (millis() + 8000 >= inicio)
+                break;
         }
+        detener();
     }
 
-    if (getSharpCorta(SHARP_C) < 14) {
+    /*if (getSharpCorta(SHARP_C) < 14) {
         //lcd.clear();
         //lcd.home();
         //lcd.print("SHARP C");
-        while (getSharpCorta(SHARP_C) < 8.5)
-            avanzar();
-        detener();*/
-        /*while (!(getSharpCorta(SHARP_C) > 8.5 && getSharpCorta(SHARP_C) < 9.5)) {
+        while (!(getSharpCorta(SHARP_C) > 8 && getSharpCorta(SHARP_C) < 10)) {
             lcd.home();
             lcd.print("1");
             while (getSharpCorta(SHARP_C) < 8.5)
@@ -467,7 +461,7 @@ void alinear() {
             detener();
             lcd.home();
             lcd.print("2");
-            while (getSharpCorta(SHARP_C) > 9.5 && getSharpCorta(SHARP_C) < 14) {
+            while (getSharpCorta(SHARP_C) > 9.5 && getSharpLarga(SHARP_LC) < 30) {
                 reversa();
                 lcd.clear();
                 lcd.setCursor(0, 1);
@@ -1106,29 +1100,39 @@ void funcionD() {
 void checarInterr() {
     unsigned long pos = 0;
     if(inFireB == true) {
-        pos = steps;
-       detener();
-       delay(500);
-       vueltaIzq();
-       servoMotor();
-       delay(500);
-       vueltaDer();
-       delay(500);
-       inFireB = false;
-       steps = pos;
+        if (!firstFireB) {
+            pos = steps;
+            detener();
+            delay(200);
+            vueltaIzq();
+            servoMotor();
+            delay(200);
+            vueltaDer();
+            delay(200);
+            inFireB = false;
+            steps = pos;
+        } else {
+            firstFireB = false;
+            inFireB = false;
+        }
     }
 
    if(inFireD == true) {
-       pos = steps;
-       detener();
-       delay(500);
-       vueltaDer();
-       servoMotor();
-       delay(500);
-       vueltaIzq();
-       delay(500);
-       inFireD = false;
-       steps = pos;
+       if (!firstFireD) {
+           pos = steps;
+           detener();
+           delay(200);
+           vueltaDer();
+           servoMotor();
+           delay(200);
+           vueltaIzq();
+           delay(200);
+           inFireD = false;
+           steps = pos;
+        } else {
+           firstFireD = false;
+           inFireD = false;
+        }
    }
 }
 
@@ -1201,7 +1205,6 @@ void moverCuadro() {
         }
     } else {
         steps = 0;
-        avanzar();
         while (steps <= 1500) {
             avanzar();
             if(getAngulo() > 320)
@@ -2788,10 +2791,10 @@ void setup() {
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    /*attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);*/
+    attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
@@ -2876,6 +2879,5 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
-   //checarColor();
+   checarColor();
 }
-    
