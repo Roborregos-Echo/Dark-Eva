@@ -5,7 +5,7 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.0.7 --------------------------------
+//------------------------------ VERSIÓN 1.1.0 --------------------------------
 //--------------------------- 03 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -430,7 +430,7 @@ void alinear() {
         }
     }
 
-
+/*
     if (getSharpCorta(SHARP_A) < 20) {
         //lcd.clear();
         //lcd.home();
@@ -457,7 +457,7 @@ void alinear() {
         //lcd.print("SHARP C");
         while (getSharpCorta(SHARP_C) < 8.5)
             avanzar();
-        detener();
+        detener();*/
         /*while (!(getSharpCorta(SHARP_C) > 8.5 && getSharpCorta(SHARP_C) < 9.5)) {
             lcd.home();
             lcd.print("1");
@@ -475,28 +475,10 @@ void alinear() {
             detener();
             lcd.home();
             lcd.print("3");
-        }*/
-    }
+        }
+    }*/
 }
 
-void compensacion() {
-    steps = 0;
-    avanzar();
-    while (steps <= 0) {
-        if(getAngulo() > 320)
-            inIzq = - (360 - getAngulo());
-        else
-            inIzq = getAngulo();
-        if(getAngulo() > 320)
-            inDer = - (360 - getAngulo());
-        else
-            inDer = getAngulo();
-        izqPID.Compute();
-        derPID.Compute();
-        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-    }
-    alinear();
-}
 
 void vueltaIzq() {
     float posInicial, posFinal, limInf, limSup;
@@ -574,7 +556,6 @@ void vueltaIzq() {
         break;
     }
     delay(400);
-    alinear();
 }
 
 void vueltaDer() {
@@ -653,7 +634,6 @@ void vueltaDer() {
         break;
     }
     delay(200);
-    alinear();
 }
 
 void vueltaAtras() {
@@ -733,7 +713,6 @@ void vueltaAtras() {
         break;
     }
     delay(200);
-    alinear();
 }
 
 class Cuadro {
@@ -1300,21 +1279,22 @@ void absoluteMove(char cLado) {
 
             case 'E':
             LastMove = TO_EAST;
-            compensacion();
             vueltaDer();
+            alinear();
             moverCuadro();
             break;
 
             case 'S':
             LastMove = TO_SOUTH;
             vueltaAtras();
+            alinear();
             moverCuadro();
             break;
 
             case 'O':
             LastMove = TO_WEST;
-            compensacion();
             vueltaIzq();
+            alinear();
             moverCuadro();
             break;
         }
@@ -1324,21 +1304,22 @@ void absoluteMove(char cLado) {
         switch(cLado) {
             case 'N':
             LastMove = TO_NORTH;
-            compensacion();
             vueltaDer();
+            alinear();
             moverCuadro();
             break;
 
             case 'E':
             LastMove = TO_EAST;
             vueltaAtras();
+            alinear();
             moverCuadro();
             break;
 
             case 'S':
             LastMove = TO_SOUTH;
-            compensacion();
             vueltaIzq();
+            alinear();
             moverCuadro();
             break;
 
@@ -1354,13 +1335,14 @@ void absoluteMove(char cLado) {
             case 'N':
             LastMove = TO_NORTH;
             vueltaAtras();
+            alinear();
             moverCuadro();
             break;
 
             case 'E':
             LastMove = TO_EAST;
-            compensacion();
             vueltaIzq();
+            alinear();
             moverCuadro();
             break;
 
@@ -1371,8 +1353,8 @@ void absoluteMove(char cLado) {
 
             case 'O':
             LastMove = TO_WEST;
-            compensacion();
             vueltaDer();
+            alinear();
             moverCuadro();
             break;
         }
@@ -1382,8 +1364,8 @@ void absoluteMove(char cLado) {
         switch(cLado) {
             case 'N':
             LastMove = TO_NORTH;
-            compensacion();
             vueltaIzq();
+            alinear();
             moverCuadro();
             break;
 
@@ -1394,14 +1376,15 @@ void absoluteMove(char cLado) {
 
             case 'S':
             LastMove = TO_SOUTH;
-            compensacion();
             vueltaDer();
+            alinear();
             moverCuadro();
             break;
 
             case 'O':
             LastMove = TO_WEST;
             vueltaAtras();
+            alinear();
             moverCuadro();
             break;
         }
@@ -2223,6 +2206,7 @@ void resolverLaberinto(){
                 break;
             }
             vueltaIzq();
+            alinear();
             moverCuadro();
             checarLasts();
         } else if(!A_wall) {
@@ -2798,7 +2782,7 @@ void LackOfProgress(){
 
 
 void setup() {
-    delay(800);
+    delay(1000);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
@@ -2861,15 +2845,13 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    //calibrarColor();
+    calibrarColor();
     lcd.clear();
 }
 
 void loop() {
-    moverCuadro();
-    delay(500);
     lcd.clear();
-    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
@@ -2892,6 +2874,6 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-   resolverLaberinto();*/
-   //checarColor();
+   resolverLaberinto();
+   checarColor();
 }
