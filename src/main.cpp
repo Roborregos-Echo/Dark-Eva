@@ -2664,7 +2664,7 @@ void checarColor(){
         }
         A_wall = true;
     }
-
+    
 /*
     if(checarCuadroColor(CHECKPOINT, 20))
     {
