@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.0.7 --------------------------------
-//--------------------------- 01 / MARZO / 2017 -----------------------------
+//--------------------------- 02 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1298,10 +1298,13 @@ void moverCuadro() {
 
 
 
-void revesaCuadro() {
+void reversaCuadro() {
     steps = 0;
     reversa();
     while (steps <= 4500) {
+        lcd.setCursor(0, 1);
+        lcd.print(steps);
+
         /*if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
         else
@@ -2644,7 +2647,7 @@ void checarColor(){
         cuadros[x_actual][y_actual+1][z_actual].setPared('S', true);
         cuadros[x_actual][y_actual-1][z_actual].setPared('N', true);
         cuadros[x_actual][y_actual][z_actual].setEstado(NEGRO);
-        revesaCuadro();
+        reversaCuadro();
         A_wall = true;
     }
 
@@ -2877,6 +2880,7 @@ void setup() {
     delay(1000);
     lcd.clear();
     calibrarColor();
+    lcd.clear();
 }
 
 void loop() {
