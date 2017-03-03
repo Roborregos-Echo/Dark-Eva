@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.0.7 --------------------------------
-//--------------------------- 02 / MARZO / 2017 -----------------------------
+//--------------------------- 03 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -431,28 +431,33 @@ void alinear() {
     }
 
     if (getSharpCorta(SHARP_A) < 20) {
-        lcd.home();
-        lcd.print("SHARP A");
+        //lcd.clear();
+        //lcd.home();
+        //lcd.print("SHARP A");
         while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5)) {
-            lcd.home();
-            lcd.print("1");
+            //lcd.home();
+            //lcd.print("1");
             while (getSharpCorta(SHARP_A) < 8.5)
                 reversa();
             detener();
-            lcd.home();
-            lcd.print("2");
+            //lcd.home();
+            //lcd.print("2");
             while (getSharpCorta(SHARP_A) > 9.5)
                 avanzar();
             detener();
-            lcd.home();
-            lcd.print("3");
+            //lcd.home();
+            //lcd.print("3");
         }
     }
 
-    if (getSharpCorta(SHARP_C) < 20) {
-        lcd.home();
-        lcd.print("SHARP C");
-        while (!(getSharpCorta(SHARP_C) > 8.5 && getSharpCorta(SHARP_C) < 9.5)) {
+    if (getSharpCorta(SHARP_C) < 14) {
+        //lcd.clear();
+        //lcd.home();
+        //lcd.print("SHARP C");
+        while (getSharpCorta(SHARP_C) < 8.5)
+            avanzar();
+        detener();
+        /*while (!(getSharpCorta(SHARP_C) > 8.5 && getSharpCorta(SHARP_C) < 9.5)) {
             lcd.home();
             lcd.print("1");
             while (getSharpCorta(SHARP_C) < 8.5)
@@ -460,12 +465,16 @@ void alinear() {
             detener();
             lcd.home();
             lcd.print("2");
-            while (getSharpCorta(SHARP_C) > 9.5 && getSharpCorta(SHARP_C) < 25)
+            while (getSharpCorta(SHARP_C) > 9.5 && getSharpCorta(SHARP_C) < 14) {
                 reversa();
+                lcd.clear();
+                lcd.setCursor(0, 1);
+                lcd.print(getSharpCorta(SHARP_C));
+            }
             detener();
             lcd.home();
-            lcd.print("3");
-        }
+            lcd.print("3");*/
+
     }
 }
 
@@ -563,7 +572,7 @@ void vueltaIzq() {
         iOrientacion = A_NORTE;
         break;
     }
-    delay(200);
+    delay(400);
     alinear();
 }
 
@@ -1105,21 +1114,48 @@ bool inFireD = false;
 bool firstFireB = true;
 bool firstFireD = true;
 
-void funcionB(){
+void funcionB() {
      inFireB = true;
 }
 
-void funcionD(){
+void funcionD() {
     inFireD = true;
 }
 
-int iCounter = 0;
+void checarInterr() {
+    unsigned long pos = 0;
+    if(inFireB == true) {
+        pos = steps;
+       detener();
+       delay(500);
+       vueltaIzq();
+       servoMotor();
+       delay(500);
+       vueltaDer();
+       delay(500);
+       inFireB = false;
+       steps = pos;
+    }
+
+   if(inFireD == true) {
+       pos = steps;
+       detener();
+       delay(500);
+       vueltaDer();
+       servoMotor();
+       delay(500);
+       vueltaIzq();
+       delay(500);
+       inFireD = false;
+       steps = pos;
+   }
+}
 
 void moverCuadro() {
-    float pos = 0;
     steps = 0;
     avanzar();
-    while (steps <= 2700) {
+    while (steps <= 2500) {
+        avanzar();
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -1133,31 +1169,7 @@ void moverCuadro() {
         izqPID.Compute();
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-        /*if(inFireB == true) {
-            pos = steps;
-           detener();
-           delay(500);
-           vueltaIzq();
-           servoMotor();
-           delay(500);
-           vueltaDer();
-           delay(500);
-           inFireB = false;
-           steps = pos;
-        }
-
-       if(inFireD == true) {
-           pos = steps;
-           detener();
-           delay(500);
-           vueltaDer();
-           servoMotor();
-           delay(500);
-           vueltaIzq();
-           delay(500);
-           inFireD = false;
-           steps = pos;
-       }*/
+        checarInterr();
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1211,6 +1223,7 @@ void moverCuadro() {
         steps = 0;
         avanzar();
         while (steps <= 1500) {
+            avanzar();
             if(getAngulo() > 320)
                 inIzq = - (360 - getAngulo());
             else
@@ -1224,40 +1237,7 @@ void moverCuadro() {
             velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
             lcd.setCursor(0, 1);
             lcd.print(steps);
-
-            /*if(inFireB == true) {
-                iCounter++;
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Contador " + String(iCounter));
-                pos = steps;
-               detener();
-               delay(500);
-               vueltaIzq();
-               servoMotor();
-               delay(500);
-               vueltaDer();
-               delay(500);
-               inFireB = false;
-               steps = pos;
-            }
-
-           if(inFireD == true) {
-               iCounter++;
-               lcd.clear();
-               lcd.setCursor(0, 0);
-               lcd.print("Contador " + String(iCounter));
-               pos = steps;
-               detener();
-               delay(500);
-               vueltaDer();
-               servoMotor();
-               delay(500);
-               vueltaIzq();
-               delay(500);
-               inFireD = false;
-               steps = pos;
-           }*/
+            checarInterr();
         }
     }
     steps = 0;
@@ -1274,48 +1254,13 @@ void moverCuadro() {
         izqPID.Compute();
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-
-        /*if(inFireB == true) {
-            iCounter++;
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Contador " + String(iCounter));
-            pos = steps;
-           detener();
-           delay(500);
-           vueltaIzq();
-           servoMotor();
-           delay(500);
-           vueltaDer();
-           delay(500);
-           inFireB = false;
-           steps = pos;
-        }
-
-       if(inFireD == true) {
-           iCounter++;
-           lcd.clear();
-           lcd.setCursor(0, 0);
-           lcd.print("Contador " + String(iCounter));
-           pos = steps;
-           detener();
-           delay(500);
-           vueltaDer();
-           servoMotor();
-           delay(500);
-           vueltaIzq();
-           delay(500);
-           inFireD = false;
-           steps = pos;
-       }*/
-
+        checarInterr();
     }
     detener();
     alinear();
-    delay(200);
+    delay(500);
     permisoRampa = true;
 }
-
 
 
 void reversaCuadro() {
@@ -2410,7 +2355,7 @@ void resolverLaberinto(){
                 if(z_actual == 2)
                 {
                     lcd.print("GOTO INICIO C");
-                    delay(200);
+                    delay(400);
                     Piso3 = true;
                     gotoInicio(x_InicioC, y_InicioC);
                     //RampaMoveX();
@@ -2419,7 +2364,7 @@ void resolverLaberinto(){
                 if(z_actual == 1)
                 {
                     lcd.print("GOTO INICIO B");
-                    delay(200);
+                    delay(400);
                     Piso2 = true;
                     gotoInicio(x_InicioB, y_InicioB);
                     //RampaMoveX();
@@ -2428,14 +2373,14 @@ void resolverLaberinto(){
                 if(!Piso2 and x_InicioB != 255)
                 {
                     lcd.print("GOTO INICIO C");
-                    delay(200);
+                    delay(400);
                     gotoInicio(x_InicioC, y_InicioC);
                     //RampaMoveX();
                 }
                 else
                 {
                     lcd.print("GOTO INICIO");
-                    delay(200);
+                    delay(400);
                     gotoInicio(x_inicio, y_inicio);
 
                     Serial.println("MARI PUTISIMO, YA LLEGUE");
@@ -2857,8 +2802,8 @@ void setup() {
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, FALLING); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, FALLING); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
@@ -2920,12 +2865,14 @@ void setup() {
 }
 
 void loop() {
-    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    moverCuadro();
+    delay(500);
+    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
    lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-   delay(300);
+   delay(500);
    checarParedes();
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
@@ -2943,6 +2890,6 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-   resolverLaberinto();
-   checarColor();
+   resolverLaberinto();*/
+   //checarColor();
 }
