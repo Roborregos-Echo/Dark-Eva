@@ -2798,7 +2798,7 @@ void LackOfProgress(){
 
 
 void setup() {
-    delay(200);
+    delay(800);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
