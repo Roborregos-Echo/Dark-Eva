@@ -1114,10 +1114,6 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         /*if(inFireB == true) {
-            iCounter++;
-            lcd.clear();
-            lcd.setCursor(0, 0);
-            lcd.print("Contador " + String(iCounter));
             pos = steps;
            detener();
            delay(500);
@@ -1131,10 +1127,6 @@ void moverCuadro() {
         }
 
        if(inFireD == true) {
-           iCounter++;
-           lcd.clear();
-           lcd.setCursor(0, 0);
-           lcd.print("Contador " + String(iCounter));
            pos = steps;
            detener();
            delay(500);
@@ -1310,7 +1302,7 @@ void revesaCuadro() {
     steps = 0;
     reversa();
     while (steps <= 4500) {
-        if(getAngulo() > 320)
+        /*if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
         else
             inDer = getAngulo();
@@ -1322,8 +1314,9 @@ void revesaCuadro() {
 
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);*/
     }
+    detener();
 }
 
 
