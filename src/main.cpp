@@ -297,53 +297,57 @@ void horizontalIzquierda() {
 //******************************************
 //----------------- SHARP ------------------
 float getSharpCorta(int iSharp) {
-    //int sharp = 2316.6 *(0.985 / analogRead(A7));
-    float sharpRead[8];
+    //int sharp = 2316.6 *(0.985 / analogRead(A7));  viejo
+    //3742.4 * (1 / pow(sharpRead[3], 1.081)); osvaldo
+    //3582.4 * (pow(sharpRead[3], -1.047)); neto
+    int sharpRead[9];
     float resultado;
-    for(int i = 0; i < 8; i++) {
+    for(int i = 0; i < 9; i++) {
         sharpRead[i] = analogRead(iSharp);
     }
 
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 9; j++) {
+        for (int i = 0; i < 8; i++) {
             int temp;
             if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
+                temp = sharpRead[i + 1];
                 sharpRead[i + 1] = sharpRead[i];
                 sharpRead[i] = temp;
             }
         }
     }
 
-    if (sharpRead[3] >= 99 and sharpRead[3] <= 620)
-        resultado = 3582.4 * (pow(sharpRead[3], -1.047));//3742.4 * (1 / pow(sharpRead[3], 1.081));
+    if (sharpRead[4] >= 75 && sharpRead[4] <= 550)
+        resultado = 2429 * (pow(sharpRead[4], -1.004));
     else
         resultado = 30;
+
     return resultado;
 }
 
 float getSharpLarga(int iSharp) {
-    float sharpRead[8];
+    int sharpRead[8];
     float resultado;
-    for(int i = 0; i < 8; i++) {
+    for(int i = 0; i < 9; i++) {
         sharpRead[i] = analogRead(iSharp);
     }
 
-    for (int j = 0; j < 8; j++) {
-        for (int i = 0; i < 7; i++) {
+    for (int j = 0; j < 9; j++) {
+        for (int i = 0; i < 8; i++) {
             int temp;
             if(sharpRead[i] > sharpRead[i + 1]) {
-                temp = sharpRead[i+1];
+                temp = sharpRead[i + 1];
                 sharpRead[i + 1] = sharpRead[i];
                 sharpRead[i] = temp;
             }
         }
     }
 
-    if (sharpRead[3] >= 90 and sharpRead[3] <= 680)
-        resultado = 20472 * pow(sharpRead[3], -1.045);
+    if (sharpRead[4] >= 90 and sharpRead[4] <= 680)
+        resultado = 20472 * pow(sharpRead[4], -1.045);
     else
         resultado = -1;
+
     return resultado;
 }
 
@@ -381,7 +385,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
 
 void alinear() {
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
-    if(getSharpCorta(SHARP_B1) < 15.0 && getSharpCorta(SHARP_D1) < 15.0) {
+    if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1)
                 horizontalDerecha();
@@ -390,63 +394,79 @@ void alinear() {
                 horizontalIzquierda();
             detener();
         }
-    } else if(getSharpCorta(SHARP_B1) < 15.0) {
+    } else if(getSharpCorta(SHARP_B1) < 20) {
         while (!(getSharpCorta(SHARP_B1) > 9.0 && getSharpCorta(SHARP_B1) < 10.0)) {
-            while (getSharpCorta(SHARP_B1) < 9.0) {
+            while (getSharpCorta(SHARP_B1) < 9)
                 horizontalIzquierda();
-            }
             detener();
-            while (getSharpCorta(SHARP_B1) > 10.0) {
+            while (getSharpCorta(SHARP_B1) > 10)
                 horizontalDerecha();
-            }
             detener();
         }
-        if (getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2) > 1 ) {
-            while (getSharpCorta(SHARP_B2) + 0.5 > getSharpCorta(SHARP_B1)) {
-                vueltaIzquierda();
-            }
-            detener();
-        } else if (getSharpCorta(SHARP_B2) - getSharpCorta(SHARP_B1) > 1 ) {
-            while (getSharpCorta(SHARP_B1) + 0.5 > getSharpCorta(SHARP_B2)) {
+        if (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2)) > 1.5 ) {
+            while (getSharpCorta(SHARP_B2) < getSharpCorta(SHARP_B1))
                 vueltaDerecha();
-            }
+            detener();
+            while (getSharpCorta(SHARP_B1) < getSharpCorta(SHARP_B2))
+                vueltaIzquierda();
             detener();
         }
-    } else if(getSharpCorta(SHARP_D1) < 15.0) {
+    } else if(getSharpCorta(SHARP_D1) < 20) {
         while (!(getSharpCorta(SHARP_D1) > 9.0 && getSharpCorta(SHARP_D1) < 10.0)) {
-            while (getSharpCorta(SHARP_D1) < 9.0) {
+            while (getSharpCorta(SHARP_D1) < 9)
                 horizontalDerecha();
-            }
-            while (getSharpCorta(SHARP_D1) > 10.0) {
+            detener();
+            while (getSharpCorta(SHARP_D1) > 10)
                 horizontalIzquierda();
-            }
             detener();
         }
-        if (getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2) > 1 ) {
-            while (getSharpCorta(SHARP_D2) + 0.5 > getSharpCorta(SHARP_D1)) {
-                vueltaDerecha();
-            }
-            detener();
-        } else if (getSharpCorta(SHARP_D2) - getSharpCorta(SHARP_D1) > 1 ) {
-            while (getSharpCorta(SHARP_D1) + 0.5 > getSharpCorta(SHARP_D2)) {
+        if (abs(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2)) > 1.5 ) {
+            while (getSharpCorta(SHARP_D2) < getSharpCorta(SHARP_D1))
                 vueltaIzquierda();
-            }
+            detener();
+            while (getSharpCorta(SHARP_D1) < getSharpCorta(SHARP_D2))
+                vueltaDerecha();
             detener();
         }
     }
-    /*if (getSharpCorta(SHARP_A) < 25.0) {
-        if (getSharpCorta(SHARP_A) < 8.0) {
-            while (getSharpCorta(SHARP_A) < 8) {
+
+    if (getSharpCorta(SHARP_A) < 20) {
+        lcd.home();
+        lcd.print("SHARP A");
+        while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5)) {
+            lcd.home();
+            lcd.print("1");
+            while (getSharpCorta(SHARP_A) < 8.5)
                 reversa();
-            }
             detener();
-        } else if (getSharpCorta(SHARP_A) > 12 && getSharpCorta(SHARP_A) < 16.0) {
-            while (getSharpCorta(SHARP_A) > 12) {
+            lcd.home();
+            lcd.print("2");
+            while (getSharpCorta(SHARP_A) > 9.5)
                 avanzar();
-            }
             detener();
+            lcd.home();
+            lcd.print("3");
         }
-    }*/
+    }
+
+    if (getSharpCorta(SHARP_C) < 20) {
+        lcd.home();
+        lcd.print("SHARP C");
+        while (!(getSharpCorta(SHARP_C) > 8.5 && getSharpCorta(SHARP_C) < 9.5)) {
+            lcd.home();
+            lcd.print("1");
+            while (getSharpCorta(SHARP_C) < 8.5)
+                avanzar();
+            detener();
+            lcd.home();
+            lcd.print("2");
+            while (getSharpCorta(SHARP_C) > 9.5 && getSharpCorta(SHARP_C) < 25)
+                reversa();
+            detener();
+            lcd.home();
+            lcd.print("3");
+        }
+    }
 }
 
 void compensacion() {
@@ -1301,7 +1321,7 @@ void moverCuadro() {
 void reversaCuadro() {
     steps = 0;
     reversa();
-    while (steps <= 4500) {
+    while (steps <= 4700) {
         lcd.setCursor(0, 1);
         lcd.print(steps);
 
@@ -2833,7 +2853,7 @@ void LackOfProgress(){
 
 
 void setup() {
-    delay(1000);
+    delay(200);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
@@ -2866,7 +2886,7 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("     E V A");
 
-    delay(200);
+    delay(100);
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
     ramPID.SetMode(AUTOMATIC);
@@ -2894,20 +2914,19 @@ void setup() {
 
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
-    delay(1000);
+    delay(500);
     lcd.clear();
-    calibrarColor();
+    //calibrarColor();
     lcd.clear();
 }
 
 void loop() {
-    lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
    lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-   delay(500);
+   delay(300);
    checarParedes();
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
