@@ -430,7 +430,7 @@ void alinear() {
         }
     }
 
-    if (getSharpCorta(SHARP_A) < 20) {
+    /*if (getSharpCorta(SHARP_A) < 20) {
         lcd.home();
         lcd.print("SHARP A");
         while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5)) {
@@ -466,7 +466,7 @@ void alinear() {
             lcd.home();
             lcd.print("3");
         }
-    }
+    }*/
 }
 
 void compensacion() {
@@ -2920,6 +2920,7 @@ void setup() {
 }
 
 void loop() {
+    lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
@@ -2944,5 +2945,5 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
-   checarColor();
+   //checarColor();
 }
