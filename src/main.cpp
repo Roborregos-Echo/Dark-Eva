@@ -210,7 +210,7 @@ Servo servo;
 #define S2 5
 #define S3 4
 #define sensorOut 6
-#define BOTON_COLOR 0
+#define BOTON_COLOR 12
 
 const byte ESTADO_OFF           = 0;
 const byte ESTADO_NEGRO         = 1;
@@ -2523,8 +2523,8 @@ int getColor(){
 void calibrarColor(){
     while(EstadoColor == ESTADO_OFF) {
         Serial.println("Calibrar...");
-        lcd.setCursor(2, 0);
-        lcd.print("Calibrar...");
+        lcd.setCursor(0, 0);
+        lcd.print("   Calibrar...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //*Limpia la pantalla
@@ -2535,8 +2535,8 @@ void calibrarColor(){
 
     while(EstadoColor == ESTADO_NEGRO) {
         Serial.println("Calibrar Negro");
-        lcd.setCursor(2, 0);
-        lcd.print("Calibrar Negro");
+        lcd.clear();
+        lcd.print("    Negro...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2559,6 +2559,8 @@ void calibrarColor(){
 
     while(EstadoColor == ESTADO_CHECKPOINT) {
         Serial.println("Calibrar Checkpoint");
+        lcd.clear();
+        lcd.print("  Checkpoint...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2581,6 +2583,8 @@ void calibrarColor(){
 
     while(EstadoColor == ESTADO_LISTO) {
         Serial.println("Listo...");
+        lcd.clear();
+        lcd.print("   LISTO... ");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //*Limpia la pantalla
@@ -2632,12 +2636,18 @@ void checarColor(){
 
     if(checarCuadroColor(COLOR_NEGRO, 80))
     {
+        lcd.setCursor(0, 0);
+        lcd.print("NEGRO DETECTADO!");
+        cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
+        cuadros[x_actual-1][y_actual][z_actual].setPared('E', true);
+        cuadros[x_actual][y_actual+1][z_actual].setPared('S', true);
+        cuadros[x_actual][y_actual-1][z_actual].setPared('N', true);
         cuadros[x_actual][y_actual][z_actual].setEstado(NEGRO);
         revesaCuadro();
         A_wall = true;
     }
 
-
+/*
     if(checarCuadroColor(CHECKPOINT, 20))
     {
       int TotalGrid;
@@ -2697,7 +2707,7 @@ void checarColor(){
           }
         }
       }
-    }
+  }*/
 
 }
 
@@ -2894,4 +2904,5 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
+   checarColor();
 }
