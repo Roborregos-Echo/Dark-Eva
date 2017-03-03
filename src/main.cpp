@@ -430,6 +430,7 @@ void alinear() {
         }
     }
 
+
     if (getSharpCorta(SHARP_A) < 20) {
         //lcd.clear();
         //lcd.home();
@@ -473,8 +474,8 @@ void alinear() {
             }
             detener();
             lcd.home();
-            lcd.print("3");*/
-
+            lcd.print("3");
+        }*/
     }
 }
 
@@ -1153,7 +1154,6 @@ void checarInterr() {
 
 void moverCuadro() {
     steps = 0;
-    avanzar();
     while (steps <= 2500) {
         avanzar();
         if(getAngulo() > 320)
@@ -1243,6 +1243,7 @@ void moverCuadro() {
     steps = 0;
     avanzar();
     while (steps <= 1500) {
+        avanzar();
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
         else
@@ -2802,8 +2803,8 @@ void setup() {
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, FALLING); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, FALLING); //Declara la funcion a ejectura en interruptD
+    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
@@ -2867,6 +2868,7 @@ void setup() {
 void loop() {
     moverCuadro();
     delay(500);
+    lcd.clear();
     /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
