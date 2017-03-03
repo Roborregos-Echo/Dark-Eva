@@ -81,9 +81,9 @@ const byte Y_MAX = 15;
 const byte Z_MAX = 3;
 
 // Coordeanas actuales
-byte    x_actual = 0;
-byte    y_actual = 0;
-byte    z_actual = 0;
+int    x_actual = 0;
+int    y_actual = 0;
+int    z_actual = 0;
 
 // Ultimas coordeanas vistas
 byte    x_last  = 255;
@@ -1884,7 +1884,7 @@ void checarParedes(){
     switch(iOrientacion) {
         case A_NORTE:
         if(y_actual > 0)
-            if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_C) > 20 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('S');
                 shortMove = true;
@@ -1892,149 +1892,149 @@ void checarParedes(){
                 C_wall = true;
             }
 
-        if(getSharpCorta(SHARP_C) < 15)
+        if(getSharpCorta(SHARP_C) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
 
-        if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_B1) > 20 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_A) > 20 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             A_wall = true;
         }
-        if(getSharpCorta(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
-            if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_D1) > 20 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('O');
                 shortMove = true;
             } else {
                 D_wall = true;
             }
-        if(getSharpCorta(SHARP_D1) < 15)
+        if(getSharpCorta(SHARP_D1) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         break;
         //--------------------------------------------------------------------
         case B_NORTE:
-        if(getSharpCorta(SHARP_C)  > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_C)  > 20 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharpCorta(SHARP_C)  < 15)
+        if(getSharpCorta(SHARP_C)  < 20)
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharpCorta(SHARP_B1)  > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_B1)  > 20 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 20)
         cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
 
         if(x_actual > 0)
-            if(getSharpCorta(SHARP_A)  > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_A)  > 20 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('O');
                 shortMove = true;
             } else {
                 A_wall = true;
             }
-        if(getSharpCorta(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
-            if(getSharpCorta(SHARP_D1)  > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_D1)  > 20 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('S');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharpCorta(SHARP_D1)  < 15)
+        if(getSharpCorta(SHARP_D1)  < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         break;
         //--------------------------------------------------------------------
         case C_NORTE:
-        if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_C) > 20 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharpCorta(SHARP_C) < 15)
+        if(getSharpCorta(SHARP_C) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
-            if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_B1) > 20 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('O');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 20)
         cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
-            if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_A) > 20 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('S');
             shortMove = true;
         } else {
             A_wall = true;
         }
-        if(getSharpCorta(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_D1) > 20 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharpCorta(SHARP_D1) < 15)
+        if(getSharpCorta(SHARP_D1) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         break;
         //--------------------------------------------------------------------
         case D_NORTE:
         if(x_actual > 0)
-            if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_C) > 20 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('O');
                 shortMove = true;
             } else {
                 C_wall = true;
             }
-        if(getSharpCorta(SHARP_C) < 15)
+        if(getSharpCorta(SHARP_C) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
 
         if(y_actual > 0)
-            if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_B1) > 20 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER)) {
                 agregarLast('S');
                 shortMove = true;
@@ -2042,10 +2042,10 @@ void checarParedes(){
                 B_wall = true;
         }
 
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(getSharpCorta(SHARP_B1) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_A) > 20 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2053,18 +2053,18 @@ void checarParedes(){
             A_wall = true;
         }
 
-        if(getSharpCorta(SHARP_A) < 15)
+        if(getSharpCorta(SHARP_A) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
 
-        if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_D1) > 20 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharpCorta(SHARP_D1) < 15)
+        if(getSharpCorta(SHARP_D1) < 20)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
         break;
     }
@@ -2405,7 +2405,7 @@ void resolverLaberinto(){
                     //RampaMoveX();
                 }
                 else
-                if(!Piso2)
+                if(!Piso2 and x_InicioB != 255)
                 {
                     lcd.print("GOTO INICIO C");
                     delay(200);
