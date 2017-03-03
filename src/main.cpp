@@ -2652,6 +2652,23 @@ void checarColor(){
         cuadros[x_actual][y_actual-1][z_actual].setPared('N', true);
         cuadros[x_actual][y_actual][z_actual].setEstado(NEGRO);
         revesaCuadro();
+        switch (iOrientacion) {
+            case A_NORTE:
+            y_actual--;
+            break;
+
+            case B_NORTE:
+            x_actual++;
+            break;
+
+            case C_NORTE:
+            y_actual++;
+            break;
+
+            case D_NORTE:
+            x_actual--;
+            break;
+        }
         A_wall = true;
     }
 
