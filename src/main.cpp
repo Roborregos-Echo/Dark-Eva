@@ -2655,7 +2655,8 @@ void calibrarColor(){
 
             //*Limpia la pantalla
             delay(500);
-            EstadoColor = ESTADO_CHECKPOINT;
+            //EstadoColor = ESTADO_CHECKPOINT;
+            EstadoColor = ESTADO_LISTO;
         }
     }
 
@@ -2765,7 +2766,7 @@ void checarColor() {
     }
 
 
-    if(checarCuadroColor(CHECKPOINT, 20))
+    /*if(checarCuadroColor(CHECKPOINT, 20))
     {
       int TotalGrid;
       for(int z=0; z<Z_MAX; z++)
@@ -2824,7 +2825,7 @@ void checarColor() {
           }
         }
       }
-  }
+  }*/
 
 }
 
@@ -2978,7 +2979,6 @@ void setup() {
         checkList2[i] = 0;
     }
 
-    
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
