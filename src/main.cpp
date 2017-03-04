@@ -1890,6 +1890,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                     gridActual -= 1;
                                 }
                             }
+                            x_actual = gridToCoord(gridActual, 'x');
+                            y_actual = gridToCoord(gridActual, 'y');
                         }
                     } else {
                         for(int i = 0; i<GRID_MAX; i++) {
