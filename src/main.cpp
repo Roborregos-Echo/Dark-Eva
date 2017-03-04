@@ -307,7 +307,8 @@ float getSharpCorta(int iSharp) {
     //3742.4 * (1 / pow(sharpRead[3], 1.081)); osvaldo
     //3582.4 * (pow(sharpRead[3], -1.047)); neto
     int sharpRead[20];
-    float resultado;
+    float resultado = 0;
+    float promedio = 0;
     for(int i = 0; i < 20; i++) {
         sharpRead[i] = analogRead(iSharp);
     }
@@ -323,8 +324,14 @@ float getSharpCorta(int iSharp) {
         }
     }
 
-    if (sharpRead[10] >= 75 && sharpRead[10] <= 580)
-        resultado = 2429 * (pow(sharpRead[10], -1.004));
+    for (int i = 5; i < 15; i++) {
+        promedio += sharpRead[i];
+    }
+
+    promedio /= 10;
+
+    if (promedio >= 75 && promedio <= 580)
+        resultado = 2429 * (pow(promedio, -1.004));
     else
         resultado = 30;
 
@@ -334,6 +341,7 @@ float getSharpCorta(int iSharp) {
 float getSharpLarga(int iSharp) {
     // resultado = 20472 * pow(sharpRead[4], -1.045
     int sharpRead[30];
+    float promedio = 0;
     float resultado;
     for(int i = 0; i < 30; i++) {
         sharpRead[i] = analogRead(iSharp);
@@ -350,8 +358,14 @@ float getSharpLarga(int iSharp) {
         }
     }
 
-    if (sharpRead[15] >= 100 and sharpRead[15] <= 500)
-        resultado = 17921 * pow(sharpRead[15], -1.072);
+    for (int i = 10; i < 20; i++) {
+        promedio += sharpRead[i];
+    }
+
+    promedio /= 10;
+
+    if (promedio >= 100 and promedio <= 500)
+        resultado = 17921 * pow(promedio, -1.072);
     else
         resultado = -1;
 
@@ -1123,6 +1137,7 @@ void Victim_Detected() {
 }
 
 void Lack_Interrupt(){
+    lcd.print("INTERRUP");
     Lack = true;
 }
 
@@ -1130,51 +1145,61 @@ void Lack_Interrupt(){
 void checarInterr() {
     unsigned long pos = 0;
     if(inFire == true) {
-        if(digitalRead(InterruptDefiner)) {
-            detener();
-            pos = steps;
-            for (int i = 0; i < 10; i++) {
-                lcd.noBacklight();
-                delay(100);
-                lcd.backlight();
-                delay(100);
+        if (!cuadros[x_actual][y_actual][z_actual].getMlx()) {
+            if(digitalRead(InterruptDefiner) == 0) {
+                detener();
+                pos = steps;
+                steps = 0;
+                while (steps <= 500)
+                    reversa();
+                detener();
+
+                for (int i = 0; i < 10; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                vueltaIzq();
+                delay(250);
+                servoMotor();
+                vueltaDer();
+                for (int i = 0; i < 15; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                inFire = false;
+                steps = pos;
+            } else {
+                detener();
+                pos = steps;
+                steps = 0;
+                while (steps <= 500)
+                    reversa();
+                detener();
+                for (int i = 0; i < 10; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                vueltaDer();
+                servoMotor();
+                vueltaIzq();
+                for (int i = 0; i < 15; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                inFire = false;
+                steps = pos;
             }
-            vueltaIzq();
-            delay(250);
-            servoMotor();
-            vueltaDer();
-            for (int i = 0; i < 15; i++) {
-                lcd.noBacklight();
-                delay(100);
-                lcd.backlight();
-                delay(100);
-            }
-            inFire = false;
-            steps = pos;
-        } else {
-            detener();
-            pos = steps;
-            for (int i = 0; i < 10; i++) {
-                lcd.noBacklight();
-                delay(100);
-                lcd.backlight();
-                delay(100);
-            }
-            vueltaDer();
-            servoMotor();
-            vueltaIzq();
-            for (int i = 0; i < 15; i++) {
-                lcd.noBacklight();
-                delay(100);
-                lcd.backlight();
-                delay(100);
-            }
-            inFire = false;
-            steps = pos;
+            cuadros[x_actual][y_actual][z_actual].setMlx(true);
         }
-
     }
-
 }
 
 void moverCuadro() {
@@ -1196,6 +1221,7 @@ void moverCuadro() {
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
         while (Lack) {
+            lcd.print("INTERRUPTS");
             detener();
             LackOfProgress();
         }
@@ -1211,6 +1237,7 @@ void moverCuadro() {
             setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
             while (vec.y() < -10.0) {
                 while (Lack) {
+                    lcd.print("INTERRUPTS");
                     detener();
                     LackOfProgress();
                 }
@@ -1243,6 +1270,7 @@ void moverCuadro() {
         if (permisoRampa) {
             while (vec.y() > 10.0) {
                 while (Lack) {
+                    lcd.print("INTERRUPTS");
                     detener();
                     LackOfProgress();
                 }
@@ -1281,6 +1309,7 @@ void moverCuadro() {
             lcd.print(steps);
             checarInterr();
             while (Lack) {
+                lcd.print("INTERRUPTS");
                 detener();
                 LackOfProgress();
             }
@@ -1303,6 +1332,7 @@ void moverCuadro() {
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
         while (Lack) {
+            lcd.print("INTERRUPTS");
             detener();
             LackOfProgress();
         }
@@ -2463,14 +2493,19 @@ void resolverLaberinto(){
 //******************************************
 //******************************************
 
-
+bool primerServo = true;
 //Gira el servo 180 grados
 void servoMotor() {
     servo.attach(servoPin);
+    if (primerServo) {
+        servo.write(0);
+        primerServo = false;
+    }
     if(servo.read() == 0)
         servo.write(180);
     else
         servo.write(0);
+    delay(700);
     servo.detach();
 }
 
@@ -2927,36 +2962,13 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
-    //velocidad(218, 255, 218, 255);
-    //velocidad(196, 230, 196, 230);
-
-    /*Serial.print(getSharpCorta(SHARP_A));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B1));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B2));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_C));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_D1));
-    Serial.print("\t");
-    Serial.println(getSharpCorta(SHARP_D2));
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);*/
-
-=======
->>>>>>> 078b2056a0c17a6bf6c1c15fc718980f84e98ca4
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
    lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-   //delay(00);
+   delay(300);
    checarParedes();
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
