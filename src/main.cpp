@@ -19,6 +19,7 @@
 void resolverLaberinto();
 void servoMotor();
 void checarColor();
+void LackOfProgress();
 
 
 //********************************************
@@ -122,9 +123,9 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR         =   150;
-const int VEL_MOTOR_VUELTA  =   120;
-const int VEL_MOTOR_ENCODER  =   115;
+const int VEL_MOTOR         =   135;
+const int VEL_MOTOR_VUELTA  =   108;
+const int VEL_MOTOR_ENCODER  =   105;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -152,7 +153,7 @@ const int SHARP_B1  = 14;
 const int SHARP_B2  = 9;
 const int SHARP_C   = 2;
 const int SHARP_D1  = 13;
-const int SHARP_D2  = 7;
+const int SHARP_D2  = 15;
 const int SHARP_LA  = 0;
 const int SHARP_LC  = 11;
 
@@ -446,8 +447,8 @@ void alinear() {
             while (getSharpCorta(SHARP_A) > 9.5 && getSharpLarga(SHARP_LA) < 60)
                 avanzar();
             detener();
-            lcd.home();
-            lcd.print("ALINEAR AVANZAR");
+            //lcd.home();
+            //lcd.print("ALINEAR AVANZAR");
             if (millis() + 8000 >= inicio)
                 break;
         }
@@ -521,17 +522,25 @@ void vueltaIzq() {
     else
         limSup = posFinal + PRECISION_IMU;
 
+        //lcd.clear();
+        //lcd.home();
+        //lcd.print(posFinal);
+
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaIzquierda();
 
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            //lcd.setCursor(0, 1);
+            //lcd.print(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            //lcd.setCursor(0, 1);
+            //lcd.print(posInicial);
         }
         detener();
     }
@@ -602,14 +611,22 @@ void vueltaDer() {
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
+    //lcd.clear();
+    //lcd.home();
+    //lcd.print(posFinal);
+
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            //lcd.setCursor(0, 1);
+            //lcd.print(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            //lcd.setCursor(0, 1);
+            //lcd.print(posInicial);
         }
         detener();
     }
@@ -679,15 +696,22 @@ void vueltaAtras() {
 
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
+    //lcd.clear();
+    //lcd.home();
+    //lcd.print(posFinal);
 
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            //lcd.setCursor(0, 1);
+            //lcd.print(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+        //    lcd.setCursor(0, 1);
+        //    lcd.print(posInicial);
         }
 
         detener();
@@ -1092,13 +1116,16 @@ void checarRampa(){
 //******************************************
 
 bool inFire = false;
+bool Lack = false;
 
-void funcionB() {
+void Victim_Detected() {
      inFire = true;
 }
 
-void funcionD() {
+void Lack_Interrupt(){
+    Lack = true;
 }
+
 
 void checarInterr() {
     unsigned long pos = 0;
@@ -1113,6 +1140,7 @@ void checarInterr() {
                 delay(100);
             }
             vueltaIzq();
+            delay(250);
             servoMotor();
             vueltaDer();
             for (int i = 0; i < 15; i++) {
@@ -1151,7 +1179,7 @@ void checarInterr() {
 
 void moverCuadro() {
     steps = 0;
-    while (steps <= 2500) {
+    while (steps <= 3500) {
         avanzar();
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
@@ -1167,15 +1195,26 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
+        while (Lack) {
+            detener();
+            LackOfProgress();
+        }
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    if(vec.y() < -4.0) {
+    if(vec.y() < -10.0) {
+        lcd.home();
+        lcd.print("SUBIR RAMPA");
         subirRampa = true;
         checarRampa();
         if (permisoRampa) {
             setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
-            while (vec.y() < -4.0) {
+            while (vec.y() < -10.0) {
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
+
                 if(getAngulo() > 320)
                     inIzq = - (360 - getAngulo());
                 else
@@ -1196,11 +1235,18 @@ void moverCuadro() {
             }
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         }
-    } else if(vec.y() > 4.0) {
+    } else if(vec.y() > 10.0) {
         bajarRampa = true;
+        lcd.home();
+        lcd.print("BAJAR RAMPA");
         checarRampa();
         if (permisoRampa) {
-            while (vec.y() > 4.0) {
+            while (vec.y() > 10.0) {
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
+
                 if(getAngulo() > 320)
                     inIzq = - (360 - getAngulo());
                 else
@@ -1218,7 +1264,7 @@ void moverCuadro() {
         }
     } else {
         steps = 0;
-        while (steps <= 1500) {
+        while (steps <= 1000) {
             avanzar();
             if(getAngulo() > 320)
                 inIzq = - (360 - getAngulo());
@@ -1234,11 +1280,15 @@ void moverCuadro() {
             lcd.setCursor(0, 1);
             lcd.print(steps);
             checarInterr();
+            while (Lack) {
+                detener();
+                LackOfProgress();
+            }
         }
     }
     steps = 0;
     avanzar();
-    while (steps <= 1500) {
+    while (steps <= 1000) {
         avanzar();
         if(getAngulo() > 320)
             inIzq = - (360 - getAngulo());
@@ -1252,11 +1302,15 @@ void moverCuadro() {
         derPID.Compute();
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
+        while (Lack) {
+            detener();
+            LackOfProgress();
+        }
     }
     detener();
-    checarColor();
+    //delay(200);
+    //checarColor();
     alinear();
-    delay(500);
     permisoRampa = true;
 }
 
@@ -1264,7 +1318,7 @@ void moverCuadro() {
 void reversaCuadro() {
     steps = 0;
     reversa();
-    while (steps <= 4700) {
+    while (steps <= 4800) {
         lcd.setCursor(0, 1);
         lcd.print(steps);
 
@@ -2085,7 +2139,9 @@ void recorrerX(){
 
     x_actual++;
     x_inicio++;
+    if(x_InicioB != 255)
     x_InicioB++;
+    if(x_InicioC != 255)
     x_InicioC++;
 
     if(x_last != 255 and y_last != 255)
@@ -2119,7 +2175,9 @@ void recorrerY(){
 
     y_actual++;
     y_inicio++;
+    if(y_InicioB != 255)
     y_InicioB++;
+    if(y_InicioC != 255)
     y_InicioC++;
 
     if(x_last != 255 and y_last != 255)
@@ -2360,7 +2418,7 @@ void resolverLaberinto(){
                 if(z_actual == 2)
                 {
                     lcd.print("GOTO INICIO C");
-                    delay(400);
+                    //delay(400);
                     Piso3 = true;
                     gotoInicio(x_InicioC, y_InicioC);
                     //RampaMoveX();
@@ -2369,7 +2427,7 @@ void resolverLaberinto(){
                 if(z_actual == 1)
                 {
                     lcd.print("GOTO INICIO B");
-                    delay(400);
+                    //delay(400);
                     Piso2 = true;
                     gotoInicio(x_InicioB, y_InicioB);
                     //RampaMoveX();
@@ -2378,19 +2436,19 @@ void resolverLaberinto(){
                 if(!Piso2 and x_InicioB != 255)
                 {
                     lcd.print("GOTO INICIO C");
-                    delay(400);
+                    //delay(400);
                     gotoInicio(x_InicioC, y_InicioC);
                     //RampaMoveX();
                 }
                 else
                 {
                     lcd.print("GOTO INICIO");
-                    delay(400);
+                    //delay(400);
                     gotoInicio(x_inicio, y_inicio);
 
                     Serial.println("MARI PUTISIMO, YA LLEGUE");
                     lcd.print("  LLEGUE");
-                    delay(20000);
+                    delay(200000);
                 }
             }
             //gotoSR
@@ -2408,10 +2466,12 @@ void resolverLaberinto(){
 
 //Gira el servo 180 grados
 void servoMotor() {
+    servo.attach(servoPin);
     if(servo.read() == 0)
         servo.write(180);
     else
         servo.write(0);
+    servo.detach();
 }
 
 void checarMlx(){
@@ -2502,7 +2562,7 @@ void calibrarColor(){
         if(BotonColor == 1) {
             //*Limpia la pantalla
             EstadoColor = ESTADO_NEGRO;
-            delay(1000);
+            delay(500);
         }
     }
 
@@ -2525,7 +2585,7 @@ void calibrarColor(){
             iA_NEGRO = getColor();
 
             //*Limpia la pantalla
-            delay(1000);
+            delay(500);
             EstadoColor = ESTADO_CHECKPOINT;
         }
     }
@@ -2550,7 +2610,7 @@ void calibrarColor(){
 
             //*Limpia la pantalla
             EstadoColor = ESTADO_LISTO;
-            delay(1000);
+            delay(500);
         }
     }
 
@@ -2800,16 +2860,15 @@ void LackOfProgress(){
 
 
 void setup() {
-    delay(200);
+    delay(1000);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(InterruptNano), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(InterruptBoton), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
-    servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
     pinMode(S0, OUTPUT);         //Establece  pin de Salida
@@ -2818,6 +2877,7 @@ void setup() {
     pinMode(S3, OUTPUT);         //Establece  pin de Salida
     if(!bno.begin())
            Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    delay(500);
     bno.setExtCrystalUse(true);
 
     AFMS.begin();
@@ -2862,7 +2922,7 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    calibrarColor();
+    //calibrarColor();
     lcd.clear();
 }
 
@@ -2870,6 +2930,22 @@ void loop() {
     //velocidad(218, 255, 218, 255);
     //velocidad(196, 230, 196, 230);
 
+    /*Serial.print(getSharpCorta(SHARP_A));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_B1));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_B2));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_C));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_D1));
+    Serial.print("\t");
+    Serial.println(getSharpCorta(SHARP_D2));
+    Serial.print(getSharpLarga(SHARP_LA));
+    Serial.print("\t\t\t");
+    Serial.println(getSharpLarga(SHARP_LC));
+    Serial.println("");
+    delay(500);*/
 
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
@@ -2877,7 +2953,7 @@ void loop() {
    checarArray();
    lcd.setCursor(0,1);
    lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-   delay(500);
+   //delay(00);
    checarParedes();
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
