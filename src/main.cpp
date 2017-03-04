@@ -11,7 +11,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 int iContadorrr = 0;
-
 //********************************************
 //********************************************
 //------------------ HEADERS -----------------
@@ -204,6 +203,7 @@ byte checkList2[GRID_MAX];
 #define InterruptNano 2
 #define InterruptBoton 3
 #define InterruptDefiner 9
+int first_victim = 0;
 
 
 //******************************************
@@ -1142,6 +1142,14 @@ void checarInterr() {
                 }
                 vueltaIzq();
                 delay(250);
+                if(first_victim == 0)
+                {
+                    servoMotor();
+                    delay(800);
+                    servoMotor();
+                    first_victim = 1;
+                }
+                else
                 servoMotor();
                 vueltaDer();
                 for (int i = 0; i < 15; i++) {
@@ -1169,6 +1177,14 @@ void checarInterr() {
                     delay(100);
                 }
                 vueltaDer();
+                if(first_victim == 0)
+                {
+                    servoMotor();
+                    delay(800);
+                    servoMotor();
+                    first_victim = 1;
+                }
+                else
                 servoMotor();
                 vueltaIzq();
                 for (int i = 0; i < 15; i++) {
@@ -2874,6 +2890,8 @@ void LackOfProgress(){
 
     }
   }
+  Lack = false;
+
 }
 
 
@@ -2881,12 +2899,6 @@ void setup() {
     delay(1000);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
-    attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
     pinMode(S0, OUTPUT);         //Establece  pin de Salida
@@ -2940,17 +2952,19 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    calibrarColor();
     lcd.clear();
+    calibrarColor();
 
-    //avanzar();
-    //velocidad(255, 230, 255, 255);
-    //velocidad(240, 235, 210, 245);
-
-    //velocidad(50, 45, 50, 50);
+        pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+        pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+        attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+        attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
+        attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
 }
 
 void loop() {
+    Serial.println("jeje");
     lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
