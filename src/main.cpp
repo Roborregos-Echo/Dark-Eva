@@ -1863,7 +1863,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     //delay(500);
                     //Dar ordenes de movimiento para llegar
                     backFinished = true;
-
+                    
                     if(ref == 255) {
                         x_actual = x_destino;
                         y_actual = y_destino;
