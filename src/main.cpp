@@ -2856,12 +2856,6 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
-    //velocidad(218, 255, 218, 255);
-    //velocidad(196, 230, 196, 230);
-
-=======
->>>>>>> cd0d976c79a3977cea08031d4a9387f883737b70
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
