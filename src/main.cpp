@@ -1152,6 +1152,8 @@ void checarInterr() {
                 steps = 0;
                 while (steps <= 500) {
                     reversa();
+                    lcd.home();
+                    lcd.print(500);
                 }
                 detener();
 
@@ -1179,6 +1181,8 @@ void checarInterr() {
                 steps = 0;
                 while (steps <= 500) {
                     reversa();
+                    lcd.home();
+                    lcd.print(500);
                 }
                 detener();
                 for (int i = 0; i < 10; i++) {
