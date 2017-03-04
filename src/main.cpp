@@ -555,7 +555,7 @@ void vueltaIzq() {
         iOrientacion = A_NORTE;
         break;
     }
-    delay(400);
+    //delay(400);
 }
 
 void vueltaDer() {
@@ -633,7 +633,7 @@ void vueltaDer() {
         iOrientacion = C_NORTE;
         break;
     }
-    delay(200);
+    //delay(200);
 }
 
 void vueltaAtras() {
@@ -712,7 +712,7 @@ void vueltaAtras() {
         iOrientacion = B_NORTE;
         break;
     }
-    delay(200);
+    //delay(200);
 }
 
 class Cuadro {
@@ -1103,29 +1103,44 @@ void funcionD() {
 void checarInterr() {
     unsigned long pos = 0;
     if(inFire == true) {
-        if(digitalRead(InterruptDefiner))
-        {
-            pos = steps;
+        if(digitalRead(InterruptDefiner)) {
             detener();
-            delay(2000);
+            pos = steps;
+            for (int i = 0; i < 10; i++) {
+                lcd.noBacklight();
+                delay(100);
+                lcd.backlight();
+                delay(100);
+            }
             vueltaIzq();
             servoMotor();
-            delay(1000);
             vueltaDer();
-            delay(2000);
+            for (int i = 0; i < 15; i++) {
+                lcd.noBacklight();
+                delay(100);
+                lcd.backlight();
+                delay(100);
+            }
             inFire = false;
             steps = pos;
-        }
-        else
-        {
-            pos = steps;
+        } else {
             detener();
-            delay(2000);
+            pos = steps;
+            for (int i = 0; i < 10; i++) {
+                lcd.noBacklight();
+                delay(100);
+                lcd.backlight();
+                delay(100);
+            }
             vueltaDer();
             servoMotor();
-            delay(1000);
             vueltaIzq();
-            delay(2000);
+            for (int i = 0; i < 15; i++) {
+                lcd.noBacklight();
+                delay(100);
+                lcd.backlight();
+                delay(100);
+            }
             inFire = false;
             steps = pos;
         }
@@ -2785,7 +2800,7 @@ void LackOfProgress(){
 
 
 void setup() {
-    delay(1000);
+    delay(200);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
@@ -2818,7 +2833,6 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("     E V A");
 
-    delay(100);
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
     ramPID.SetMode(AUTOMATIC);
@@ -2853,12 +2867,10 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
     //velocidad(218, 255, 218, 255);
     //velocidad(196, 230, 196, 230);
 
-=======
->>>>>>> cd0d976c79a3977cea08031d4a9387f883737b70
+
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
