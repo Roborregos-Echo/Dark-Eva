@@ -2927,6 +2927,7 @@ void setup() {
 }
 
 void loop() {
+<<<<<<< HEAD
     //velocidad(218, 255, 218, 255);
     //velocidad(196, 230, 196, 230);
 
@@ -2947,6 +2948,8 @@ void loop() {
     Serial.println("");
     delay(500);*/
 
+=======
+>>>>>>> 078b2056a0c17a6bf6c1c15fc718980f84e98ca4
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
