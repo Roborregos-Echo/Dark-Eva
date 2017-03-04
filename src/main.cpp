@@ -141,8 +141,8 @@ const float PRECISION_IMU = 2.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
-PID izqPID(&inIzq, &outIzq, &setIzq, 15, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 20, 0, 0, REVERSE);
+PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 15, 0, 0, REVERSE);
 PID ramPID(&inRam, &outRam, &setRam, 60, 0, 0, REVERSE);
 
 
@@ -1150,8 +1150,9 @@ void checarInterr() {
                 detener();
                 pos = steps;
                 steps = 0;
-                while (steps <= 500)
+                while (steps <= 500) {
                     reversa();
+                }
                 detener();
 
                 for (int i = 0; i < 10; i++) {
@@ -1176,8 +1177,9 @@ void checarInterr() {
                 detener();
                 pos = steps;
                 steps = 0;
-                while (steps <= 500)
+                while (steps <= 500) {
                     reversa();
+                }
                 detener();
                 for (int i = 0; i < 10; i++) {
                     lcd.noBacklight();
@@ -2503,6 +2505,7 @@ void servoMotor() {
         servo.write(0);
         primerServo = false;
     }
+    delay(300);
     if(servo.read() == 0)
         servo.write(180);
     else
