@@ -124,8 +124,10 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //--------------- MOTORES ------------------
 
 const int VEL_MOTOR         =   135;
+const int VEL_MOTOR_RAMPA   =   255;
+const int VEL_MOTOR_RAMPA_ENCODER   =   218;
 const int VEL_MOTOR_VUELTA  =   108;
-const int VEL_MOTOR_ENCODER  =   105;
+const int VEL_MOTOR_VUELTA_ENCODER  =   105;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -143,7 +145,7 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55);
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
 PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
 PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
-PID ramPID(&inRam, &outRam, &setRam, 30, 0, 0, REVERSE);
+//PID ramPID(&inRam, &outRam, &setRam, 30, 0, 0, REVERSE);
 
 
 //******************************************
@@ -405,7 +407,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void alinear() {
-    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
+    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1)
@@ -1238,9 +1240,9 @@ void moverCuadro() {
                 izqPID.Compute();
                 derPID.Compute();
                 if (outRam > 4)
-                    velocidad(VEL_MOTOR, VEL_MOTOR + outRam, VEL_MOTOR, VEL_MOTOR + outRam);
+                    velocidad(218, 235, 218, 255);
                 else
-                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer + outRam, VEL_MOTOR + outIzq, VEL_MOTOR + outDer + outRam);
+                    velocidad(218 + outIzq, 235 + outDer + outRam, 218 + outIzq, VEL_MOTOR_RAMPA + outDer + outRam);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
@@ -1268,7 +1270,7 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                velocidad(50, 45, 50, 50);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
@@ -2946,6 +2948,12 @@ void setup() {
     lcd.clear();
     //calibrarColor();
     lcd.clear();
+
+    //avanzar();
+    //velocidad(255, 230, 255, 255);
+    //velocidad(240, 235, 210, 245);
+
+    //velocidad(50, 45, 50, 50);
 }
 
 void loop() {
