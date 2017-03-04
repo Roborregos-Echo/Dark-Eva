@@ -1859,10 +1859,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     //delay(500);
                     //Dar ordenes de movimiento para llegar
                     backFinished = true;
-                    
+
                     if(ref == 255) {
-                        x_actual = x_destino;
-                        y_actual = y_destino;
+                        //x_actual = x_destino;
+                        //y_actual = y_destino;
 
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
@@ -1892,6 +1892,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                             }
                             x_actual = gridToCoord(gridActual, 'x');
                             y_actual = gridToCoord(gridActual, 'y');
+                            lcd.setCursor(0, 1);
+                            lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
                         }
                     } else {
                         for(int i = 0; i<GRID_MAX; i++) {
