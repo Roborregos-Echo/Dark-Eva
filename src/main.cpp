@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.1.0 --------------------------------
-//--------------------------- 03 / MARZO / 2017 -----------------------------
+//--------------------------- 04 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -137,13 +137,13 @@ unsigned long steps = 0;
 bool bajarRampa = false;
 bool subirRampa = false;
 bool permisoRampa = true;
-const float PRECISION_IMU = 2.5;
+const float PRECISION_IMU = 2;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
 PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 15, 0, 0, REVERSE);
-PID ramPID(&inRam, &outRam, &setRam, 60, 0, 0, REVERSE);
+PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
+PID ramPID(&inRam, &outRam, &setRam, 30, 0, 0, REVERSE);
 
 
 //******************************************
@@ -375,7 +375,7 @@ float getSharpLarga(int iSharp) {
 
 //******************************************
 //---------------- ENCODER -----------------
-void addStep(){
+void addStep() {
   steps++;
 }
 
@@ -536,25 +536,17 @@ void vueltaIzq() {
     else
         limSup = posFinal + PRECISION_IMU;
 
-        //lcd.clear();
-        //lcd.home();
-        //lcd.print(posFinal);
-
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaIzquierda();
 
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.setCursor(0, 1);
-            //lcd.print(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.setCursor(0, 1);
-            //lcd.print(posInicial);
         }
         detener();
     }
@@ -578,7 +570,6 @@ void vueltaIzq() {
         iOrientacion = A_NORTE;
         break;
     }
-    //delay(400);
 }
 
 void vueltaDer() {
@@ -625,22 +616,14 @@ void vueltaDer() {
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
-    //lcd.clear();
-    //lcd.home();
-    //lcd.print(posFinal);
-
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.setCursor(0, 1);
-            //lcd.print(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.setCursor(0, 1);
-            //lcd.print(posInicial);
         }
         detener();
     }
@@ -664,7 +647,6 @@ void vueltaDer() {
         iOrientacion = C_NORTE;
         break;
     }
-    //delay(200);
 }
 
 void vueltaAtras() {
@@ -710,22 +692,15 @@ void vueltaAtras() {
 
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
-    //lcd.clear();
-    //lcd.home();
-    //lcd.print(posFinal);
 
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.setCursor(0, 1);
-            //lcd.print(posInicial);
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-        //    lcd.setCursor(0, 1);
-        //    lcd.print(posInicial);
         }
 
         detener();
@@ -750,7 +725,6 @@ void vueltaAtras() {
         iOrientacion = B_NORTE;
         break;
     }
-    //delay(200);
 }
 
 class Cuadro {
@@ -841,7 +815,7 @@ void setWall(byte x, byte y, byte z){
     }
 }
 
-void setInicioB(){
+void setInicioB() {
     switch(LastMove)
     {
         case TO_NORTH:
@@ -869,7 +843,7 @@ void setInicioB(){
     z_InicioB = z_actual;
 }
 
-void setInicioC(){
+void setInicioC() {
     switch(LastMove)
     {
         case TO_NORTH:
@@ -1136,8 +1110,10 @@ void Victim_Detected() {
      inFire = true;
 }
 
-void Lack_Interrupt(){
-    lcd.print("INTERRUP");
+void Lack_Interrupt() {
+    lcd.clear();
+    lcd.home();
+    lcd.print("INTERRUPT");
     Lack = true;
 }
 
@@ -1206,6 +1182,7 @@ void checarInterr() {
             cuadros[x_actual][y_actual][z_actual].setMlx(true);
         }
     }
+    inFire = false;
 }
 
 void moverCuadro() {
@@ -1344,7 +1321,6 @@ void moverCuadro() {
         }
     }
     detener();
-    //delay(200);
     //checarColor();
     alinear();
     permisoRampa = true;
@@ -1581,9 +1557,9 @@ byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
 //******************************************
 //------------- PATHFINDING ----------------
 void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
-    Serial.println("Estoy en PathFinding");
-    Serial.println("Actual = " + String(x_actual)+ "," + String(y_actual));
-    Serial.println("Destino = " + String(x_destino)+ "," + String(y_destino));
+    ////Serial.println("Estoy en PathFinding");
+    ////Serial.println("Actual = " + String(x_actual)+ "," + String(y_actual));
+    ////Serial.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
     lcd.print("    " + String(x_destino) + "," + String(y_destino));
     bool pathFinished = false;
@@ -1620,18 +1596,18 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
 
     while (!pathFinished) {
-        Serial.println("Entre al while");
+        ////Serial.println("Entre al while");
         NeighborSortValue = 999;
         openSortValue = 999;
         LastPathValue = pathway(x_path, y_path, x_destino, y_destino);
-        Serial.println("LastPathValue =" + String(LastPathValue));
+        ////Serial.println("LastPathValue =" + String(LastPathValue));
 
         if(x_destino == x_actual and y_destino == y_actual) {
             pathFinished = true;
             lcd.setCursor(0, 1);
             lcd.print("Sali rapido");
-            delay(500);
-            Serial.println("Sali rapidamente");
+            delay(400);
+            ////Serial.println("Sali rapidamente");
         }
 
         for (int i = 0; i<4; i++)
@@ -1753,25 +1729,25 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             }
         }
 
-        Serial.println("Paths: " + String(x_path) + "," + String(y_path) + " = " + String(pathway(x_path, y_path, x_destino, y_destino)));
+        ////Serial.println("Paths: " + String(x_path) + "," + String(y_path) + " = " + String(pathway(x_path, y_path, x_destino, y_destino)));
         //delay(1000);
-        Serial.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
+        ////Serial.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino and y_path == y_destino) {
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
-                    Serial.println("Open[" + String(i) + "] = " + String (openList[i]));
+                    ////Serial.println("Open[" + String(i) + "] = " + String (openList[i]));
                 }
                 for(int i = 0; i<GRID_MAX; i++)
                 {
-                Serial.println("Closed[" + String(i) + "] = " + String (closedList[i]));
+                ////Serial.println("Closed[" + String(i) + "] = " + String (closedList[i]));
             }*/
 
             //Encontrar camino de regreso
             x_back = x_path;
             y_back = y_path;
-            /*Serial.println(x_back);
-            Serial.println(y_back);*/
+            /*////Serial.println(x_back);
+            ////Serial.println(y_back);*/
 
             while(!backFinished) {
                 for (int i = 0; i<4; i++)
@@ -1849,17 +1825,17 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 backList[back_index] = newGrid;
                 lastBackGrid = back_index;
 
-                //Serial.println("BackList = " + String(backList[back_index]));
+                //////Serial.println("BackList = " + String(backList[back_index]));
 
-                /*Serial.print(x_back);
-                Serial.print(" ");
-                Serial.println(y_back);
+                /*//Serial.print(x_back);
+                //Serial.print(" ");
+                ////Serial.println(y_back);
                 delay(3000);*/
                 back_index--;
                 //-----------
                 if(x_back == x_actual and y_back == y_actual) {
                     backList[back_index+1] = 999;
-                    Serial.println("Entre al final");
+                    ////Serial.println("Entre al final");
                     //delay(500);
                     //Dar ordenes de movimiento para llegar
                     backFinished = true;
@@ -1871,25 +1847,25 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
                                 if(gridActual-backList[i] == X_MAX) {
-                                    Serial.println("Abajo");
+                                    ////Serial.println("Abajo");
                                     absoluteMove('S');
                                     gridActual -= X_MAX;
                                 }
 
                                 if(gridActual-backList[i] == -1) {
-                                    Serial.println("Derecha");
+                                    ////Serial.println("Derecha");
                                     absoluteMove('E');
                                     gridActual += 1;
                                 }
 
                                 if(gridActual-backList[i] == -X_MAX) {
-                                    Serial.println("Arriba");
+                                    ////Serial.println("Arriba");
                                     absoluteMove('N');
                                     gridActual += X_MAX;
                                 }
 
                                 if(gridActual-backList[i] == 1) {
-                                    Serial.println("Izquierda");
+                                    ////Serial.println("Izquierda");
                                     absoluteMove('O');
                                     gridActual -= 1;
                                 }
@@ -2157,7 +2133,7 @@ void checarLasts(){
 
 //Verificar si en el for i es i>1 o i>0 (probar)
 void recorrerX(){
-    Serial.println("Recorrer X");
+    ////Serial.println("Recorrer X");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<Y_MAX; j++) {
             for(int i=X_MAX-1; i>0; i--) {
@@ -2193,7 +2169,7 @@ void recorrerX(){
 }
 
 void recorrerY(){
-    Serial.println("Recorrer Y");
+    ////Serial.println("Recorrer Y");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<X_MAX; j++) {
             for(int i=Y_MAX-1; i>0; i--){
@@ -2234,35 +2210,35 @@ void gotoInicio(byte x_final, byte y_final){
     bool boolInicio = false;
 
     if(nearInicio == 1) {
-        Serial.println("Entre a nearInicio");
-        Serial.println("Inicio " + String(x_final) + "," + String(y_final));
-        Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
+        ////Serial.println("Entre a nearInicio");
+        ////Serial.println("Inicio " + String(x_final) + "," + String(y_final));
+        ////Serial.println("Actual " + String(x_actual) + "," + String(y_actual));
         int xInicio = x_final - x_actual;
         int yInicio = y_final - y_actual;
 
         if(xInicio == 1) {
-            Serial.println("Inicio E");
+            ////Serial.println("Inicio E");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('E')) {
                 absoluteMove('E');
                 boolInicio = true;
             }
         }
         else if(xInicio == -1) {
-            Serial.println("Inicio O");
+            ////Serial.println("Inicio O");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('O')) {
                 absoluteMove('O');
                 boolInicio = true;
             }
         }
         else if(yInicio == 1) {
-            Serial.println("Inicio N");
+            ////Serial.println("Inicio N");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('N')) {
                 absoluteMove('N');
                 boolInicio = true;
             }
         }
         else if(yInicio == -1) {
-            Serial.println("Inicio S");
+            ////Serial.println("Inicio S");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('S')) {
                 absoluteMove('S');
                 boolInicio = true;
@@ -2299,9 +2275,9 @@ void RampaMoveX(){
 
 void resolverLaberinto(){
     if(shortMove) {
-        Serial.println("ENTRE AL SHORTMOVE");
+        ////Serial.println("ENTRE AL SHORTMOVE");
         if(!D_wall) {
-            Serial.println("Short Izquierda");
+            ////Serial.println("Short Izquierda");
             switch(iOrientacion) {
                 case A_NORTE:
                 x_actual--;
@@ -2328,7 +2304,7 @@ void resolverLaberinto(){
             moverCuadro();
             checarLasts();
         } else if(!A_wall) {
-            Serial.println("Short Frente");
+            ////Serial.println("Short Frente");
             switch(iOrientacion) {
                 case A_NORTE:
                 y_actual++;
@@ -2353,7 +2329,7 @@ void resolverLaberinto(){
             moverCuadro();
             checarLasts();
         } else if(!B_wall) {
-            Serial.println("Short Derecha");
+            ////Serial.println("Short Derecha");
             switch(iOrientacion) {
                 case A_NORTE:
                 x_actual++;
@@ -2379,7 +2355,7 @@ void resolverLaberinto(){
             moverCuadro();
             checarLasts();
         } else {
-            Serial.println("Short Atras");
+            ////Serial.println("Short Atras");
             switch(iOrientacion) {
                 case A_NORTE:
                 y_actual--;
@@ -2407,24 +2383,24 @@ void resolverLaberinto(){
         }
     } else {
         if(Last) {
-            Serial.println("LAST");
+            ////Serial.println("LAST");
             lcd.clear();
             lcd.print("GOTO LAST");
-            /*Serial.print(x_last);
-            Serial.print(" | ");
-            Serial.println(y_last);*/
+            /*//Serial.print(x_last);
+            //Serial.print(" | ");
+            ////Serial.println(y_last);*/
             /*for(int x=0; x<X_MAX; x++)
             {
             for(int y=0; y<Y_MAX; y++)
             {
-            Serial.print(y);
-            Serial.print(" , ");
-            Serial.print(x);
-            Serial.print(" = ");
-            Serial.println(cuadros[x][y][z_actual].getEstado());
+            //Serial.print(y);
+            //Serial.print(" , ");
+            //Serial.print(x);
+            //Serial.print(" = ");
+            ////Serial.println(cuadros[x][y][z_actual].getEstado());
                 }
             }
-            Serial.println("Ya");*/
+            ////Serial.println("Ya");*/
             byte var = 255;
             Pathfinding(x_last, y_last, var);
 
@@ -2433,7 +2409,7 @@ void resolverLaberinto(){
             Last = false;
             //gotoLast
         } else {
-            Serial.println("GOTO-SR");
+            ////Serial.println("GOTO-SR");
             lcd.clear();
             lcd.print("GOTO SR");
             int LowestCSR = 999;
@@ -2452,7 +2428,7 @@ void resolverLaberinto(){
                 byte var = 255;
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
-                Serial.println("GOTO-INICIO");
+                ////Serial.println("GOTO-INICIO");
                 lcd.clear();
 
                 if(z_actual == 2)
@@ -2486,7 +2462,7 @@ void resolverLaberinto(){
                     //delay(400);
                     gotoInicio(x_inicio, y_inicio);
 
-                    Serial.println("MARI PUTISIMO, YA LLEGUE");
+                    ////Serial.println("MARI PUTISIMO, YA LLEGUE");
                     lcd.print("  LLEGUE");
                     delay(200000);
                 }
@@ -2601,7 +2577,7 @@ int getColor(){
 // Funcion para calibrar los colores que se usaran
 void calibrarColor(){
     while(EstadoColor == ESTADO_OFF) {
-        Serial.println("Calibrar...");
+        ////Serial.println("Calibrar...");
         lcd.setCursor(0, 0);
         lcd.print("   Calibrar...");
         BotonColor = digitalRead(BOTON_COLOR);
@@ -2615,7 +2591,7 @@ void calibrarColor(){
     lcd.clear();
     lcd.print("    Negro...");
     while(EstadoColor == ESTADO_NEGRO) {
-        Serial.println("Calibrar Negro");
+        ////Serial.println("Calibrar Negro");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2639,7 +2615,7 @@ void calibrarColor(){
     lcd.clear();
     lcd.print("  Checkpoint...");
     while(EstadoColor == ESTADO_CHECKPOINT) {
-        Serial.println("Calibrar Checkpoint");
+        ////Serial.println("Calibrar Checkpoint");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             setFiltro('N');
@@ -2663,7 +2639,7 @@ void calibrarColor(){
     lcd.clear();
     lcd.print("   LISTO... ");
     while(EstadoColor == ESTADO_LISTO) {
-        Serial.println("Listo...");
+        ////Serial.println("Listo...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //*Limpia la pantalla
@@ -2922,7 +2898,7 @@ void setup() {
     pinMode(S2, OUTPUT);         //Establece  pin de Salida
     pinMode(S3, OUTPUT);         //Establece  pin de Salida
     if(!bno.begin())
-           Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+           //Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
     delay(500);
     bno.setExtCrystalUse(true);
 
@@ -2974,13 +2950,13 @@ void setup() {
 
 void loop() {
     lcd.clear();
-    checarInterr();
-    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+
+    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
    lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-   delay(300);
+   delay(200);
    checarParedes();
    if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
@@ -2998,5 +2974,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-   resolverLaberinto();*/
+   resolverLaberinto();
 }
