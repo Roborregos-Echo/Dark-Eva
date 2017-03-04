@@ -18,6 +18,7 @@
 //********************************************
 void resolverLaberinto();
 void servoMotor();
+void checarColor();
 
 
 //********************************************
@@ -1222,6 +1223,7 @@ void moverCuadro() {
         checarInterr();
     }
     detener();
+    checarColor();
     alinear();
     delay(500);
     permisoRampa = true;
@@ -2572,10 +2574,8 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 }
 
 
-void checarColor(){
-
-    if(checarCuadroColor(COLOR_NEGRO, 80))
-    {
+void checarColor() {
+    if(checarCuadroColor(COLOR_NEGRO, 80)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
         cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
@@ -2837,12 +2837,9 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
     //velocidad(218, 255, 218, 255);
     //velocidad(196, 230, 196, 230);
 
-=======
->>>>>>> 9816c05f66b0b661b93448fd92abcf8534ccfdca
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -2868,5 +2865,4 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
-   checarColor();
 }
