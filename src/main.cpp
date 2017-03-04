@@ -1101,20 +1101,36 @@ void funcionD() {
 }
 
 void checarInterr() {
-    /*unsigned long pos = 0;
+    unsigned long pos = 0;
     if(inFire == true) {
-        if(digitalRead())
+        if(digitalRead(InterruptDefiner))
+        {
             pos = steps;
             detener();
-            delay(200);
+            delay(2000);
             vueltaIzq();
             servoMotor();
-            delay(200);
+            delay(1000);
             vueltaDer();
-            delay(200);
+            delay(2000);
             inFire = false;
             steps = pos;
-    }*/
+        }
+        else
+        {
+            pos = steps;
+            detener();
+            delay(2000);
+            vueltaDer();
+            servoMotor();
+            delay(1000);
+            vueltaIzq();
+            delay(2000);
+            inFire = false;
+            steps = pos;
+        }
+
+    }
 
 }
 
@@ -2837,9 +2853,12 @@ void setup() {
 }
 
 void loop() {
+<<<<<<< HEAD
     //velocidad(218, 255, 218, 255);
     //velocidad(196, 230, 196, 230);
 
+=======
+>>>>>>> cd0d976c79a3977cea08031d4a9387f883737b70
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
