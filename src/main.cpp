@@ -3081,6 +3081,7 @@ void setup() {
 
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
+    pinMode(InterruptDefiner, INPUT);
     delay(500);
     lcd.clear();
     calibrarColor();
