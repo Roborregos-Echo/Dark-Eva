@@ -1206,7 +1206,6 @@ void moverCuadro() {
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
         while (Lack) {
-            lcd.print("INTERRUPTS");
             detener();
             LackOfProgress();
         }
@@ -1219,10 +1218,9 @@ void moverCuadro() {
         subirRampa = true;
         checarRampa();
         if (permisoRampa) {
-            setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
+            //setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
             while (vec.y() < -10.0) {
                 while (Lack) {
-                    lcd.print("INTERRUPTS");
                     detener();
                     LackOfProgress();
                 }
@@ -1235,14 +1233,14 @@ void moverCuadro() {
                     inDer = - (360 - getAngulo());
                 else
                     inDer = getAngulo();
-                inRam = getSharpCorta(SHARP_D1);
-                ramPID.Compute();
+                //inRam = getSharpCorta(SHARP_D1);
+                //ramPID.Compute();
                 izqPID.Compute();
                 derPID.Compute();
-                if (outRam > 4)
+                /*if (outRam > 4)
                     velocidad(218, 235, 218, 255);
                 else
-                    velocidad(218 + outIzq, 235 + outDer + outRam, 218 + outIzq, VEL_MOTOR_RAMPA + outDer + outRam);
+                    velocidad(218 + outIzq, 235 + outDer + outRam, 218 + outIzq, VEL_MOTOR_RAMPA + outDer + outRam*/
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
@@ -1255,7 +1253,6 @@ void moverCuadro() {
         if (permisoRampa) {
             while (vec.y() > 10.0) {
                 while (Lack) {
-                    lcd.print("INTERRUPTS");
                     detener();
                     LackOfProgress();
                 }
@@ -1294,7 +1291,6 @@ void moverCuadro() {
             lcd.print(steps);
             checarInterr();
             while (Lack) {
-                lcd.print("INTERRUPTS");
                 detener();
                 LackOfProgress();
             }
@@ -1317,7 +1313,6 @@ void moverCuadro() {
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
         while (Lack) {
-            lcd.print("INTERRUPTS");
             detener();
             LackOfProgress();
         }
@@ -2919,7 +2914,7 @@ void setup() {
 
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
-    ramPID.SetMode(AUTOMATIC);
+    //ramPID.SetMode(AUTOMATIC);
     setIzq = 0;
     setDer = 0;
     if(getAngulo() > 300)
