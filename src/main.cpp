@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+int iContadorrr = 0;
 
 //********************************************
 //********************************************
@@ -1113,9 +1114,7 @@ void Victim_Detected() {
 }
 
 void Lack_Interrupt() {
-    lcd.clear();
-    lcd.home();
-    lcd.print("INTERRUPT");
+    Serial.println("INTERRUPT BOTON");
     Lack = true;
 }
 
@@ -1318,7 +1317,7 @@ void moverCuadro() {
         }
     }
     detener();
-    //checarColor();
+    checarColor();
     alinear();
     permisoRampa = true;
 }
@@ -2714,7 +2713,7 @@ void checarColor() {
         A_wall = true;
     }
 
-/*
+
     if(checarCuadroColor(CHECKPOINT, 20))
     {
       int TotalGrid;
@@ -2774,7 +2773,7 @@ void checarColor() {
           }
         }
       }
-  }*/
+  }
 
 }
 
@@ -2941,7 +2940,7 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    //calibrarColor();
+    calibrarColor();
     lcd.clear();
 
     //avanzar();
@@ -2978,4 +2977,5 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
+
 }
