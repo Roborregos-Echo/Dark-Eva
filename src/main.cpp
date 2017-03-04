@@ -1100,20 +1100,36 @@ void funcionD() {
 }
 
 void checarInterr() {
-    /*unsigned long pos = 0;
+    unsigned long pos = 0;
     if(inFire == true) {
-        if(digitalRead())
+        if(digitalRead(InterruptDefiner))
+        {
             pos = steps;
             detener();
-            delay(200);
+            delay(2000);
             vueltaIzq();
             servoMotor();
-            delay(200);
+            delay(1000);
             vueltaDer();
-            delay(200);
+            delay(2000);
             inFire = false;
             steps = pos;
-    }*/
+        }
+        else
+        {
+            pos = steps;
+            detener();
+            delay(2000);
+            vueltaDer();
+            servoMotor();
+            delay(1000);
+            vueltaIzq();
+            delay(2000);
+            inFire = false;
+            steps = pos;
+        }
+
+    }
 
 }
 
