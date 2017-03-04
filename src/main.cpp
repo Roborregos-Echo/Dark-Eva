@@ -1100,7 +1100,7 @@ void funcionD() {
 }
 
 void checarInterr() {
-    unsigned long pos = 0;
+    /*unsigned long pos = 0;
     if(inFire == true) {
         if(digitalRead())
             pos = steps;
@@ -1113,7 +1113,7 @@ void checarInterr() {
             delay(200);
             inFire = false;
             steps = pos;
-    }
+    }*/
 
 }
 
@@ -2837,7 +2837,7 @@ void setup() {
 }
 
 void loop() {
-    /*lcd.clear();
+    lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
@@ -2862,6 +2862,5 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
-   checarColor();*/
-   moverCuadro();
+   checarColor();
 }
