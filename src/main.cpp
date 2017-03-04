@@ -1858,6 +1858,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                     gridActual -= 1;
                                 }
                             }
+                            x_actual = gridToCoord(gridActual, 'x');
+                            y_actual = gridToCoord(gridActual, 'y');
                         }
                     } else {
                         for(int i = 0; i<GRID_MAX; i++) {
@@ -2927,29 +2929,6 @@ void setup() {
 }
 
 void loop() {
-<<<<<<< HEAD
-    //velocidad(218, 255, 218, 255);
-    //velocidad(196, 230, 196, 230);
-
-    /*Serial.print(getSharpCorta(SHARP_A));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B1));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B2));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_C));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_D1));
-    Serial.print("\t");
-    Serial.println(getSharpCorta(SHARP_D2));
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);*/
-
-=======
->>>>>>> 078b2056a0c17a6bf6c1c15fc718980f84e98ca4
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
