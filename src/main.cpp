@@ -1153,7 +1153,7 @@ void checarInterr() {
                 while (steps <= 500) {
                     reversa();
                     lcd.home();
-                    lcd.print(500);
+                    lcd.print(steps);
                 }
                 detener();
 
@@ -1182,7 +1182,7 @@ void checarInterr() {
                 while (steps <= 500) {
                     reversa();
                     lcd.home();
-                    lcd.print(500);
+                    lcd.print(steps);
                 }
                 detener();
                 for (int i = 0; i < 10; i++) {
@@ -1863,7 +1863,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     //delay(500);
                     //Dar ordenes de movimiento para llegar
                     backFinished = true;
-                    
+
                     if(ref == 255) {
                         x_actual = x_destino;
                         y_actual = y_destino;
@@ -2972,7 +2972,8 @@ void setup() {
 
 void loop() {
     lcd.clear();
-    if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
+    checarInterr();
+    /*if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
    lcd.setCursor(0,1);
@@ -2995,5 +2996,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-   resolverLaberinto();
+   resolverLaberinto();*/
 }
