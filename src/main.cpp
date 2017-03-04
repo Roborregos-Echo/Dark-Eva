@@ -578,7 +578,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
-                    loop();
+                    return;
                 }
 
             }
@@ -588,6 +588,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -599,6 +600,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -607,6 +609,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -618,6 +621,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -626,6 +630,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -637,6 +642,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -645,6 +651,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -655,6 +662,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -663,6 +671,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -678,6 +687,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -686,6 +696,7 @@ void alinear() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
             }
             detener();
@@ -773,6 +784,7 @@ void vueltaIzq() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
         detener();
@@ -782,6 +794,7 @@ void vueltaIzq() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
         detener();
@@ -858,6 +871,7 @@ void vueltaDer() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
         detener();
@@ -867,6 +881,7 @@ void vueltaDer() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
         detener();
@@ -943,6 +958,7 @@ void vueltaAtras() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
         detener();
@@ -952,6 +968,7 @@ void vueltaAtras() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
 
@@ -1304,6 +1321,7 @@ void moverCuadro() {
         while (Lack) {
             detener();
             LackOfProgress();
+            return;
         }
     }
 
@@ -1319,6 +1337,7 @@ void moverCuadro() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
                 /*if(getAngulo() > 320)
                     inIzq = - (360 - getAngulo());
@@ -1352,6 +1371,7 @@ void moverCuadro() {
                 while (Lack) {
                     detener();
                     LackOfProgress();
+                    return;
                 }
 
                 /*if(getAngulo() > 320)
@@ -1392,6 +1412,7 @@ void moverCuadro() {
             while (Lack) {
                 detener();
                 LackOfProgress();
+                return;
             }
         }
     }
@@ -1414,6 +1435,7 @@ void moverCuadro() {
         while (Lack) {
             detener();
             LackOfProgress();
+            return;
         }
     }
     detener();
@@ -1432,6 +1454,7 @@ void reversaCuadro() {
         while (Lack) {
             detener();
             LackOfProgress();
+            return;
         }
 
         /*if(getAngulo() > 320)
