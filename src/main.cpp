@@ -124,8 +124,10 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //--------------- MOTORES ------------------
 
 const int VEL_MOTOR         =   135;
+
 const int VEL_MOTOR_RAMPA   =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   218;
+
 const int VEL_MOTOR_VUELTA  =   108;
 const int VEL_MOTOR_VUELTA_ENCODER  =   105;
 
@@ -139,6 +141,9 @@ unsigned long steps = 0;
 bool bajarRampa = false;
 bool subirRampa = false;
 bool permisoRampa = true;
+
+bool factibleSubir = false;
+
 const float PRECISION_IMU = 2;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
@@ -411,28 +416,55 @@ void alinear() {
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
-            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1)
+            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1) {
                 horizontalDerecha();
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
+            }
             detener();
-            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1)
+            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1) {
                 horizontalIzquierda();
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
+            }
             detener();
         }
     } else if(getSharpCorta(SHARP_B1) < 20) {
         while (!(getSharpCorta(SHARP_B1) > 9.0 && getSharpCorta(SHARP_B1) < 10.0)) {
-            while (getSharpCorta(SHARP_B1) < 9)
+            while (getSharpCorta(SHARP_B1) < 9) {
                 horizontalIzquierda();
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
+            }
             detener();
             while (getSharpCorta(SHARP_B1) > 10)
                 horizontalDerecha();
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
             detener();
         }
         if (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2)) > 1.5 ) {
             while (getSharpCorta(SHARP_B2) < getSharpCorta(SHARP_B1))
                 vueltaDerecha();
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
             detener();
             while (getSharpCorta(SHARP_B1) < getSharpCorta(SHARP_B2))
                 vueltaIzquierda();
+                while (Lack) {
+                    detener();
+                    LackOfProgress();
+                }
             detener();
         }
     } else if(getSharpCorta(SHARP_D1) < 20) {
@@ -1239,8 +1271,7 @@ void moverCuadro() {
                     detener();
                     LackOfProgress();
                 }
-
-                if(getAngulo() > 320)
+                /*if(getAngulo() > 320)
                     inIzq = - (360 - getAngulo());
                 else
                     inIzq = getAngulo();
@@ -1252,10 +1283,12 @@ void moverCuadro() {
                 //ramPID.Compute();
                 izqPID.Compute();
                 derPID.Compute();
-                /*if (outRam > 4)
+                if (outRam > 4)
                     velocidad(218, 235, 218, 255);
                 else
                     velocidad(218 + outIzq, 235 + outDer + outRam, 218 + outIzq, VEL_MOTOR_RAMPA + outDer + outRam*/
+                avanzar();
+                velocidad(255, 230, 255, 255);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             }
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
@@ -1272,7 +1305,7 @@ void moverCuadro() {
                     LackOfProgress();
                 }
 
-                if(getAngulo() > 320)
+                /*if(getAngulo() > 320)
                     inIzq = - (360 - getAngulo());
                 else
                     inIzq = getAngulo();
@@ -1282,8 +1315,10 @@ void moverCuadro() {
                     inDer = getAngulo();
                 izqPID.Compute();
                 derPID.Compute();
-                velocidad(50, 45, 50, 50);
+                velocidad(50, 45, 50, 50);*/
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                avanzar();
+                velocidad(50, 45, 50, 50);
             }
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         }
@@ -2943,7 +2978,7 @@ void setup() {
         checkList2[i] = 0;
     }
 
-
+    
     x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
@@ -2951,7 +2986,6 @@ void setup() {
     pinMode(13, OUTPUT);
     pinMode(6, INPUT);
     delay(500);
-    lcd.clear();
     lcd.clear();
     calibrarColor();
 
@@ -2961,6 +2995,7 @@ void setup() {
         attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
         attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
         attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
+
 }
 
 void loop() {
