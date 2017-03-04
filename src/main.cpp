@@ -2848,11 +2848,17 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    //calibrarColor();
+    calibrarColor();
     lcd.clear();
 }
 
 void loop() {
+<<<<<<< HEAD
+    //velocidad(218, 255, 218, 255);
+    //velocidad(196, 230, 196, 230);
+
+=======
+>>>>>>> 9816c05f66b0b661b93448fd92abcf8534ccfdca
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
