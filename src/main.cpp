@@ -2849,12 +2849,17 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    calibrarColor();
+    //calibrarColor();
     lcd.clear();
 }
 
 void loop() {
-    lcd.clear();
+    velocidad(200, 190, 200, 200);
+    //velocidad(128, 115, 128, 128);
+    avanzar();
+
+
+    /*lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
    checarArray();
@@ -2879,5 +2884,5 @@ void loop() {
        lcd.print("O");
    }
    resolverLaberinto();
-   checarColor();
+   checarColor();*/
 }
