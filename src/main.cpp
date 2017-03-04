@@ -465,6 +465,7 @@ void addStep() {
 
 bool inFire = false;
 bool Lack = false;
+bool first_victim = true;
 
 void Victim_Detected() {
      inFire = true;
@@ -499,6 +500,13 @@ void checarInterr() {
                 }
                 vueltaIzq();
                 delay(250);
+                if(first_victim)
+                {
+                    servoMotor();
+                    delay(600);
+                    servoMotor();
+                }
+                else
                 servoMotor();
                 vueltaDer();
                 for (int i = 0; i < 15; i++) {
@@ -526,6 +534,13 @@ void checarInterr() {
                     delay(100);
                 }
                 vueltaDer();
+                if(first_victim)
+                {
+                    servoMotor();
+                    delay(600);
+                    servoMotor();
+                }
+                else
                 servoMotor();
                 vueltaIzq();
                 for (int i = 0; i < 15; i++) {
@@ -541,6 +556,7 @@ void checarInterr() {
         }
     }
     inFire = false;
+    first_victim = false;
 }
 
 
