@@ -1091,13 +1091,16 @@ void checarRampa(){
 //******************************************
 
 bool inFire = false;
+bool Lack = false;
 
-void funcionB() {
+void Victim_Detected() {
      inFire = true;
 }
 
-void funcionD() {
+void Lack_Interrupt(){
+    Lack = true;
 }
+
 
 void checarInterr() {
     unsigned long pos = 0;
@@ -2790,8 +2793,8 @@ void setup() {
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(InterruptNano), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(InterruptBoton), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
