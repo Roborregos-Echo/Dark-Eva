@@ -148,7 +148,7 @@ bool permisoRampa = true;
 
 bool factibleSubir = false;
 
-const float PRECISION_IMU = 2;
+const float PRECISION_IMU = 3;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
@@ -482,6 +482,8 @@ void checarInterr() {
     if(inFire == true) {
         if (!cuadros[x_actual][y_actual][z_actual].getMlx()) {
             if(digitalRead(InterruptDefiner) == 0) {
+                lcd.clear();
+                lcd.print("0000000");
                 detener();
                 pos = steps;
                 steps = 0;
@@ -503,7 +505,7 @@ void checarInterr() {
                 if(first_victim)
                 {
                     servoMotor();
-                    delay(600);
+                    delay(1200);
                     servoMotor();
                 }
                 else
@@ -518,6 +520,8 @@ void checarInterr() {
                 inFire = false;
                 steps = pos;
             } else {
+                lcd.clear();
+                lcd.print("111111");
                 detener();
                 pos = steps;
                 steps = 0;
@@ -2622,16 +2626,17 @@ bool primerServo = true;
 //Gira el servo 180 grados
 void servoMotor() {
     servo.attach(servoPin);
-    if (primerServo) {
+    /*if (primerServo) {
         servo.write(0);
         primerServo = false;
-    }
-    delay(300);
+        lcd.print("primer SERVO00");
+    }*/
+    delay(900);
     if(servo.read() == 0)
         servo.write(180);
     else
         servo.write(0);
-    delay(700);
+    delay(900);
     servo.detach();
 }
 
@@ -3083,11 +3088,12 @@ void setup() {
     pinMode(6, INPUT);
     delay(500);
     lcd.clear();
-    calibrarColor();
+    //calibrarColor();
 }
 
 void loop() {
     checarInterr();
+    cuadros[x_actual][y_actual][z_actual].setMlx(false);
 
         /*lcd.clear();
 
