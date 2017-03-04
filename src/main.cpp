@@ -194,8 +194,11 @@ byte checkList2[GRID_MAX];
 
 //******************************************
 //---------------INTERRUPTS-----------------
-#define interruptB 2
-#define interruptD 3
+
+// Interupcion del nano;
+#define InterruptNano 2
+#define InterruptBoton 3
+#define InterruptDefiner 9
 
 
 //******************************************
@@ -1087,23 +1090,19 @@ void checarRampa(){
 //******************************************
 //******************************************
 
-bool inFireB = false;
-bool inFireD = false;
-bool firstFireB = true;
-bool firstFireD = true;
+bool inFire = false;
 
 void funcionB() {
-     inFireB = true;
+     inFire = true;
 }
 
 void funcionD() {
-    inFireD = true;
 }
 
 void checarInterr() {
-    unsigned long pos = 0;
-    if(inFireB == true) {
-        if (!firstFireB) {
+    /*unsigned long pos = 0;
+    if(inFire == true) {
+        if(digitalRead())
             pos = steps;
             detener();
             delay(200);
@@ -1112,31 +1111,10 @@ void checarInterr() {
             delay(200);
             vueltaDer();
             delay(200);
-            inFireB = false;
+            inFire = false;
             steps = pos;
-        } else {
-            firstFireB = false;
-            inFireB = false;
-        }
-    }
+    }*/
 
-   if(inFireD == true) {
-       if (!firstFireD) {
-           pos = steps;
-           detener();
-           delay(200);
-           vueltaDer();
-           servoMotor();
-           delay(200);
-           vueltaIzq();
-           delay(200);
-           inFireD = false;
-           steps = pos;
-        } else {
-           firstFireD = false;
-           inFireD = false;
-        }
-   }
 }
 
 void moverCuadro() {
@@ -2794,10 +2772,10 @@ void setup() {
     delay(1000);
     Serial.begin(9600);
     PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    pinMode(interruptB, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    pinMode(interruptD, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(interruptB), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
-    attachInterrupt(digitalPinToInterrupt(interruptD), funcionD, LOW); //Declara la funcion a ejectura en interruptD
+    pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    attachInterrupt(digitalPinToInterrupt(InterruptNano), funcionB, LOW); //Declara la funcion a ejecutar en interruptB
+    attachInterrupt(digitalPinToInterrupt(InterruptBoton), funcionD, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     servo.attach(servoPin);      //Pin PWM a donde estará conectado el servo
@@ -2859,9 +2837,12 @@ void setup() {
 }
 
 void loop() {
+<<<<<<< HEAD
     //velocidad(218, 255, 218, 255);
     //velocidad(196, 230, 196, 230);
 
+=======
+>>>>>>> 9816c05f66b0b661b93448fd92abcf8534ccfdca
     lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
