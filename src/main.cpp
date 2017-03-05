@@ -2660,7 +2660,6 @@ void resolverLaberinto(){
 bool primerServo = true;
 //Gira el servo 180 grados
 void servoMotor() {
-    servo.attach(servoPin);
     /*if (primerServo) {
         servo.write(0);
         primerServo = false;
@@ -2672,7 +2671,6 @@ void servoMotor() {
     else
         servo.write(0);
     delay(900);
-    servo.detach();
 }
 
 void checarMlx(){
@@ -3154,6 +3152,11 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("     E V A");
 
+    servo.attach(servoPin);
+    servo.write(0);
+    delay(400);
+    servo.write(180);
+    
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
     //ramPID.SetMode(AUTOMATIC);
