@@ -796,26 +796,39 @@ void vueltaIzq() {
     else
         limSup = posFinal + PRECISION_IMU;
 
+    long actual = millis();
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaIzquierda();
 
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            while (Lack) {
+            if (millis() >= actual + 6000) {
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+            } else if (millis() >= actual + 12000) {
+                velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
+            } else if (millis() >= actual + 18000) {
                 detener();
-                LackOfProgress();
-                return;
+                vueltaIzquierda();
+                velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
+                delay(500);
+                velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
             }
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            while (Lack) {
+            if (millis() >= actual + 6000) {
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+            } else if (millis() >= actual + 12000) {
+                velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
+            } else if (millis() >= actual + 18000) {
                 detener();
-                LackOfProgress();
-                return;
+                vueltaDerecha();
+                velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
+                delay(500);
+                velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
             }
         }
         detener();
@@ -883,6 +896,7 @@ void vueltaDer() {
     else
         limSup = posFinal + PRECISION_IMU;
 
+    long actual = millis();
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
     vueltaDerecha();
 
@@ -1514,7 +1528,9 @@ void absoluteMove(char cLado) {
 
             case 'S':
             LastMove = TO_SOUTH;
+            noInterrupts();
             vueltaDer();
+            interrupts();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -1541,7 +1557,9 @@ void absoluteMove(char cLado) {
 
             case 'E':
             LastMove = TO_EAST;
+            noInterrupts();
             vueltaDer();
+            interrupts();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -1566,7 +1584,9 @@ void absoluteMove(char cLado) {
         switch(cLado) {
             case 'N':
             LastMove = TO_NORTH;
+            noInterrupts();
             vueltaDer();
+            interrupts();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -1617,7 +1637,9 @@ void absoluteMove(char cLado) {
 
             case 'O':
             LastMove = TO_WEST;
+            noInterrupts();
             vueltaDer();
+            interrupts();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -2529,7 +2551,9 @@ void resolverLaberinto(){
                 LastMove = TO_WEST;
                 break;
             }
+            noInterrupts();
             vueltaDer();
+            interrupts();
             vueltaDer();
             //vueltaAtras();
             moverCuadro();
