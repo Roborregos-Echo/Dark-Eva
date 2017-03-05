@@ -192,7 +192,7 @@ bool GridOriginal[GRID_MAX];
 bool SharpRampa = true;
 
 byte firstFloor = 0;
-byte RampaDiff = 4;
+byte RampaDiff = 6;
 byte PisoReal  = 0;
 byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
@@ -477,6 +477,8 @@ void Lack_Interrupt() {
     Lack = false;
 }
 
+
+bool alfa = false;
 
 void checarInterr() {
     unsigned long pos = 0;
@@ -840,7 +842,6 @@ void vueltaIzq() {
         iOrientacion = A_NORTE;
         break;
     }
-    checarInterr();
 }
 
 void vueltaDer() {
@@ -928,7 +929,6 @@ void vueltaDer() {
         iOrientacion = C_NORTE;
         break;
     }
-    checarInterr();
 }
 
 void vueltaAtras() {
@@ -1517,7 +1517,9 @@ void absoluteMove(char cLado) {
             case 'S':
             LastMove = TO_SOUTH;
             vueltaDer();
+            checarInterr();
             vueltaDer();
+            checarInterr();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -1544,7 +1546,9 @@ void absoluteMove(char cLado) {
             case 'E':
             LastMove = TO_EAST;
             vueltaDer();
+            checarInterr();
             vueltaDer();
+            checarInterr();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -1569,7 +1573,9 @@ void absoluteMove(char cLado) {
             case 'N':
             LastMove = TO_NORTH;
             vueltaDer();
+            checarInterr();
             vueltaDer();
+            checarInterr();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -1620,7 +1626,9 @@ void absoluteMove(char cLado) {
             case 'O':
             LastMove = TO_WEST;
             vueltaDer();
+            checarInterr();
             vueltaDer();
+            checarInterr();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -2532,7 +2540,9 @@ void resolverLaberinto(){
                 break;
             }
             vueltaDer();
+            checarInterr();
             vueltaDer();
+            checarInterr();
             //vueltaAtras();
             moverCuadro();
             checarLasts();
