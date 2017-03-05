@@ -853,6 +853,7 @@ void vueltaIzq() {
         iOrientacion = A_NORTE;
         break;
     }
+    checarInterr();
 }
 
 void vueltaDer() {
@@ -941,6 +942,7 @@ void vueltaDer() {
         iOrientacion = C_NORTE;
         break;
     }
+    checarInterr();
 }
 
 void vueltaAtras() {
@@ -3156,7 +3158,7 @@ void setup() {
     servo.write(0);
     delay(400);
     servo.write(180);
-    
+
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
     //ramPID.SetMode(AUTOMATIC);
