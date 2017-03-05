@@ -207,7 +207,7 @@ byte checkList2[GRID_MAX];
 
 
 //******************************************
-//---------------INTERRUPTS-----------------
+//---------------//interrupts();-----------------
 
 // Interupcion del nano;
 #define InterruptNano 2
@@ -460,7 +460,7 @@ void addStep() {
 
 //******************************************
 //******************************************
-//---------------INTERRUPTS-----------------
+//---------------//interrupts();-----------------
 //******************************************
 //******************************************
 
@@ -1530,9 +1530,9 @@ void absoluteMove(char cLado) {
 
             case 'S':
             LastMove = TO_SOUTH;
-            noInterrupts();
+            //no//interrupts();();
             vueltaDer();
-            interrupts();
+            //interrupts();();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -1559,9 +1559,9 @@ void absoluteMove(char cLado) {
 
             case 'E':
             LastMove = TO_EAST;
-            noInterrupts();
+            //no//interrupts();();
             vueltaDer();
-            interrupts();
+            //interrupts();();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -1586,9 +1586,9 @@ void absoluteMove(char cLado) {
         switch(cLado) {
             case 'N':
             LastMove = TO_NORTH;
-            noInterrupts();
+            //no//interrupts();();
             vueltaDer();
-            interrupts();
+            //interrupts();();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -1639,9 +1639,9 @@ void absoluteMove(char cLado) {
 
             case 'O':
             LastMove = TO_WEST;
-            noInterrupts();
+            //no//interrupts();();
             vueltaDer();
-            interrupts();
+            //interrupts();();
             vueltaDer();
             //vueltaAtras();
             alinear();
@@ -2553,9 +2553,9 @@ void resolverLaberinto(){
                 LastMove = TO_WEST;
                 break;
             }
-            noInterrupts();
+            //no//interrupts();();
             vueltaDer();
-            interrupts();
+            //interrupts();();
             vueltaDer();
             //vueltaAtras();
             moverCuadro();
