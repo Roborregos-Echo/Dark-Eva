@@ -212,7 +212,7 @@ byte checkList2[GRID_MAX];
 // Interupcion del nano;
 #define InterruptNano 2
 //#define InterruptBoton 3
-const int InterruptDefiner = 53;
+const int InterruptDefiner = 11;
 
 
 //******************************************
@@ -520,7 +520,7 @@ void checarInterr() {
                 }
                 inFire = false;
                 steps = pos;
-            } else {
+            } else if (digitalRead(InterruptDefiner) == 1){
                 lcd.clear();
                 lcd.print("111111");
                 detener();
