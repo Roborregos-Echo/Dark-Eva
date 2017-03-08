@@ -1553,7 +1553,6 @@ void absoluteMove(char cLado) {
             alinear();
             moverCuadro();
             break;
-
             case 'S':
             LastMove = TO_SOUTH;
             vueltaIzq();
