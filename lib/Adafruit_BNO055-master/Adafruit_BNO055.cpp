@@ -107,7 +107,7 @@ bool Adafruit_BNO055::begin(adafruit_bno055_opmode_t mode)
   write8(BNO055_AXIS_MAP_SIGN_ADDR, REMAP_SIGN_P2); // P0-P7, Default is P1
   delay(10);
   */
-  
+
   write8(BNO055_SYS_TRIGGER_ADDR, 0x0);
   delay(10);
   /* Set the requested operating mode (see section 3.3) */
@@ -495,6 +495,18 @@ void Adafruit_BNO055::setSensorOffsets(const uint8_t* calibData)
 
     write8(MAG_RADIUS_LSB_ADDR, calibData[20]);
     write8(MAG_RADIUS_MSB_ADDR, calibData[21]);
+
+    setMode(lastMode);
+}
+
+void Adafruit_BNO055::setAxis()
+{
+    adafruit_bno055_opmode_t lastMode = _mode;
+    setMode(OPERATION_MODE_CONFIG);
+    delay(25);
+
+    write8(BNO055_AXIS_MAP_SIGN_ADDR, 0x04); // P0-P7, Default is P1
+    delay(10);
 
     setMode(lastMode);
 }
