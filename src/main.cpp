@@ -221,6 +221,7 @@ byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
 byte RampaLastMove;
 
+byte rampaid = 0;
 
 //******************************************
 //-------------- CHECKPOINT ----------------
@@ -2391,7 +2392,6 @@ void verificarCSR(){
 
 
 void verificarRampa(){
-    byte rampaid = 0;
     for (int y=0; y<Y_MAX; y++)
     {
         for(int x=0; x<X_MAX; x++)
@@ -3086,51 +3086,47 @@ void resolverLaberinto(){
                 }
                 byte var = 255;
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
-            } else if(true){
+            } else {
                 // GOTO RAMPA
+                int LowestRampa = 999;
+                int iRampa;
 
-            }
-            else{
+                verificarRampa();
+                if (rampaid > 0)
+                {
+                    for(int i=0; i<rampaid; i++)
+                    {
+                        byte var = 0;
+                        Pathfinding(x_rampa[i], y_rampa[i], var);
+                        if(var < LowestRampa)
+                        {
+                            LowestRampa = var;
+                            iRampa = i;
+                        }
+                    }
+                    byte var = 255;
+                    Pathfinding(x_rampa[iRampa], y_rampa[iRampa], var);
+                }
+                else{
                 ////lcd.println("GOTO-INICIO");
                 lcd.clear();
 
-                if(z_actual == 2)
+                for(int y=0; y < Y_MAX; y++)
                 {
-                    lcd.print("GOTO INICIO C");
-                    //delay(400);
-                    Piso3 = true;
-                    gotoInicio(x_InicioC, y_InicioC);
-                    //RampaMoveX();
+                    for (int x=0; x < X_MAX; x++)
+                    {
+                        if(cuadros[x][y][z_actual].getEstado() == INICIO)
+                        {
+                            x_inicio = x;
+                            y_inicio = y;
+                        }
+                    }
                 }
-                else
-                if(z_actual == 1)
-                {
-                    lcd.print("GOTO INICIO B");
-                    //delay(400);
-                    Piso2 = true;
-                    gotoInicio(x_InicioB, y_InicioB);
-                    //RampaMoveX();
-                }
-                else
-                if(!Piso2 and x_InicioB != 255)
-                {
-                    lcd.print("GOTO INICIO C");
-                    //delay(400);
-                    gotoInicio(x_InicioC, y_InicioC);
-                    //RampaMoveX();
-                }
-                else
-                {
-                    lcd.print("GOTO INICIO");
-                    //delay(400);
-                    gotoInicio(x_inicio, y_inicio);
 
-                    ////lcd.println("MARI PUTISIMO, YA LLEGUE");
-                    lcd.print("  LLEGUE");
-                    delay(200000);
-                }
+                gotoInicio(x_inicio, y_inicio);
             }
             //gotoSR
+            }
         }
     }
 }
@@ -3664,7 +3660,6 @@ void setup() {
         checkList2[i] = 0;
     }
 
-    x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
