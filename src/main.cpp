@@ -3045,28 +3045,12 @@ void resolverLaberinto(){
             ////lcd.println("LAST");
             lcd.clear();
             lcd.print("GOTO LAST");
-            /*//lcd.print(x_last);
-            //lcd.print(" | ");
-            ////lcd.println(y_last);*/
-            /*for(int x=0; x<X_MAX; x++)
-            {
-            for(int y=0; y<Y_MAX; y++)
-            {
-            //lcd.print(y);
-            //lcd.print(" , ");
-            //lcd.print(x);
-            //lcd.print(" = ");
-            ////lcd.println(cuadros[x][y][z_actual].getEstado());
-                }
-            }
-            ////lcd.println("Ya");*/
             byte var = 255;
             Pathfinding(x_last, y_last, var);
 
             x_last = 255;
             y_last = 255;
             Last = false;
-            //gotoLast
         } else {
             ////lcd.println("GOTO-SR");
             lcd.clear();
@@ -3086,11 +3070,7 @@ void resolverLaberinto(){
                 }
                 byte var = 255;
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
-            } else if(true){
-                // GOTO RAMPA
-
-            }
-            else{
+            } else{
                 ////lcd.println("GOTO-INICIO");
                 lcd.clear();
 
