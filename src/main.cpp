@@ -1,28 +1,15 @@
-///////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////                                         ///////////////////
 ///////////////////                 E V A                   ///////////////////
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.2.0 --------------------------------
-//--------------------------- 05 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.2.2 --------------------------------
+//--------------------------- 09 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-
-//********************************************
-//********************************************
-//------------------ HEADERS -----------------
-//********************************************
-//********************************************
-void resolverLaberinto();
-void servoMotor();
-void checarColor();
-void LackOfProgress();
-void vueltaDer();
-void servoMotor();
-void vueltaIzq();
 
 
 //********************************************
@@ -46,11 +33,24 @@ void vueltaIzq();
 
 //********************************************
 //********************************************
+//------------------ HEADERS -----------------
+//********************************************
+//********************************************
+void resolverLaberinto();
+void servoMotor();
+void checarColor();
+void LackOfProgress();
+void vueltaDer();
+void servoMotor();
+void vueltaIzq();
+
+
+
+//********************************************
+//********************************************
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
 //********************************************
-
-
 
 
 //******************************************
@@ -59,7 +59,6 @@ void vueltaIzq();
 const byte DERECHA = 0; const byte IZQUIERDA = 1;
 
 byte Preferencia;
-
 
 
 //******************************************
@@ -139,13 +138,16 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR         =   135;
+const int VEL_MOTOR                 =   180;
 
-const int VEL_MOTOR_RAMPA   =   255;
+const int VEL_MOTOR_RAMPA           =   235;
 const int VEL_MOTOR_RAMPA_ENCODER   =   218;
 
-const int VEL_MOTOR_VUELTA  =   108;
+const int VEL_MOTOR_VUELTA          =   108;
 const int VEL_MOTOR_VUELTA_ENCODER  =   105;
+
+const int VEL_MOTOR_ALINEAR          =   80;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   77;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -154,9 +156,9 @@ unsigned long steps = 0;
 
 //******************************************
 //------------- IMU BNO055 ----------------
-bool bajarRampa = false;
-bool subirRampa = false;
-bool permisoRampa = true;
+bool bajarRampa     = false;
+bool subirRampa     = false;
+bool permisoRampa   = true;
 
 bool factibleSubir = false;
 
@@ -194,10 +196,15 @@ int Neighbors[4];
 
 //******************************************
 //-------------RAMPA ALGORITHM--------------
-const byte ABAJO = 1; const byte ARRIBA = 2;
+const byte ABAJO    = 1;
+const byte ARRIBA   = 2;
 
-const byte SUBIR = 0; const byte BAJAR = 1; const byte SUBIR_BAJAR = 2; const byte BAJAR_SUBIR = 3;
-const byte REGRESA_ARRIBA = 4; const byte REGRESA_ABAJO = 5;
+const byte SUBIR            = 0;
+const byte BAJAR            = 1;
+const byte SUBIR_BAJAR      = 2;
+const byte BAJAR_SUBIR      = 3;
+const byte REGRESA_ARRIBA   = 4;
+const byte REGRESA_ABAJO    = 5;
 
 byte x_rampa[2];
 byte y_rampa[2];
@@ -220,6 +227,8 @@ byte PisoReal  = 0;
 byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
 byte RampaLastMove;
+
+byte rampaid = 0;
 
 
 //******************************************
@@ -270,8 +279,6 @@ byte BotonColor;
 //********************************************
 //********************************************
 //---------------- FUNCIONES ----------------
-//********************************************
-//********************************************
 //********************************************
 //********************************************
 class Cuadro {
@@ -1385,7 +1392,6 @@ void checarRampa2(){
                         else
                         z_actual++;
                         break;
-
                     }
                 }
                 else
@@ -1397,14 +1403,6 @@ void checarRampa2(){
 
             }
         }
-
-
-
-
-
-
-
-
     }
 }
 
@@ -1633,23 +1631,19 @@ void moverCuadro() {
     steps = 0;
     while (steps <= 3600) {
         avanzar();
-        if(getAngulo() > 320)
+        if(getAngulo() > 320) {
             inIzq = - (360 - getAngulo());
-        else
-            inIzq = getAngulo();
-
-        if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
-        else
+        }
+        else {
+            inIzq = getAngulo();
             inDer = getAngulo();
-
+        }
         izqPID.Compute();
         derPID.Compute();
+
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
-        lcd.clear();
-        lcd.home();
-        lcd.print(getAngulo());
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1658,113 +1652,230 @@ void moverCuadro() {
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
         checarRampa2();
-        if (permisoRampa) {
-            //setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
-            while (vec.y() < -10.0) {
-                /*while (Lack) {
-                    detener();
-                    LackOfProgress();
-                    return;
-                }*/
-                /*if(getAngulo() > 320)
-                    inIzq = - (360 - getAngulo());
-                else
-                    inIzq = getAngulo();
-                if(getAngulo() > 320)
-                    inDer = - (360 - getAngulo());
-                else
-                    inDer = getAngulo();
-                //inRam = getSharpCorta(SHARP_D1);
-                //ramPID.Compute();
-                izqPID.Compute();
-                derPID.Compute();
-                if (outRam > 4)
-                    velocidad(218, 235, 218, 255);
-                else
-                    velocidad(218 + outIzq, 235 + outDer + outRam, 218 + outIzq, VEL_MOTOR_RAMPA + outDer + outRam*/
-                avanzar();
-                velocidad(220, 235, 220, 250);
-                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-            }
-            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+
+        switch (PermisoRampa) {
+            case REGRESA_ARRIBA:
+            case BAJAR_SUBIR:
+            case BAJAR:
+                lcd.clear();
+                lcd.home();
+                lcd.print("ERROR");
+                break;
+
+            case SUBIR:
+                while (vec.y() < -10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
+
+            case SUBIR_BAJAR:
+                while (vec.y() < -10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                lcd.print("BAJAR RAMPA");
+                delay(2000);
+                vueltaDerecha();
+                vueltaDerecha();
+                while (vec.y() > 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
+
+            case REGRESA_ABAJO:
+            detener();
+                while (vec.y() < -10.0) {
+                    reversa();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
         }
     } else if(vec.y() > 10.0) {
-        bajarRampa = true;
         lcd.home();
         lcd.print("BAJAR RAMPA");
+        bajarRampa = true;
         checarRampa2();
-        if (permisoRampa) {
-            while (vec.y() > 10.0) {
-                /*while (Lack) {
-                    detener();
-                    LackOfProgress();
-                    return;
-                }*/
 
-                /*if(getAngulo() > 320)
-                    inIzq = - (360 - getAngulo());
-                else
-                    inIzq = getAngulo();
-                if(getAngulo() > 320)
-                    inDer = - (360 - getAngulo());
-                else
-                    inDer = getAngulo();
-                izqPID.Compute();
-                derPID.Compute();
-                velocidad(50, 45, 50, 50);*/
-                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-                avanzar();
-                velocidad(75, 68, 75, 75);
-            }
-            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+        switch (PermisoRampa) {
+            case REGRESA_ABAJO:
+            case SUBIR_BAJAR:
+            case SUBIR:
+                lcd.clear();
+                lcd.home();
+                lcd.print("ERROR");
+                break;
+
+            case BAJAR:
+                while (vec.y() > 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
+
+            case BAJAR_SUBIR:
+                while (vec.y() > 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                lcd.print("SUBIR RAMPA");
+                delay(2000);
+                vueltaDerecha();
+                vueltaDerecha();
+                while (vec.y() < 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
+
+            case REGRESA_ARRIBA:
+            detener();
+                while (vec.y() > -5.0) {
+                    reversa();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
         }
     } else {
         steps = 0;
+        velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         while (steps <= 1000) {
             avanzar();
-            if(getAngulo() > 320)
+            if(getAngulo() > 320) {
                 inIzq = - (360 - getAngulo());
-            else
-                inIzq = getAngulo();
-            if(getAngulo() > 320)
                 inDer = - (360 - getAngulo());
-            else
+            }
+            else {
+                inIzq = getAngulo();
                 inDer = getAngulo();
+            }
             izqPID.Compute();
             derPID.Compute();
+
             velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-            lcd.setCursor(0, 1);
-            lcd.print(steps);
             checarInterr();
-            lcd.clear();
-            lcd.home();
-            lcd.print(getAngulo());
         }
     }
+
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
     avanzar();
     while (steps <= 1000) {
         avanzar();
-        if(getAngulo() > 320)
+        if(getAngulo() > 320) {
             inIzq = - (360 - getAngulo());
-        else
-            inIzq = getAngulo();
-        if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
-        else
+        }
+        else {
+            inIzq = getAngulo();
             inDer = getAngulo();
+        }
         izqPID.Compute();
         derPID.Compute();
+
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
-        lcd.clear();
-        lcd.home();
-        lcd.print(getAngulo());
     }
     detener();
     checarColor();
     alinear();
-    permisoRampa = true;
 }
 
 
@@ -2391,7 +2502,6 @@ void verificarCSR(){
 
 
 void verificarRampa(){
-    byte rampaid = 0;
     for (int y=0; y<Y_MAX; y++)
     {
         for(int x=0; x<X_MAX; x++)
@@ -3070,47 +3180,57 @@ void resolverLaberinto(){
                 }
                 byte var = 255;
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
-            } else{
+            } else {
+                // GOTO RAMPA
+                int LowestRampa = 999;
+                int iRampa;
+
+                verificarRampa();
+                if (rampaid > 0)
+                {
+                    for(int i=0; i<rampaid; i++)
+                    {
+                        byte var = 0;
+                        Pathfinding(x_rampa[i], y_rampa[i], var);
+                        if(var < LowestRampa)
+                        {
+                            LowestRampa = var;
+                            iRampa = i;
+                        }
+                    }
+                    byte var = 255;
+
+                    if(z_actual == 0)
+                        Piso1 = true;
+                    else
+                    if(z_actual == 1)
+                        Piso2 = true;
+                    else
+                    if(z_actual == 2)
+                        Piso3 = true;
+
+                    Pathfinding(x_rampa[iRampa], y_rampa[iRampa], var);
+                }
+                else{
                 ////lcd.println("GOTO-INICIO");
                 lcd.clear();
 
-                if(z_actual == 2)
+                for(int y=0; y < Y_MAX; y++)
                 {
-                    lcd.print("GOTO INICIO C");
-                    //delay(400);
-                    Piso3 = true;
-                    gotoInicio(x_InicioC, y_InicioC);
-                    //RampaMoveX();
+                    for (int x=0; x < X_MAX; x++)
+                    {
+                        if(cuadros[x][y][z_actual].getEstado() == INICIO)
+                        {
+                            x_inicio = x;
+                            y_inicio = y;
+                        }
+                    }
                 }
-                else
-                if(z_actual == 1)
-                {
-                    lcd.print("GOTO INICIO B");
-                    //delay(400);
-                    Piso2 = true;
-                    gotoInicio(x_InicioB, y_InicioB);
-                    //RampaMoveX();
-                }
-                else
-                if(!Piso2 and x_InicioB != 255)
-                {
-                    lcd.print("GOTO INICIO C");
-                    //delay(400);
-                    gotoInicio(x_InicioC, y_InicioC);
-                    //RampaMoveX();
-                }
-                else
-                {
-                    lcd.print("GOTO INICIO");
-                    //delay(400);
-                    gotoInicio(x_inicio, y_inicio);
 
-                    ////lcd.println("MARI PUTISIMO, YA LLEGUE");
-                    lcd.print("  LLEGUE");
-                    delay(200000);
-                }
+                gotoInicio(x_inicio, y_inicio);
             }
             //gotoSR
+            }
         }
     }
 }
@@ -3644,7 +3764,6 @@ void setup() {
         checkList2[i] = 0;
     }
 
-    x_inicio = 1; y_inicio = 1; z_inicio = 0;
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
@@ -3683,7 +3802,7 @@ void setup() {
 }
 
 void loop() {
-    /*lcd.clear();
+    lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3709,5 +3828,5 @@ void loop() {
        lcd.print("O");
 
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
