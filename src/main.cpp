@@ -1682,7 +1682,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR_BAJAR:
-                while (vec.y() < -10.0) {
+                while (vec.y() < -5.0) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1800,7 +1800,7 @@ void moverCuadro() {
                 delay(2000);
                 vueltaDerecha();
                 vueltaDerecha();
-                while (vec.y() < 10.0) {
+                while (vec.y() < -10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1820,7 +1820,7 @@ void moverCuadro() {
 
             case REGRESA_ARRIBA:
             detener();
-                while (vec.y() > -5.0) {
+                while (vec.y() > 5.0) {
                     reversa();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
