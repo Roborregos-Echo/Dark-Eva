@@ -1682,7 +1682,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR_BAJAR:
-                while (vec.y() < -5.0) {
+                while (vec.y() < -10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1698,6 +1698,7 @@ void moverCuadro() {
                     velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                lcd.print("BAJAR RAMPA");
                 delay(2000);
                 vueltaDerecha();
                 vueltaDerecha();
@@ -1720,7 +1721,8 @@ void moverCuadro() {
                 break;
 
             case REGRESA_ABAJO:
-                while (vec.y() < -5.0) {
+            detener();
+                while (vec.y() < -10.0) {
                     reversa();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1773,9 +1775,62 @@ void moverCuadro() {
                 break;
 
             case BAJAR_SUBIR:
+                while (vec.y() > 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                lcd.print("SUBIR RAMPA");
+                delay(2000);
+                vueltaDerecha();
+                vueltaDerecha();
+                while (vec.y() < 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
                 break;
 
             case REGRESA_ARRIBA:
+            detener();
+                while (vec.y() > -5.0) {
+                    reversa();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
                 break;
         }
     } else {
@@ -1798,9 +1853,10 @@ void moverCuadro() {
             checarInterr();
         }
     }
+
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
     avanzar();
-    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     while (steps <= 1000) {
         avanzar();
         if(getAngulo() > 320) {
@@ -3752,7 +3808,7 @@ void setup() {
 }
 
 void loop() {
-    /*lcd.clear();
+    lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3778,5 +3834,5 @@ void loop() {
        lcd.print("O");
 
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
