@@ -3944,14 +3944,7 @@ void setup() {
 }
 
 void loop() {
-    imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     lcd.clear();
-    lcd.home();
-    lcd.print(vec.y());
-    lcd.setCursor(8,1);
-    lcd.print(vec.z());
-    delay(250);
-    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3977,5 +3970,5 @@ void loop() {
        lcd.print("O");
 
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
