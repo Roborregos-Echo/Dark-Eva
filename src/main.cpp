@@ -1593,6 +1593,7 @@ void checarRampa2() {
 }*/
 
 void alinearIMU() {
+    lcd.print("alimear imu");
     byte ultimaOrientacion = iOrientacion;
     switch (iOrientacion) {
         case B_NORTE:
@@ -1612,25 +1613,26 @@ void alinearIMU() {
     velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
     if (getSharpCorta(SHARP_A) < 10) {
         steps = 0;
-        while (steps <= 2000) {
+        while (steps <= 1200) {
+            lcd.print("1");
             avanzar();
         }
         detener();
     } else if (getSharpCorta(SHARP_B1) < 10) {
         steps = 0;
-        while (steps <= 2000) {
+        while (steps <= 1200) {
             horizontalDerecha();
         }
         detener();
     } else if (getSharpCorta(SHARP_C) < 10) {
         steps = 0;
-        while (steps <= 2000) {
+        while (steps <= 1200) {
             reversa();
         }
         detener();
     } else if (getSharpCorta(SHARP_D1) < 10) {
         steps = 0;
-        while (steps <= 2000) {
+        while (steps <= 1200) {
             horizontalIzquierda();
         }
         detener();
@@ -1715,6 +1717,8 @@ void moverCuadro() {
 
             case SUBIR_BAJAR:
                 while (vec.y() < -10.0) {
+                    lcd.clear();
+                    lcd.print(vec.y());
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1756,7 +1760,7 @@ void moverCuadro() {
                 delay(400);
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
-                while (steps <= 3000) {
+                while (steps <= 5000) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1773,8 +1777,15 @@ void moverCuadro() {
                 }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                lcd.print("111111111");
                 while (vec.y() > 10.0) {
+                    lcd.noBacklight();
+                    delay(25);
+                    lcd.backlight();
                     avanzar();
+                    lcd.clear();
+                    lcd.print(vec.y());
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
                         inDer = - (360 - getAngulo());
@@ -1852,6 +1863,8 @@ void moverCuadro() {
 
             case BAJAR_SUBIR:
                 while (vec.y() > 10.0) {
+                    lcd.clear();
+                    lcd.print(vec.y());
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1909,7 +1922,10 @@ void moverCuadro() {
                     velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                lcd.print("111111111");
                 while (vec.y() < -10.0) {
+                    lcd.clear();
+                    lcd.print(vec.y());
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
