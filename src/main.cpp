@@ -1621,18 +1621,21 @@ void alinearIMU() {
     } else if (getSharpCorta(SHARP_B1) < 10) {
         steps = 0;
         while (steps <= 1200) {
+            lcd.print("2");
             horizontalDerecha();
         }
         detener();
     } else if (getSharpCorta(SHARP_C) < 10) {
         steps = 0;
         while (steps <= 1200) {
+            lcd.print("2");
             reversa();
         }
         detener();
     } else if (getSharpCorta(SHARP_D1) < 10) {
         steps = 0;
         while (steps <= 1200) {
+            lcd.print("3");
             horizontalIzquierda();
         }
         detener();
@@ -1642,7 +1645,7 @@ void alinearIMU() {
     lcd.home();
     lcd.print("   BNO");
     bno.begin();
-    delay(3000);
+    delay(2000);
     alinear();
 
     switch (ultimaOrientacion) {
@@ -3941,7 +3944,14 @@ void setup() {
 }
 
 void loop() {
+    imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     lcd.clear();
+    lcd.home();
+    lcd.print(vec.y());
+    lcd.setCursor(8,1);
+    lcd.print(vec.z());
+    delay(250);
+    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3967,5 +3977,5 @@ void loop() {
        lcd.print("O");
 
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
