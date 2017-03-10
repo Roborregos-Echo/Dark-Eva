@@ -1230,7 +1230,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
-                    delay(1000);
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
@@ -1238,7 +1238,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(1000);
+                    delay(100);
                     if(!Piso2)
                     z_actual++;
                     else
@@ -1250,7 +1250,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(1000);
+                    delay(100);
                     z_actual--;
                 }
             }
@@ -1261,7 +1261,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
-                    delay(1000);
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
@@ -1269,7 +1269,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(1000);
+                    delay(100);
                     switch(LastMove)
                     {
                         case TO_NORTH:
@@ -1319,7 +1319,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(1000);
+                    delay(100);
                     z_actual -= 2;
                 }
 
@@ -1334,7 +1334,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
-                    delay(1000);
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
@@ -1342,7 +1342,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(1000);
+                    delay(100);
                     if(!Piso2)
                     z_actual++;
                     else
@@ -1354,7 +1354,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(1000);
+                    delay(100);
                     z_actual--;
                 }
             }
@@ -1365,7 +1365,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
-                    delay(1000);
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
@@ -1373,7 +1373,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(1000);
+                    delay(100);
                     switch(LastMove)
                     {
                         case TO_NORTH:
@@ -1422,7 +1422,7 @@ void checarRampa2(){
                 {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(1000);
+                    delay(100);
                     z_actual -= 2;
                 }
 
@@ -1674,7 +1674,7 @@ void moverCuadro() {
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     if(vec.y() < -10.0) {
         lcd.home();
-        lcd.print("SUBIR RAMPA");
+        lcd.print("ySUBIR RAMPAy");
         subirRampa = true;
         checarRampa2();
 
@@ -1707,7 +1707,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR_BAJAR:
-                while (vec.y() < -5.0) {
+                while (vec.y() < -10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1723,12 +1723,48 @@ void moverCuadro() {
                     velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 1000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
                 detener();
                 lcd.clear();
-                lcd.print("BAJAR RAMPA");
+                lcd.print("xxBAJAR RAMPAxx");
                 delay(2000);
                 vueltaDerecha();
                 vueltaDerecha();
+                delay(2000);
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                avanzar();
+                while (steps <= 1000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
                 while (vec.y() > 10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
@@ -1770,7 +1806,7 @@ void moverCuadro() {
         }
     } else if(vec.y() > 10.0) {
         lcd.home();
-        lcd.print("BAJAR RAMPA");
+        lcd.print("yBAJAR RAMPAy");
         bajarRampa = true;
         checarRampa2();
 
@@ -1819,12 +1855,46 @@ void moverCuadro() {
                     velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 1000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
                 detener();
                 lcd.clear();
-                lcd.print("SUBIR RAMPA");
+                lcd.print("xxSUBIR RAMPAxx");
                 delay(2000);
                 vueltaDerecha();
                 vueltaDerecha();
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 1000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
                 while (vec.y() < -10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
@@ -1845,7 +1915,7 @@ void moverCuadro() {
 
             case REGRESA_ARRIBA:
             detener();
-                while (vec.y() > 5.0) {
+                while (vec.y() > 10.0) {
                     reversa();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
