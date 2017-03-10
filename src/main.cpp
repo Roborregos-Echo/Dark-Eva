@@ -1207,35 +1207,27 @@ void setNewRampa(){
 
 }
 
-void checarRampa2(){
-    if(subirRampa or bajarRampa)
-    {
+void checarRampa2() {
+    if(subirRampa or bajarRampa) {
         lcd.clear();
         SharpRampa = false;
 
-        if(firstFloor == 0)
-        {
+        if(firstFloor == 0) {
             if(subirRampa)
-            firstFloor = ABAJO;
+                firstFloor = ABAJO;
 
             if(bajarRampa)
-            firstFloor = ARRIBA;
+                firstFloor = ARRIBA;
         }
 
-        if(firstFloor == ABAJO)
-        {
-            if(subirRampa)
-            {
-                if(z_actual == 0 and !Piso1)
-                {
+        if(firstFloor == ABAJO) {
+            if(subirRampa) {
+                if(z_actual == 0 and !Piso1) {
                     PermisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 0 and Piso1)
-                {
+                } else if(z_actual == 0 and Piso1) {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
@@ -1244,188 +1236,136 @@ void checarRampa2(){
                     else
                     z_actual += 2;
                     setNewRampa();
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     z_actual--;
                 }
-            }
-            else
-            if(bajarRampa)
-            {
-                if(z_actual==1 and !Piso2)
-                {
+            } else if(bajarRampa) {
+                if(z_actual==1 and !Piso2) {
                     PermisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 1 and Piso2)
-                {
+                } else if(z_actual == 1 and Piso2) {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
-                    switch(LastMove)
-                    {
+                    switch(LastMove) {
                         case TO_NORTH:
-                        if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_EAST:
-                        if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_SOUTH:
-                        if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_WEST:
-                        if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
-
+                            if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            }
+                            else
+                                z_actual++;
+                            break;
                     }
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     z_actual -= 2;
                 }
-
             }
-        }
-        else
-        if(firstFloor == ARRIBA)
-        {
-            if(bajarRampa)
-            {
-                if(z_actual == 0 and !Piso1)
-                {
+        } else if(firstFloor == ARRIBA) {
+            if(bajarRampa) {
+                if(z_actual == 0 and !Piso1) {
                     PermisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 0 and Piso1)
-                {
+                } else if(z_actual == 0 and Piso1) {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     if(!Piso2)
-                    z_actual++;
+                        z_actual++;
                     else
-                    z_actual += 2;
+                        z_actual += 2;
                     setNewRampa();
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     z_actual--;
                 }
-            }
-            else
-            if(subirRampa)
-            {
-                if(z_actual==1 and !Piso2)
-                {
+            } else if(subirRampa) {
+                if(z_actual==1 and !Piso2) {
                     PermisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 1 and Piso2)
-                {
+                } else if(z_actual == 1 and Piso2) {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
-                    switch(LastMove)
-                    {
+                    switch(LastMove) {
                         case TO_NORTH:
-                        if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_EAST:
-                        if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            }
+                            else
+                                z_actual++;
+                            break;
 
                         case TO_SOUTH:
-                        if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            }
+                            else
+                                z_actual++;
+                            break;
 
                         case TO_WEST:
-                        if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
                     }
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     z_actual -= 2;
                 }
-
             }
         }
     }
@@ -1689,6 +1629,7 @@ void moverCuadro() {
 
             case SUBIR:
                 while (vec.y() < -10.0) {
+                    lcd.print("yyy");
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1708,6 +1649,7 @@ void moverCuadro() {
 
             case SUBIR_BAJAR:
                 while (vec.y() < -10.0) {
+                    lcd.print("yyy");
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1725,7 +1667,12 @@ void moverCuadro() {
                 }
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
-                while (steps <= 1000) {
+                while (steps <= 3000) {
+                    lcd.clear();
+                    lcd.print("111");
+                    lcd.noBacklight();
+                    delay(25);
+                    lcd.backlight();
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1741,16 +1688,13 @@ void moverCuadro() {
                     velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 }
                 detener();
-                lcd.clear();
-                lcd.print("xxBAJAR RAMPAxx");
-                delay(2000);
-                vueltaDerecha();
-                vueltaDerecha();
-                delay(2000);
+                vueltaDer();
+                delay(100);
+                vueltaDer();
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                delay(500);
                 steps = 0;
-                avanzar();
-                while (steps <= 1000) {
+                while (steps <= 3000) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1765,6 +1709,10 @@ void moverCuadro() {
 
                     velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 }
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                lcd.print(vec.y());
+                delay(1000);
                 while (vec.y() > 10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
@@ -1857,7 +1805,7 @@ void moverCuadro() {
                 }
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
-                while (steps <= 1000) {
+                while (steps <= 3000) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1873,14 +1821,13 @@ void moverCuadro() {
                     velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 }
                 detener();
-                lcd.clear();
-                lcd.print("xxSUBIR RAMPAxx");
-                delay(2000);
-                vueltaDerecha();
-                vueltaDerecha();
+                vueltaDer();
+                delay(100);
+                vueltaDer();
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                delay(500);
                 steps = 0;
-                while (steps <= 1000) {
+                while (steps <= 3000) {
                     avanzar();
                     if(getAngulo() > 320) {
                         inIzq = - (360 - getAngulo());
@@ -1895,6 +1842,7 @@ void moverCuadro() {
 
                     velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 }
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 while (vec.y() < -10.0) {
                     avanzar();
                     if(getAngulo() > 320) {
