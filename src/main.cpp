@@ -1210,6 +1210,7 @@ void setNewRampa(){
 void checarRampa2(){
     if(subirRampa or bajarRampa)
     {
+        lcd.clear();
         SharpRampa = false;
 
         if(firstFloor == 0)
@@ -1228,12 +1229,16 @@ void checarRampa2(){
                 if(z_actual == 0 and !Piso1)
                 {
                     PermisoRampa = SUBIR_BAJAR;
+                    lcd.print("SUBIR_BAJAR");
+                    delay(1000);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
                 if(z_actual == 0 and Piso1)
                 {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(1000);
                     if(!Piso2)
                     z_actual++;
                     else
@@ -1244,6 +1249,8 @@ void checarRampa2(){
                 if(z_actual == 2)
                 {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(1000);
                     z_actual--;
                 }
             }
@@ -1253,12 +1260,16 @@ void checarRampa2(){
                 if(z_actual==1 and !Piso2)
                 {
                     PermisoRampa = BAJAR_SUBIR;
+                    lcd.print("BAJAR_SUBIR");
+                    delay(1000);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
                 if(z_actual == 1 and Piso2)
                 {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(1000);
                     switch(LastMove)
                     {
                         case TO_NORTH:
@@ -1307,6 +1318,8 @@ void checarRampa2(){
                 if(z_actual == 2)
                 {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(1000);
                     z_actual -= 2;
                 }
 
@@ -1320,12 +1333,16 @@ void checarRampa2(){
                 if(z_actual == 0 and !Piso1)
                 {
                     PermisoRampa = BAJAR_SUBIR;
+                    lcd.print("BAJAR_SUBIR");
+                    delay(1000);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
                 if(z_actual == 0 and Piso1)
                 {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(1000);
                     if(!Piso2)
                     z_actual++;
                     else
@@ -1336,6 +1353,8 @@ void checarRampa2(){
                 if(z_actual == 2)
                 {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(1000);
                     z_actual--;
                 }
             }
@@ -1345,12 +1364,16 @@ void checarRampa2(){
                 if(z_actual==1 and !Piso2)
                 {
                     PermisoRampa = SUBIR_BAJAR;
+                    lcd.print("SUBIR_BAJAR");
+                    delay(1000);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 }
                 else
                 if(z_actual == 1 and Piso2)
                 {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(1000);
                     switch(LastMove)
                     {
                         case TO_NORTH:
@@ -1398,6 +1421,8 @@ void checarRampa2(){
                 if(z_actual == 2)
                 {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(1000);
                     z_actual -= 2;
                 }
 
