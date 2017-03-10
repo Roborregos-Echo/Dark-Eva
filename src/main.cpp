@@ -1723,6 +1723,8 @@ void moverCuadro() {
                     velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                detener();
+                lcd.clear();
                 lcd.print("BAJAR RAMPA");
                 delay(2000);
                 vueltaDerecha();
@@ -1763,6 +1765,7 @@ void moverCuadro() {
                     velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                detener();
                 break;
         }
     } else if(vec.y() > 10.0) {
@@ -1816,6 +1819,8 @@ void moverCuadro() {
                     velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                detener();
+                lcd.clear();
                 lcd.print("SUBIR RAMPA");
                 delay(2000);
                 vueltaDerecha();
@@ -1856,6 +1861,7 @@ void moverCuadro() {
                     velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                detener();
                 break;
         }
     } else {
