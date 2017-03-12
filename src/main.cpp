@@ -5,24 +5,11 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.2.0 --------------------------------
-//--------------------------- 05 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.2.2 --------------------------------
+//--------------------------- 09 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-
-//********************************************
-//********************************************
-//------------------ HEADERS -----------------
-//********************************************
-//********************************************
-void resolverLaberinto();
-void servoMotor();
-void checarColor();
-void LackOfProgress();
-void vueltaDer();
-void servoMotor();
-void vueltaIzq();
 
 
 //********************************************
@@ -46,11 +33,24 @@ void vueltaIzq();
 
 //********************************************
 //********************************************
+//------------------ HEADERS -----------------
+//********************************************
+//********************************************
+void resolverLaberinto();
+void servoMotor();
+void checarColor();
+void LackOfProgress();
+void vueltaDer();
+void servoMotor();
+void vueltaIzq();
+
+
+
+//********************************************
+//********************************************
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
 //********************************************
-
-
 
 
 //******************************************
@@ -58,8 +58,9 @@ void vueltaIzq();
 #define switch_preferencia 20
 const byte DERECHA = 0; const byte IZQUIERDA = 1;
 
-byte Preferencia;
+byte ContadorLaberinto = 0;
 
+byte Preferencia;
 
 
 //******************************************
@@ -139,13 +140,16 @@ Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR         =   135;
+const int VEL_MOTOR                 =   180;
 
-const int VEL_MOTOR_RAMPA   =   255;
+const int VEL_MOTOR_RAMPA           =   235;
 const int VEL_MOTOR_RAMPA_ENCODER   =   218;
 
-const int VEL_MOTOR_VUELTA  =   108;
+const int VEL_MOTOR_VUELTA          =   108;
 const int VEL_MOTOR_VUELTA_ENCODER  =   105;
+
+const int VEL_MOTOR_ALINEAR          =   80;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   77;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -154,9 +158,9 @@ unsigned long steps = 0;
 
 //******************************************
 //------------- IMU BNO055 ----------------
-bool bajarRampa = false;
-bool subirRampa = false;
-bool permisoRampa = true;
+bool bajarRampa     = false;
+bool subirRampa     = false;
+bool permisoRampa   = true;
 
 bool factibleSubir = false;
 
@@ -194,10 +198,15 @@ int Neighbors[4];
 
 //******************************************
 //-------------RAMPA ALGORITHM--------------
-const byte ABAJO = 1; const byte ARRIBA = 2;
+const byte ABAJO    = 1;
+const byte ARRIBA   = 2;
 
-const byte SUBIR = 0; const byte BAJAR = 1; const byte SUBIR_BAJAR = 2; const byte BAJAR_SUBIR = 3;
-const byte REGRESA_ARRIBA = 4; const byte REGRESA_ABAJO = 5;
+const byte SUBIR            = 0;
+const byte BAJAR            = 1;
+const byte SUBIR_BAJAR      = 2;
+const byte BAJAR_SUBIR      = 3;
+const byte REGRESA_ARRIBA   = 4;
+const byte REGRESA_ABAJO    = 5;
 
 byte x_rampa[2];
 byte y_rampa[2];
@@ -222,6 +231,7 @@ byte LastMove;            // 0,1,0
 byte RampaLastMove;
 
 byte rampaid = 0;
+
 
 //******************************************
 //-------------- CHECKPOINT ----------------
@@ -271,8 +281,6 @@ byte BotonColor;
 //********************************************
 //********************************************
 //---------------- FUNCIONES ----------------
-//********************************************
-//********************************************
 //********************************************
 //********************************************
 class Cuadro {
@@ -1201,211 +1209,167 @@ void setNewRampa(){
 
 }
 
-void checarRampa2(){
-    if(subirRampa or bajarRampa)
-    {
+void checarRampa2() {
+    if(subirRampa or bajarRampa) {
+        lcd.clear();
         SharpRampa = false;
 
-        if(firstFloor == 0)
-        {
+        if(firstFloor == 0) {
             if(subirRampa)
-            firstFloor = ABAJO;
+                firstFloor = ABAJO;
 
             if(bajarRampa)
-            firstFloor = ARRIBA;
+                firstFloor = ARRIBA;
         }
 
-        if(firstFloor == ABAJO)
-        {
-            if(subirRampa)
-            {
-                if(z_actual == 0 and !Piso1)
-                {
+        if(firstFloor == ABAJO) {
+            if(subirRampa) {
+                if(z_actual == 0 and !Piso1) {
                     PermisoRampa = SUBIR_BAJAR;
+                    lcd.print("SUBIR_BAJAR");
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 0 and Piso1)
-                {
+                } else if(z_actual == 0 and Piso1) {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(100);
                     if(!Piso2)
                     z_actual++;
                     else
                     z_actual += 2;
                     setNewRampa();
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(100);
                     z_actual--;
                 }
-            }
-            else
-            if(bajarRampa)
-            {
-                if(z_actual==1 and !Piso2)
-                {
+            } else if(bajarRampa) {
+                if(z_actual==1 and !Piso2) {
                     PermisoRampa = BAJAR_SUBIR;
+                    lcd.print("BAJAR_SUBIR");
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 1 and Piso2)
-                {
+                } else if(z_actual == 1 and Piso2) {
                     PermisoRampa = BAJAR;
-                    switch(LastMove)
-                    {
+                    lcd.print("BAJAR");
+                    delay(100);
+                    switch(LastMove) {
                         case TO_NORTH:
-                        if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_EAST:
-                        if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_SOUTH:
-                        if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_WEST:
-                        if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
-
+                            if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            }
+                            else
+                                z_actual++;
+                            break;
                     }
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(100);
                     z_actual -= 2;
                 }
-
             }
-        }
-        else
-        if(firstFloor == ARRIBA)
-        {
-            if(bajarRampa)
-            {
-                if(z_actual == 0 and !Piso1)
-                {
+        } else if(firstFloor == ARRIBA) {
+            if(bajarRampa) {
+                if(z_actual == 0 and !Piso1) {
                     PermisoRampa = BAJAR_SUBIR;
+                    lcd.print("BAJAR_SUBIR");
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 0 and Piso1)
-                {
+                } else if(z_actual == 0 and Piso1) {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(100);
                     if(!Piso2)
-                    z_actual++;
+                        z_actual++;
                     else
-                    z_actual += 2;
+                        z_actual += 2;
                     setNewRampa();
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = BAJAR;
+                    lcd.print("BAJAR");
+                    delay(100);
                     z_actual--;
                 }
-            }
-            else
-            if(subirRampa)
-            {
-                if(z_actual==1 and !Piso2)
-                {
+            } else if(subirRampa) {
+                if(z_actual==1 and !Piso2) {
                     PermisoRampa = SUBIR_BAJAR;
+                    lcd.print("SUBIR_BAJAR");
+                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                }
-                else
-                if(z_actual == 1 and Piso2)
-                {
+                } else if(z_actual == 1 and Piso2) {
                     PermisoRampa = SUBIR;
-                    switch(LastMove)
-                    {
+                    lcd.print("SUBIR");
+                    delay(100);
+                    switch(LastMove) {
                         case TO_NORTH:
-                        if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual + (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
 
                         case TO_EAST:
-                        if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual + (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual + (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            }
+                            else
+                                z_actual++;
+                            break;
 
                         case TO_SOUTH:
-                        if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
+                            if(cuadros[x_actual][y_actual - (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual][y_actual - (RampaDiff-1)][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            }
+                            else
+                                z_actual++;
+                            break;
 
                         case TO_WEST:
-                        if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE)
-                        {
-                            cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
-                            z_actual--;
-                        }
-                        else
-                        z_actual++;
-                        break;
-
+                            if(cuadros[x_actual - (RampaDiff-1)][y_actual][0].getEstado() != NO_EXISTE) {
+                                cuadros[x_actual - (RampaDiff-1)][y_actual][0].setEstado(RECORRIDO);
+                                z_actual--;
+                            } else
+                                z_actual++;
+                            break;
                     }
-                }
-                else
-                if(z_actual == 2)
-                {
+                } else if(z_actual == 2) {
                     PermisoRampa = SUBIR;
+                    lcd.print("SUBIR");
+                    delay(100);
                     z_actual -= 2;
                 }
-
             }
         }
-
-
-
-
-
-
-
-
     }
 }
 
@@ -1630,27 +1594,95 @@ void checarRampa2(){
     bajarRampa = false;
 }*/
 
+void alinearIMU() {
+    lcd.print("alimear imu");
+    byte ultimaOrientacion = iOrientacion;
+    switch (iOrientacion) {
+        case B_NORTE:
+            vueltaDer();
+            break;
+
+        case C_NORTE:
+            vueltaDer();
+            vueltaDer();
+            break;
+
+        case D_NORTE:
+            vueltaIzq();
+            break;
+    }
+
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+    if (getSharpCorta(SHARP_A) < 10) {
+        steps = 0;
+        while (steps <= 1200) {
+            lcd.print("1");
+            avanzar();
+        }
+        detener();
+    } else if (getSharpCorta(SHARP_B1) < 10) {
+        steps = 0;
+        while (steps <= 1200) {
+            lcd.print("2");
+            horizontalDerecha();
+        }
+        detener();
+    } else if (getSharpCorta(SHARP_C) < 10) {
+        steps = 0;
+        while (steps <= 1200) {
+            lcd.print("2");
+            reversa();
+        }
+        detener();
+    } else if (getSharpCorta(SHARP_D1) < 10) {
+        steps = 0;
+        while (steps <= 1200) {
+            lcd.print("3");
+            horizontalIzquierda();
+        }
+        detener();
+    }
+
+    lcd.clear();
+    lcd.home();
+    lcd.print("   BNO");
+    bno.begin();
+    delay(2000);
+    alinear();
+
+    switch (ultimaOrientacion) {
+        case B_NORTE:
+            vueltaIzq();
+            break;
+
+        case C_NORTE:
+            vueltaDer();
+            vueltaDer();
+            break;
+
+        case D_NORTE:
+            vueltaDer();
+            break;
+    }
+}
+
 void moverCuadro() {
     steps = 0;
     while (steps <= 3600) {
         avanzar();
-        if(getAngulo() > 320)
+        if(getAngulo() > 320) {
             inIzq = - (360 - getAngulo());
-        else
-            inIzq = getAngulo();
-
-        if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
-        else
+        }
+        else {
+            inIzq = getAngulo();
             inDer = getAngulo();
-
+        }
         izqPID.Compute();
         derPID.Compute();
+
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
-        lcd.clear();
-        lcd.home();
-        lcd.print(getAngulo());
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1659,113 +1691,335 @@ void moverCuadro() {
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
         checarRampa2();
-        if (permisoRampa) {
-            //setRam = (getSharpCorta(SHARP_D1) + getSharpCorta(SHARP_D2)) / 2;
-            while (vec.y() < -10.0) {
-                /*while (Lack) {
-                    detener();
-                    LackOfProgress();
-                    return;
-                }*/
-                /*if(getAngulo() > 320)
-                    inIzq = - (360 - getAngulo());
-                else
-                    inIzq = getAngulo();
-                if(getAngulo() > 320)
-                    inDer = - (360 - getAngulo());
-                else
-                    inDer = getAngulo();
-                //inRam = getSharpCorta(SHARP_D1);
-                //ramPID.Compute();
-                izqPID.Compute();
-                derPID.Compute();
-                if (outRam > 4)
-                    velocidad(218, 235, 218, 255);
-                else
-                    velocidad(218 + outIzq, 235 + outDer + outRam, 218 + outIzq, VEL_MOTOR_RAMPA + outDer + outRam*/
-                avanzar();
-                velocidad(220, 235, 220, 250);
+
+        switch (PermisoRampa) {
+            case REGRESA_ARRIBA:
+            case BAJAR_SUBIR:
+            case BAJAR:
+                lcd.clear();
+                lcd.home();
+                lcd.print("ERROR");
+                break;
+
+            case SUBIR:
+                while (vec.y() < -10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
+
+            case SUBIR_BAJAR:
+                while (vec.y() < -10.0) {
+                    lcd.clear();
+                    lcd.print(vec.y());
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 3000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
+                detener();
+                delay(400);
+                alinearIMU();
+                vueltaDer();
+                delay(400);
+                vueltaDer();
+                delay(400);
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 5000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-            }
-            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                lcd.print("111111111");
+                while (vec.y() > 10.0) {
+                    lcd.noBacklight();
+                    delay(25);
+                    lcd.backlight();
+                    avanzar();
+                    lcd.clear();
+                    lcd.print(vec.y());
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                detener();
+                alinearIMU();
+                break;
+
+            case REGRESA_ABAJO:
+            detener();
+                while (vec.y() < -10.0) {
+                    reversa();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                detener();
+                delay(400);
+                vueltaDer();
+                delay(400);
+                vueltaDer();
+                break;
         }
     } else if(vec.y() > 10.0) {
-        bajarRampa = true;
         lcd.home();
         lcd.print("BAJAR RAMPA");
+        bajarRampa = true;
         checarRampa2();
-        if (permisoRampa) {
-            while (vec.y() > 10.0) {
-                /*while (Lack) {
-                    detener();
-                    LackOfProgress();
-                    return;
-                }*/
 
-                /*if(getAngulo() > 320)
-                    inIzq = - (360 - getAngulo());
-                else
-                    inIzq = getAngulo();
-                if(getAngulo() > 320)
-                    inDer = - (360 - getAngulo());
-                else
-                    inDer = getAngulo();
-                izqPID.Compute();
-                derPID.Compute();
-                velocidad(50, 45, 50, 50);*/
+        switch (PermisoRampa) {
+            case REGRESA_ABAJO:
+            case SUBIR_BAJAR:
+            case SUBIR:
+                lcd.clear();
+                lcd.home();
+                lcd.print("ERROR");
+                break;
+
+            case BAJAR:
+                while (vec.y() > 10.0) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                break;
+
+            case BAJAR_SUBIR:
+                while (vec.y() > 10.0) {
+                    lcd.clear();
+                    lcd.print(vec.y());
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 3000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
+                detener();
+                alinearIMU();
+                delay(400);
+                vueltaDer();
+                delay(400);
+                vueltaDer();
+                delay(400);
+                velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                steps = 0;
+                while (steps <= 3000) {
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-                avanzar();
-                velocidad(75, 68, 75, 75);
-            }
-            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+                lcd.print("111111111");
+                while (vec.y() < -10.0) {
+                    lcd.clear();
+                    lcd.print(vec.y());
+                    avanzar();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                detener();
+                alinearIMU();
+                break;
+
+            case REGRESA_ARRIBA:
+            detener();
+                while (vec.y() > 10.0) {
+                    reversa();
+                    if(getAngulo() > 320) {
+                        inIzq = - (360 - getAngulo());
+                        inDer = - (360 - getAngulo());
+                    }
+                    else {
+                        inIzq = getAngulo();
+                        inDer = getAngulo();
+                    }
+                    izqPID.Compute();
+                    derPID.Compute();
+
+                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                detener();
+                delay(400);
+                vueltaDer();
+                delay(400);
+                vueltaDer();
+                break;
         }
     } else {
         steps = 0;
+        velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         while (steps <= 1000) {
             avanzar();
-            if(getAngulo() > 320)
+            if(getAngulo() > 320) {
                 inIzq = - (360 - getAngulo());
-            else
-                inIzq = getAngulo();
-            if(getAngulo() > 320)
                 inDer = - (360 - getAngulo());
-            else
+            }
+            else {
+                inIzq = getAngulo();
                 inDer = getAngulo();
+            }
             izqPID.Compute();
             derPID.Compute();
+
             velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
-            lcd.setCursor(0, 1);
-            lcd.print(steps);
             checarInterr();
-            lcd.clear();
-            lcd.home();
-            lcd.print(getAngulo());
         }
     }
+
+    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
     avanzar();
     while (steps <= 1000) {
         avanzar();
-        if(getAngulo() > 320)
+        if(getAngulo() > 320) {
             inIzq = - (360 - getAngulo());
-        else
-            inIzq = getAngulo();
-        if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
-        else
+        }
+        else {
+            inIzq = getAngulo();
             inDer = getAngulo();
+        }
         izqPID.Compute();
         derPID.Compute();
+
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
-        lcd.clear();
-        lcd.home();
-        lcd.print(getAngulo());
     }
     detener();
     checarColor();
     alinear();
-    permisoRampa = true;
 }
 
 
@@ -2408,8 +2662,8 @@ void verificarRampa(){
 
 // Detecta paredes y las actualiza en el array cuadros[] en la posicion actual
 void checarParedes(){
-    shortMove = false;
-    A_wall = false; B_wall = false; C_wall = false; D_wall = false;
+    shortMove = true;
+    A_wall = true; B_wall = true; C_wall = true; D_wall = true;
 
     switch(iOrientacion) {
         case A_NORTE:
@@ -2418,54 +2672,39 @@ void checarParedes(){
             if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('S');
-                shortMove = true;
-            }
-            else
-            {
-                C_wall = true;
+                C_wall = false;
             }
         }
-
-
         if(getSharpCorta(SHARP_C) < 15 and SharpRampa)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
 
         if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('E');
-            shortMove = true;
-        } else {
-            B_wall = true;
+        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER))
+        {
+            B_wall = false;
         }
         if(getSharpCorta(SHARP_B1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
+
         if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('N');
-            shortMove = true;
-        } else {
-            A_wall = true;
+        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER))
+        {
+            A_wall = false;
         }
         if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+
 
         if(x_actual > 0)
         {
             if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('O');
-                shortMove = true;
-            }
-            else
-            {
-                D_wall = true;
+                D_wall = false;
             }
         }
-
         if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
@@ -2473,21 +2712,18 @@ void checarParedes(){
         //--------------------------------------------------------------------
         case B_NORTE:
         if(getSharpCorta(SHARP_C)  > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('E');
-            shortMove = true;
-        } else {
-            C_wall = true;
+        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER))
+        {
+            C_wall = false;
         }
         if(getSharpCorta(SHARP_C)  < 15 and SharpRampa)
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
+
         if(getSharpCorta(SHARP_B1)  > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('N');
-            shortMove = true;
-        } else {
-            B_wall = true;
+        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER))
+        {
+            B_wall = false;
         }
         if(getSharpCorta(SHARP_B1) < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('N', true);
@@ -2498,31 +2734,21 @@ void checarParedes(){
             if(getSharpCorta(SHARP_A)  > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('O');
-                shortMove = true;
-            }
-            else
-            {
-                A_wall = true;
+                A_wall = false;
             }
         }
         if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+
 
         if(y_actual > 0)
         {
             if(getSharpCorta(SHARP_D1)  > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
-            agregarLast('S');
-            shortMove = true;
-            }
-            else
-            {
-                D_wall = true;
+                D_wall = false;
             }
         }
-
         if(getSharpCorta(SHARP_D1)  < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
@@ -2530,53 +2756,42 @@ void checarParedes(){
         //--------------------------------------------------------------------
         case C_NORTE:
         if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('N');
-            shortMove = true;
-        } else {
-            C_wall = true;
+        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER))
+        {
+            C_wall = false;
         }
         if(getSharpCorta(SHARP_C) < 15 and SharpRampa)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+
 
         if(x_actual > 0)
         {
             if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('O');
-                shortMove = true;
-            }
-            else
-            {
-                B_wall = true;
+                B_wall = false;
             }
         }
         if(getSharpCorta(SHARP_B1) < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+
 
         if(y_actual > 0)
         {
             if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('S');
-                shortMove = true;
-            }
-            else
-            {
-                A_wall = true;
+                A_wall = false;
             }
         }
         if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
+
         if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('E');
-            shortMove = true;
-        } else {
-            D_wall = true;
+        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER))
+        {
+            D_wall = false;
         }
         if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
@@ -2589,15 +2804,9 @@ void checarParedes(){
             if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('O');
-                shortMove = true;
-            }
-            else
-            {
-                C_wall = true;
+                C_wall = false;
             }
         }
-
         if(getSharpCorta(SHARP_C) < 15 and SharpRampa)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
@@ -2607,37 +2816,26 @@ void checarParedes(){
             if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
-                agregarLast('S');
-                shortMove = true;
-            }
-            else
-            {
-                B_wall = true;
+                B_wall = false;
             }
         }
-
-
         if(getSharpCorta(SHARP_B1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('E');
-            shortMove = true;
-        } else {
-            A_wall = true;
-        }
 
+        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER))
+        {
+            A_wall = false;
+        }
         if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
 
         if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
-        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('N');
-            shortMove = true;
-        } else {
-            D_wall = true;
+        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER))
+        {
+            D_wall = false;
         }
         if(getSharpCorta(SHARP_D1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
@@ -2812,13 +3010,15 @@ void RampaMoveX(){
 }
 
 void resolverLaberinto(){
-    if(shortMove) {
+    if(ContadorLaberinto < 3) {   // el numero define el numero de cuadros que avanza antes de hacer pathfinding
+
         ////lcd.println("ENTRE AL SHORTMOVE");
 
         if(Preferencia == IZQUIERDA)
         {
             if(!D_wall) {
                 ////lcd.println("Short Izquierda");
+                ContadorLaberinto = 0;
                 switch(iOrientacion) {
                     case A_NORTE:
                     x_actual--;
@@ -2846,6 +3046,7 @@ void resolverLaberinto(){
                 checarLasts();
             } else if(!A_wall) {
                 ////lcd.println("Short Frente");
+                ContadorLaberinto = 0;
                 switch(iOrientacion) {
                     case A_NORTE:
                     y_actual++;
@@ -2871,6 +3072,7 @@ void resolverLaberinto(){
                 checarLasts();
             } else if(!B_wall) {
                 ////lcd.println("Short Derecha");
+                ContadorLaberinto = 0;
                 switch(iOrientacion) {
                     case A_NORTE:
                     x_actual++;
@@ -2895,8 +3097,120 @@ void resolverLaberinto(){
                 vueltaDer();
                 moverCuadro();
                 checarLasts();
-            } else {
+            } else if(!C_wall){
                 ////lcd.println("Short Atras");
+                ContadorLaberinto = 0;
+                switch(iOrientacion) {
+                    case A_NORTE:
+                    y_actual--;
+                    LastMove = TO_SOUTH;
+                    break;
+
+                    case B_NORTE:
+                    x_actual++;
+                    LastMove = TO_EAST;
+                    break;
+
+                    case C_NORTE:
+                    y_actual++;
+                    LastMove = TO_NORTH;
+                    break;
+
+                    case D_NORTE:
+                    x_actual--;
+                    LastMove = TO_WEST;
+                    break;
+                }
+                vueltaDer();
+                checarInterr();
+                vueltaDer();
+                checarInterr();
+                moverCuadro();
+                checarLasts();
+            }else if(getSharpCorta(SHARP_D1) > 15)
+            {
+                ContadorLaberinto++;
+                switch(iOrientacion) {
+                    case A_NORTE:
+                    x_actual--;
+                    LastMove = TO_WEST;
+                    break;
+
+                    case B_NORTE:
+                    y_actual--;
+                    LastMove = TO_SOUTH;
+                    break;
+
+                    case C_NORTE:
+                    x_actual++;
+                    LastMove = TO_EAST;
+                    break;
+
+                    case D_NORTE:
+                    y_actual++;
+                    LastMove = TO_NORTH;
+                    break;
+                }
+                vueltaIzq();
+                alinear();
+                moverCuadro();
+                checarLasts();
+            }else if(getSharpCorta(SHARP_A) > 15)
+            {
+                ContadorLaberinto++;
+                switch(iOrientacion) {
+                    case A_NORTE:
+                    y_actual++;
+                    LastMove = TO_NORTH;
+                    break;
+
+                    case B_NORTE:
+                    x_actual--;
+                    LastMove = TO_WEST;
+                    break;
+
+                    case C_NORTE:
+                    y_actual--;
+                    LastMove = TO_SOUTH;
+                    break;
+
+                    case D_NORTE:
+                    x_actual++;
+                    LastMove = TO_EAST;
+                    break;
+                }
+                moverCuadro();
+                checarLasts();
+            }else if(getSharpCorta(SHARP_B1) > 15)
+            {
+                ContadorLaberinto++;
+                switch(iOrientacion) {
+                    case A_NORTE:
+                    x_actual++;
+                    LastMove = TO_EAST;
+                    break;
+
+                    case B_NORTE:
+                    y_actual++;
+                    LastMove = TO_NORTH;
+                    break;
+
+                    case C_NORTE:
+                    x_actual--;
+                    LastMove = TO_WEST;
+                    break;
+
+                    case D_NORTE:
+                    y_actual--;
+                    LastMove = TO_SOUTH;
+                    break;
+                }
+                vueltaDer();
+                moverCuadro();
+                checarLasts();
+            }else
+            {
+                ContadorLaberinto++;
                 switch(iOrientacion) {
                     case A_NORTE:
                     y_actual--;
@@ -2925,12 +3239,17 @@ void resolverLaberinto(){
                 moverCuadro();
                 checarLasts();
             }
+
+
+
+
         }else
 
         if(Preferencia == DERECHA)
         {
             if(!B_wall) {
                 ////lcd.println("Short Derecha");
+                ContadorLaberinto = 0;
                 switch(iOrientacion) {
                     case A_NORTE:
                     x_actual++;
@@ -2957,6 +3276,7 @@ void resolverLaberinto(){
                 checarLasts();
             }else if(!A_wall) {
                 ////lcd.println("Short Frente");
+                ContadorLaberinto = 0;
                 switch(iOrientacion) {
                     case A_NORTE:
                     y_actual++;
@@ -2983,6 +3303,7 @@ void resolverLaberinto(){
             }
             else if(!D_wall) {
                 ////lcd.println("Short Izquierda");
+                ContadorLaberinto = 0;
                 switch(iOrientacion) {
                     case A_NORTE:
                     x_actual--;
@@ -3008,7 +3329,117 @@ void resolverLaberinto(){
                 alinear();
                 moverCuadro();
                 checarLasts();
-            }else{
+            }else if (!C_wall){
+                ContadorLaberinto = 0;
+                    switch(iOrientacion) {
+                        case A_NORTE:
+                        y_actual--;
+                        LastMove = TO_SOUTH;
+                        break;
+
+                        case B_NORTE:
+                        x_actual++;
+                        LastMove = TO_EAST;
+                        break;
+
+                        case C_NORTE:
+                        y_actual++;
+                        LastMove = TO_NORTH;
+                        break;
+
+                        case D_NORTE:
+                        x_actual--;
+                        LastMove = TO_WEST;
+                        break;
+                    }
+                    vueltaDer();
+                    checarInterr();
+                    vueltaDer();
+                    checarInterr();
+                    moverCuadro();
+                    checarLasts();
+                }else if(getSharpCorta(SHARP_B1 > 15)){
+                    ContadorLaberinto++;
+                    switch(iOrientacion) {
+                        case A_NORTE:
+                        x_actual++;
+                        LastMove = TO_EAST;
+                        break;
+
+                        case B_NORTE:
+                        y_actual++;
+                        LastMove = TO_NORTH;
+                        break;
+
+                        case C_NORTE:
+                        x_actual--;
+                        LastMove = TO_WEST;
+                        break;
+
+                        case D_NORTE:
+                        y_actual--;
+                        LastMove = TO_SOUTH;
+                        break;
+                    }
+                    vueltaDer();
+                    moverCuadro();
+                    checarLasts();
+                }else if(getSharpCorta(SHARP_A > 15)){
+                    ContadorLaberinto++;
+                    switch(iOrientacion) {
+                        case A_NORTE:
+                        y_actual++;
+                        LastMove = TO_NORTH;
+                        break;
+
+                        case B_NORTE:
+                        x_actual--;
+                        LastMove = TO_WEST;
+                        break;
+
+                        case C_NORTE:
+                        y_actual--;
+                        LastMove = TO_SOUTH;
+                        break;
+
+                        case D_NORTE:
+                        x_actual++;
+                        LastMove = TO_EAST;
+                        break;
+                    }
+                    moverCuadro();
+                    checarLasts();
+                }else if(getSharpCorta(SHARP_D1)){
+                    ContadorLaberinto++;
+                    switch(iOrientacion) {
+                        case A_NORTE:
+                        y_actual--;
+                        LastMove = TO_SOUTH;
+                        break;
+
+                        case B_NORTE:
+                        x_actual++;
+                        LastMove = TO_EAST;
+                        break;
+
+                        case C_NORTE:
+                        y_actual++;
+                        LastMove = TO_NORTH;
+                        break;
+
+                        case D_NORTE:
+                        x_actual--;
+                        LastMove = TO_WEST;
+                        break;
+                    }
+                    vueltaDer();
+                    checarInterr();
+                    vueltaDer();
+                    checarInterr();
+                    moverCuadro();
+                    checarLasts();
+                }else{
+                    ContadorLaberinto++;
                     switch(iOrientacion) {
                         case A_NORTE:
                         y_actual--;
@@ -3045,28 +3476,12 @@ void resolverLaberinto(){
             ////lcd.println("LAST");
             lcd.clear();
             lcd.print("GOTO LAST");
-            /*//lcd.print(x_last);
-            //lcd.print(" | ");
-            ////lcd.println(y_last);*/
-            /*for(int x=0; x<X_MAX; x++)
-            {
-            for(int y=0; y<Y_MAX; y++)
-            {
-            //lcd.print(y);
-            //lcd.print(" , ");
-            //lcd.print(x);
-            //lcd.print(" = ");
-            ////lcd.println(cuadros[x][y][z_actual].getEstado());
-                }
-            }
-            ////lcd.println("Ya");*/
             byte var = 255;
             Pathfinding(x_last, y_last, var);
 
             x_last = 255;
             y_last = 255;
             Last = false;
-            //gotoLast
         } else {
             ////lcd.println("GOTO-SR");
             lcd.clear();
@@ -3105,6 +3520,16 @@ void resolverLaberinto(){
                         }
                     }
                     byte var = 255;
+
+                    if(z_actual == 0)
+                        Piso1 = true;
+                    else
+                    if(z_actual == 1)
+                        Piso2 = true;
+                    else
+                    if(z_actual == 2)
+                        Piso3 = true;
+
                     Pathfinding(x_rampa[iRampa], y_rampa[iRampa], var);
                 }
                 else{
@@ -3698,7 +4123,7 @@ void setup() {
 }
 
 void loop() {
-    /*lcd.clear();
+    lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3724,5 +4149,5 @@ void loop() {
        lcd.print("O");
 
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
