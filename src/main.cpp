@@ -28,6 +28,7 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <EEPROM.h>
+#include <NewPing.h>
 
 
 
@@ -182,6 +183,114 @@ const int SHARP_D1  = 14;
 const int SHARP_D2  = 8;
 const int SHARP_LA  = 12;
 const int SHARP_LC  = 11;
+
+
+//******************************************
+//------------- ULTRASONICOS ---------------
+#define TRIG_A 10
+#define ECHO_A 11
+
+#define TRIG_B 12
+#define ECHO_B 13
+
+#define TRIG_C 14
+#define ECHO_C 15
+
+#define TRIG_D 16
+#define ECHO_D 17
+
+// Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+#define MAX_DISTANCE 400
+
+int lecturasUltra[30];
+int lecturasComparador[30];
+int contador_ultra = 0;
+int lecturasDiferentes = 0;
+bool boolUltra = false;
+bool boolAvanzo = false;
+
+NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
+NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
+NewPing ULTRA_C(TRIG_C, ECHO_C, MAX_DISTANCE);
+NewPing ULTRA_D(TRIG_D, ECHO_D, MAX_DISTANCE);
+
+unsigned int getUltrasonico(char cSentido){
+    switch(cSentido)
+    {
+        case 'A':
+        return ULTRA_A.ping() / US_ROUNDTRIP_CM;
+        break;
+
+        case 'B':
+        return ULTRA_B.ping() / US_ROUNDTRIP_CM;
+        break;
+
+        case 'C':
+        return ULTRA_C.ping() / US_ROUNDTRIP_CM;
+        break;
+
+        case 'D':
+        return ULTRA_D.ping() / US_ROUNDTRIP_CM;
+        break;
+    }
+}
+
+// Checar si avanzo 30 cm con ultrasonicos
+bool checarAvance(char cSentido){
+
+    lecturasUltra[contador_ultra] = getUltrasonico(cSentido);
+    contador_ultra++;
+
+
+    if(contador_ultra == 29)
+    {
+        for(int i=0; i<30; i++)
+        {
+            lecturasComparador[i] = lecturasUltra[i];
+        }
+
+
+        for(int i=0; i<30; i++)
+        {
+            for(int j=0; j<30; j++)
+            {
+                if(lecturasComparador[j] == lecturasUltra[i])
+                {
+                    lecturasComparador[j] = 0;
+                    boolUltra = true;
+                }
+            }
+            if(boolUltra)
+            {
+                lecturasDiferentes++;
+                boolUltra = false;
+            }
+        }
+
+        if(lecturasDiferentes > 20)
+            boolAvanzo = true;
+        else
+            boolAvanzo = false;
+
+
+        for(int i=0; i<30; i++)
+        {
+            lecturasUltra[i] = 0;
+        }
+        contador_ultra = 0;
+        boolUltra = false;
+        lecturasDiferentes = 0;
+    }
+
+    if(boolAvanzo)
+    {
+        return true;
+        boolAvanzo = false;
+    }
+    else
+        return false;
+}
+
 
 
 //******************************************
