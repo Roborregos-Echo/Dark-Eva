@@ -249,20 +249,24 @@ void comprobarAvance(){
         }
         else
         {
-            Faltante_CM = 30 - (abs(primeraLectura_A-segundaLectura_A));
+            Faltante_CM = 30-abs(primeraLectura_A-segundaLectura_A);
         }
     } else if(primeraLectura_C != 0)
     {
         segundaLectura_C = getUltrasonico('C');
-        if(segundaLectura_C == 0 or (primeraLectura_C-segundaLectura_C > 27 and primeraLectura_C-segundaLectura_C) < 33)
+        if(segundaLectura_C == 0 or (abs(primeraLectura_C-segundaLectura_C) > 27 and abs(primeraLectura_C-segundaLectura_C) < 33))
         {
             Faltante_CM = 0;
         }
         else
         {
-            Faltante_CM = abs(primeraLectura_C-segundaLectura_C);
+            Faltante_CM = 30-abs(primeraLectura_C-segundaLectura_C);
         }
+    }else
+    {
+        Faltante_CM = 0;
     }
+
 }
 
 
