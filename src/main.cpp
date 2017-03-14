@@ -200,20 +200,19 @@ const int SHARP_LC  = 11;
 #define ECHO_D 17
 
 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define MAX_DISTANCE 400
+#define MAX_DISTANCE 100
 
-int lecturasUltra[30];
-int lecturasComparador[30];
-int contador_ultra = 0;
-int lecturasDiferentes = 0;
-bool boolUltra = false;
-bool boolAvanzo = false;
+int primeraLectura_A, primeraLectura_C;
+int segundaLectura_A, segundaLectura_C;
+int Faltante_CM;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
 NewPing ULTRA_C(TRIG_C, ECHO_C, MAX_DISTANCE);
 NewPing ULTRA_D(TRIG_D, ECHO_D, MAX_DISTANCE);
 
+
+// Siempre meter el delay manualmente, tiene que ser de 50!!!!
 unsigned int getUltrasonico(char cSentido){
     switch(cSentido)
     {
@@ -235,62 +234,36 @@ unsigned int getUltrasonico(char cSentido){
     }
 }
 
-// Checar si avanzo 30 cm con ultrasonicos
-bool checarAvance(char cSentido){
-
-    lecturasUltra[contador_ultra] = getUltrasonico(cSentido);
-    contador_ultra++;
-
-
-    if(contador_ultra == 29)
-    {
-        for(int i=0; i<30; i++)
-        {
-            lecturasComparador[i] = lecturasUltra[i];
-        }
-
-
-        for(int i=0; i<30; i++)
-        {
-            for(int j=0; j<30; j++)
-            {
-                if(lecturasComparador[j] == lecturasUltra[i])
-                {
-                    lecturasComparador[j] = 0;
-                    boolUltra = true;
-                }
-            }
-            if(boolUltra)
-            {
-                lecturasDiferentes++;
-                boolUltra = false;
-            }
-        }
-
-        if(lecturasDiferentes > 20)
-            boolAvanzo = true;
-        else
-            boolAvanzo = false;
-
-
-        for(int i=0; i<30; i++)
-        {
-            lecturasUltra[i] = 0;
-        }
-        contador_ultra = 0;
-        boolUltra = false;
-        lecturasDiferentes = 0;
-    }
-
-    if(boolAvanzo)
-    {
-        return true;
-        boolAvanzo = false;
-    }
-    else
-        return false;
+void PrimeraLectura(){
+    primeraLectura_A = getUltrasonico('A');
+    primeraLectura_C = getUltrasonico('C');
 }
 
+void comprobarAvance(){
+    if(primeraLectura_A != 0)
+    {
+        segundaLectura_A = getUltrasonico('A');
+        if(segundaLectura_A == 0 or (abs(primeraLectura_A-segundaLectura_A) > 27 and abs(primeraLectura_A-segundaLectura_A) < 33))
+        {
+            Faltante_CM = 0;
+        }
+        else
+        {
+            Faltante_CM = 30 - (abs(primeraLectura_A-segundaLectura_A));
+        }
+    } else if(primeraLectura_C != 0)
+    {
+        segundaLectura_C = getUltrasonico('C');
+        if(segundaLectura_C == 0 or (primeraLectura_C-segundaLectura_C > 27 and primeraLectura_C-segundaLectura_C) < 33)
+        {
+            Faltante_CM = 0;
+        }
+        else
+        {
+            Faltante_CM = abs(primeraLectura_C-segundaLectura_C);
+        }
+    }
+}
 
 
 //******************************************
