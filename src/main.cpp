@@ -4030,7 +4030,7 @@ void setup() {
 }
 
 void loop() {
-    lcd.clear();
+    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -4056,5 +4056,5 @@ void loop() {
        lcd.print("O");
 
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
