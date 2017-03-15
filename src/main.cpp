@@ -176,29 +176,30 @@ PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
 //******************************************
 //----------- SHARP GP2Y0A21YK -------------
 //----------- 1 2 4 5 7 15
-const int SHARP_A   = 13;
-const int SHARP_B1  = 0;
-const int SHARP_B2  = 9;
-const int SHARP_C   = 10;
-const int SHARP_D1  = 14;
-const int SHARP_D2  = 8;
+const int SHARP_A   = 12; // CONFIRMADO
+const int SHARP_B1  = 11; // CONFIRMADO
+const int SHARP_B2  = 0; // CONFIRMADO
+const int SHARP_C   = 2; // CONFIRMADO
+const int SHARP_D1  = 9; // CONFIRMADO
+const int SHARP_D2  = 1; // CONFIRMADO
+
 const int SHARP_LA  = 12;
 const int SHARP_LC  = 11;
 
 
 //******************************************
 //------------- ULTRASONICOS ---------------
-#define TRIG_A 10
-#define ECHO_A 11
+#define TRIG_A 23
+#define ECHO_A 24
 
-#define TRIG_B 12
-#define ECHO_B 13
+#define TRIG_B 25
+#define ECHO_B 26
 
-#define TRIG_C 14
-#define ECHO_C 15
+#define TRIG_C 27
+#define ECHO_C 28
 
-#define TRIG_D 16
-#define ECHO_D 17
+#define TRIG_D 29
+#define ECHO_D 30
 
 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 #define MAX_DISTANCE 100
@@ -325,13 +326,19 @@ Servo servo;
 
 
 //******************************************
+//---------------- LIMIT -----------------
+const int LIMIT_IZQUIERDO = 31;
+const int LIMIT_DERECHO = 32;
+
+
+//******************************************
 //---------------- TCS3200 -----------------
-#define S0 7
-#define S1 8
-#define S2 5
-#define S3 4
-#define sensorOut 6
-#define BOTON_COLOR 12
+#define S0 10
+#define S1 9
+#define S2 12
+#define S3 11
+#define sensorOut 13
+#define BOTON_COLOR 35
 
 const byte ESTADO_OFF           = 0;
 const byte ESTADO_NEGRO         = 1;
@@ -3780,23 +3787,7 @@ void setup() {
 }
 
 void loop() {
-    Serial.print(getSharpCorta(SHARP_A));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B1));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_B2));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_C));
-    Serial.print("\t");
-    Serial.print(getSharpCorta(SHARP_D1));
-    Serial.print("\t");
-    Serial.println(getSharpCorta(SHARP_D2));
-    Serial.print(getSharpLarga(SHARP_LA));
-    Serial.print("\t\t\t");
-    Serial.println(getSharpLarga(SHARP_LC));
-    Serial.println("");
-    delay(500);
-    /*lcd.clear();
+    lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3823,5 +3814,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
