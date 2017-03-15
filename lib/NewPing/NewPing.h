@@ -157,6 +157,4 @@ class NewPing {
 		static void timer_setup();
 		static void timer_ms_cntdwn();
 };
-
-
 #endif

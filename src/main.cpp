@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.2.2 --------------------------------
-//--------------------------- 09 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.2.5 --------------------------------
+//--------------------------- 15 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +40,7 @@
 void resolverLaberinto();
 void servoMotor();
 void checarColor();
-void LackOfProgress();
+void lackOfProgress();
 void vueltaDer();
 void servoMotor();
 void vueltaIzq();
@@ -57,18 +57,19 @@ void vueltaIzq();
 //******************************************
 //--------------- LABERINTO ----------------
 #define switch_preferencia 20
-const byte DERECHA = 0; const byte IZQUIERDA = 1;
+const byte DERECHA      =   0;
+const byte IZQUIERDA    =   1;
 
 byte Preferencia;
 
 
 //******************************************
-//--------------PANTALLA LCD----------------
+//------------- PANTALLA LCD ---------------
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 
 //******************************************
-//-------------CLASE CUADRO-----------------
+//------------ CLASE CUADRO ----------------
 
 // iEstado
 const int NO_EXISTE     =   0;
@@ -163,7 +164,7 @@ bool permisoRampa   = true;
 
 bool factibleSubir = false;
 
-const float PRECISION_IMU = 3.2;
+const float PRECISION_IMU = 3.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
@@ -204,7 +205,7 @@ const int SHARP_LC  = 11;
 
 int primeraLectura_A, primeraLectura_C;
 int segundaLectura_A, segundaLectura_C;
-int Faltante_CM;
+int faltante_CM;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -213,60 +214,45 @@ NewPing ULTRA_D(TRIG_D, ECHO_D, MAX_DISTANCE);
 
 
 // Siempre meter el delay manualmente, tiene que ser de 50!!!!
-unsigned int getUltrasonico(char cSentido){
-    switch(cSentido)
-    {
+unsigned int getUltrasonico(char cSentido) {
+    switch(cSentido) {
         case 'A':
-        return ULTRA_A.ping() / US_ROUNDTRIP_CM;
-        break;
+            return ULTRA_A.ping() / US_ROUNDTRIP_CM;
 
         case 'B':
-        return ULTRA_B.ping() / US_ROUNDTRIP_CM;
-        break;
+            return ULTRA_B.ping() / US_ROUNDTRIP_CM;
 
         case 'C':
-        return ULTRA_C.ping() / US_ROUNDTRIP_CM;
-        break;
+            return ULTRA_C.ping() / US_ROUNDTRIP_CM;
 
         case 'D':
-        return ULTRA_D.ping() / US_ROUNDTRIP_CM;
-        break;
+            return ULTRA_D.ping() / US_ROUNDTRIP_CM;
     }
 }
 
-void PrimeraLectura(){
+void primeraLectura() {
     primeraLectura_A = getUltrasonico('A');
     primeraLectura_C = getUltrasonico('C');
 }
 
-void comprobarAvance(){
-    if(primeraLectura_A != 0)
-    {
+void comprobarAvance() {
+    if(primeraLectura_A != 0) {
         segundaLectura_A = getUltrasonico('A');
-        if(segundaLectura_A == 0 or (abs(primeraLectura_A-segundaLectura_A) > 27 and abs(primeraLectura_A-segundaLectura_A) < 33))
-        {
-            Faltante_CM = 0;
+        if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > 27 && abs(primeraLectura_A - segundaLectura_A) < 33)) {
+            faltante_CM = 0;
+        } else {
+            faltante_CM = 30 - abs(primeraLectura_A - segundaLectura_A);
         }
-        else
-        {
-            Faltante_CM = 30-abs(primeraLectura_A-segundaLectura_A);
-        }
-    } else if(primeraLectura_C != 0)
-    {
+    } else if(primeraLectura_C != 0) {
         segundaLectura_C = getUltrasonico('C');
-        if(segundaLectura_C == 0 or (abs(primeraLectura_C-segundaLectura_C) > 27 and abs(primeraLectura_C-segundaLectura_C) < 33))
-        {
-            Faltante_CM = 0;
+        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > 27 && abs(primeraLectura_C - segundaLectura_C) < 33)) {
+            faltante_CM = 0;
+        } else {
+            faltante_CM = 30 - abs(primeraLectura_C - segundaLectura_C);
         }
-        else
-        {
-            Faltante_CM = 30-abs(primeraLectura_C-segundaLectura_C);
-        }
-    }else
-    {
-        Faltante_CM = 0;
+    } else {
+        faltante_CM = 0;
     }
-
 }
 
 
@@ -281,7 +267,7 @@ int Neighbors[4];
 
 
 //******************************************
-//-------------RAMPA ALGORITHM--------------
+//------------ RAMPA ALGORITHM -------------
 const byte ABAJO    = 1;
 const byte ARRIBA   = 2;
 
@@ -325,22 +311,21 @@ byte checkList2[GRID_MAX];
 
 
 //******************************************
-//---------------interrupts-----------------
+//-------------- INTERRUPTS ----------------
 
 // Interupcion del nano;
 #define InterruptNano 2
-//#define InterruptBoton 3
 const int InterruptDefiner = 11;
 
 
 //******************************************
-//--------------SERVO MOTOR-----------------
+//------------- SERVO MOTOR ----------------
 #define servoPin 9 //PWM
 Servo servo;
 
 
 //******************************************
-//-----------------TCS3200------------------
+//---------------- TCS3200 -----------------
 #define S0 7
 #define S1 8
 #define S2 5
@@ -558,7 +543,7 @@ float getSharpLarga(int iSharp) {
 
     promedio /= 10;
 
-    if (promedio >= 100 and promedio <= 500)
+    if (promedio >= 100 && promedio <= 500)
         resultado = 17921 * pow(promedio, -1.072);
     else
         resultado = -1;
@@ -716,7 +701,6 @@ void alinear() {
                     detener();
                     return;
                 }
-
             }
             detener();
             inicio = millis();
@@ -756,7 +740,7 @@ void alinear() {
                 vueltaDerecha();
                 while (Lack) {
                     detener();
-                    LackOfProgress();
+                    lackOfProgress();
                     return;
                 }
             }
@@ -765,7 +749,7 @@ void alinear() {
                 vueltaIzquierda();
                 while (Lack) {
                     detener();
-                    LackOfProgress();
+                    lackOfProgress();
                     return;
                 }
             }
@@ -797,7 +781,7 @@ void alinear() {
                 vueltaIzquierda();
                 while (Lack) {
                     detener();
-                    LackOfProgress();
+                    lackOfProgress();
                     return;
                 }
             }
@@ -806,7 +790,7 @@ void alinear() {
                 vueltaDerecha();
                 while (Lack) {
                     detener();
-                    LackOfProgress();
+                    lackOfProgress();
                     return;
                 }
             }
@@ -1116,7 +1100,7 @@ void vueltaAtras() {
             posInicial = getAngulo();
             while (Lack) {
                 detener();
-                LackOfProgress();
+                lackOfProgress();
                 return;
             }
         }
@@ -1126,7 +1110,7 @@ void vueltaAtras() {
             posInicial = getAngulo();
             while (Lack) {
                 detener();
-                LackOfProgress();
+                lackOfProgress();
                 return;
             }
         }
@@ -1156,9 +1140,8 @@ void vueltaAtras() {
 }
 
 
-void setWall(byte x, byte y, byte z){
-    switch(LastMove)
-    {
+void setWall(byte x, byte y, byte z) {
+    switch(LastMove) {
         case TO_NORTH:
         cuadros[x][y][z].setPared('S', true);
         break;
@@ -1178,8 +1161,7 @@ void setWall(byte x, byte y, byte z){
 }
 
 void setInicioB() {
-    switch(LastMove)
-    {
+    switch(LastMove) {
         case TO_NORTH:
         x_InicioB = x_actual;
         y_InicioB = y_actual-1;
@@ -1206,8 +1188,7 @@ void setInicioB() {
 }
 
 void setInicioC() {
-    switch(LastMove)
-    {
+    switch(LastMove) {
         case TO_NORTH:
         x_InicioC = x_actual;
         y_InicioC = y_actual-1;
@@ -1229,28 +1210,22 @@ void setInicioC() {
         break;
 
     }
-
     z_InicioC = z_actual;
-
 }
 
-void setNewRampa(){
+void setNewRampa() {
 
     bool bool_inicio = false;
 
-    for(int y = 0; y<Y_MAX; y++)
-    {
-        for(int x = 0; x<X_MAX; x++)
-        {
+    for(int y = 0; y<Y_MAX; y++) {
+        for(int x = 0; x<X_MAX; x++) {
             if(cuadros[x][y][z_actual].getEstado() == INICIO)
-            bool_inicio = true;
+                bool_inicio = true;
         }
     }
 
-    if(!bool_inicio)
-    {
-        switch(LastMove)
-        {
+    if(!bool_inicio) {
+        switch(LastMove) {
             case TO_NORTH:
             cuadros[x_actual][y_actual + (RampaDiff-1)][z_actual].setEstado(INICIO);
             break;
@@ -1267,11 +1242,8 @@ void setNewRampa(){
             cuadros[x_actual - (RampaDiff-1)][y_actual][z_actual].setEstado(INICIO);
             break;
         }
-    }
-    else
-    {
-        switch(LastMove)
-        {
+    } else {
+        switch(LastMove) {
             case TO_NORTH:
             cuadros[x_actual][y_actual + (RampaDiff-1)][z_actual].setEstado(RAMPA);
             break;
@@ -1289,12 +1261,10 @@ void setNewRampa(){
             break;
         }
     }
-
-
 }
 
-void checarRampa2() {
-    if(subirRampa or bajarRampa) {
+void checarRampa() {
+    if(subirRampa || bajarRampa) {
         lcd.clear();
         SharpRampa = false;
 
@@ -1308,12 +1278,12 @@ void checarRampa2() {
 
         if(firstFloor == ABAJO) {
             if(subirRampa) {
-                if(z_actual == 0 and !Piso1) {
+                if(z_actual == 0 && !Piso1) {
                     PermisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                } else if(z_actual == 0 and Piso1) {
+                } else if(z_actual == 0 && Piso1) {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
@@ -1329,12 +1299,12 @@ void checarRampa2() {
                     z_actual--;
                 }
             } else if(bajarRampa) {
-                if(z_actual==1 and !Piso2) {
+                if(z_actual==1 && !Piso2) {
                     PermisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                } else if(z_actual == 1 and Piso2) {
+                } else if(z_actual == 1 && Piso2) {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
@@ -1381,12 +1351,12 @@ void checarRampa2() {
             }
         } else if(firstFloor == ARRIBA) {
             if(bajarRampa) {
-                if(z_actual == 0 and !Piso1) {
+                if(z_actual == 0 && !Piso1) {
                     PermisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                } else if(z_actual == 0 and Piso1) {
+                } else if(z_actual == 0 && Piso1) {
                     PermisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
@@ -1402,12 +1372,12 @@ void checarRampa2() {
                     z_actual--;
                 }
             } else if(subirRampa) {
-                if(z_actual==1 and !Piso2) {
+                if(z_actual==1 && !Piso2) {
                     PermisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
-                } else if(z_actual == 1 and Piso2) {
+                } else if(z_actual == 1 && Piso2) {
                     PermisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
@@ -1457,226 +1427,6 @@ void checarRampa2() {
     }
 }
 
-/*void checarRampa(){
-    if(subirRampa or bajarRampa)
-    {
-
-        SharpRampa = false;
-
-        if(x_last != 255 and y_last != 255)
-        {
-            cuadros[x_last][y_last][z_actual].setEstado(SIN_RECORRER);
-            x_last = 255;
-            y_last = 255;
-            Last = false;
-        }
-
-        if(x_last2 != 255 and y_last2 != 255)
-        {
-            cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
-            x_last2 = 255;
-            y_last2 = 255;
-            Last2 = false;
-        }
-        lcd.clear();
-        lcd.print("     RAMPA");
-        if(firstFloor == 0)
-        {
-            if(subirRampa)
-            firstFloor = ABAJO;
-
-            if(bajarRampa)
-            firstFloor = ARRIBA;
-        }
-
-        switch(LastMove)
-        {
-            case TO_NORTH:
-            lcd.setCursor(0,1);
-            lcd.print("TO_NORTH");
-            setRampa(x_actual, y_actual +1, z_actual);
-            y_actual += (RampaDiff);
-            RampaLastMove = TO_NORTH;
-            break;
-
-            case TO_EAST:
-            lcd.setCursor(0,1);
-            lcd.print("TO_EAST");
-            setRampa(x_actual +1, y_actual, z_actual);
-            x_actual += (RampaDiff);
-            RampaLastMove = TO_EAST;
-            break;
-
-            case TO_SOUTH:
-            lcd.setCursor(0,1);
-            lcd.print("TO_SOUTH");
-            setRampa(x_actual, y_actual -1, z_actual);
-            y_actual -= (RampaDiff);
-            RampaLastMove = TO_SOUTH;
-            break;
-
-            case TO_WEST:
-            lcd.setCursor(0,1);
-            lcd.print("TO_WEST");
-            setRampa(x_actual -1, y_actual, z_actual);
-            x_actual -= (RampaDiff);
-            RampaLastMove = TO_WEST;
-            break;
-        }
-
-        if(firstFloor == ABAJO)
-        {
-            if(subirRampa)
-            {
-                if(Piso3 and !Fusion)
-                {
-                    z_actual--;
-                    setWall(x_actual, y_actual, z_actual);
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                if(Fusion)
-                {
-                    z_actual++;
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                {
-                    z_actual++;
-                    setInicioB();
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-            else
-            if(bajarRampa)
-            {
-                if(!Piso2)
-                {
-                    z_actual++;
-                    setInicioC();
-                    //setWall arriba
-                    switch(LastMove)
-                    {
-                        case TO_NORTH:
-                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual-1);
-                        break;
-
-                        case TO_EAST:
-                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual-1);
-                        break;
-
-                        case TO_SOUTH:
-                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
-                        break;
-
-                        case TO_WEST:
-                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
-                        break;
-                    }
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                {
-                    z_actual--;
-                    setWall(x_actual, y_actual, z_actual);
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-
-        }
-        else
-        if(firstFloor == ARRIBA)
-        {
-            if(bajarRampa)
-            {
-                if(Piso2)
-                {
-                    z_actual += 2;
-                    setInicioC();
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                {
-                    z_actual++;
-                    setInicioB();
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-            else
-            if(subirRampa)
-            {
-                if(z_actual == 1 and Piso2)
-                {
-                    z_actual--;
-                    setWall(x_actual, y_actual, z_actual);
-                    //resolverLaberinto();
-                }
-                else
-                if(z_actual == 1 and !Piso2)
-                {
-                    permisoRampa = false;
-                    setInicioC();
-                    switch(LastMove)
-                    {
-                        case TO_NORTH:
-                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
-                        break;
-
-                        case TO_EAST:
-                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
-                        break;
-
-                        case TO_SOUTH:
-                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual);
-                        break;
-
-                        case TO_WEST:
-                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual);
-                        break;
-                    }
-                    A_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                if(z_actual == 2)
-                {
-                    z_actual -= 2;
-                    setWall(x_actual, y_actual, z_actual);
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-        }
-
-        switch(LastMove)
-        {
-            case TO_NORTH:
-            setRampa(x_actual, y_actual -1, z_actual);
-            break;
-
-            case TO_EAST:
-            setRampa(x_actual -1, y_actual, z_actual);
-            break;
-
-            case TO_SOUTH:
-            setRampa(x_actual, y_actual +1, z_actual);
-            break;
-
-            case TO_WEST:
-            setRampa(x_actual +1, y_actual, z_actual);
-            break;
-        }
-    }
-    subirRampa = false;
-    bajarRampa = false;
-}*/
 
 void alinearIMU() {
     lcd.print("alimear imu");
@@ -1774,7 +1524,7 @@ void moverCuadro() {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
-        checarRampa2();
+        checarRampa();
 
         switch (PermisoRampa) {
             case REGRESA_ARRIBA:
@@ -1922,7 +1672,7 @@ void moverCuadro() {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
-        checarRampa2();
+        checarRampa();
 
         switch (PermisoRampa) {
             case REGRESA_ABAJO:
@@ -2115,7 +1865,7 @@ void reversaCuadro() {
         lcd.print(steps);
         /*while (Lack) {
             detener();
-            LackOfProgress();
+            lackOfProgress();
             return;
         }*/
 
@@ -2419,7 +2169,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         LastPathValue = pathway(x_path, y_path, x_destino, y_destino);
         ////lcd.println("LastPathValue =" + String(LastPathValue));
 
-        if(x_destino == x_actual and y_destino == y_actual) {
+        if(x_destino == x_actual && y_destino == y_actual) {
             pathFinished = true;
             lcd.setCursor(0, 1);
             lcd.print("Sali rapido");
@@ -2438,8 +2188,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('S')) {
             if(y_path > 0) {
-                if (cuadros[x_path][y_path-1][z_actual].getEstado() == INICIO or cuadros[x_path][y_path-1][z_actual].getEstado() == CHECKPOINT or
-                cuadros[x_path][y_path-1][z_actual].getEstado() == RECORRIDO or (x_path == x_destino and y_path-1 == y_destino)) {
+                if (cuadros[x_path][y_path-1][z_actual].getEstado() == INICIO || cuadros[x_path][y_path-1][z_actual].getEstado() == CHECKPOINT or
+                cuadros[x_path][y_path-1][z_actual].getEstado() == RECORRIDO || (x_path == x_destino && y_path-1 == y_destino)) {
                     Grid = coordToGrid(x_path, y_path-1);
                     if(closedList[Grid] == 999) {
                         openList[Grid] = pathway(x_path, y_path-1, x_destino, y_destino);
@@ -2451,8 +2201,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('E')) {
             if(x_path < X_MAX -1) {
-                if (cuadros[x_path+1][y_path][z_actual].getEstado() == INICIO or cuadros[x_path+1][y_path][z_actual].getEstado() == CHECKPOINT or
-                cuadros[x_path+1][y_path][z_actual].getEstado() == RECORRIDO or (x_path+1 == x_destino and y_path == y_destino)) {
+                if (cuadros[x_path+1][y_path][z_actual].getEstado() == INICIO || cuadros[x_path+1][y_path][z_actual].getEstado() == CHECKPOINT or
+                cuadros[x_path+1][y_path][z_actual].getEstado() == RECORRIDO || (x_path+1 == x_destino && y_path == y_destino)) {
                     Grid = coordToGrid(x_path+1, y_path);
                     if(closedList[Grid] == 999) {
                         openList[Grid] = pathway(x_path+1, y_path, x_destino, y_destino);
@@ -2464,8 +2214,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('N')) {
             if(y_path < Y_MAX -1) {
-                if (cuadros[x_path][y_path+1][z_actual].getEstado() == INICIO or cuadros[x_path][y_path+1][z_actual].getEstado() == CHECKPOINT or
-                cuadros[x_path][y_path+1][z_actual].getEstado() == RECORRIDO or (x_path == x_destino and y_path+1 == y_destino)) {
+                if (cuadros[x_path][y_path+1][z_actual].getEstado() == INICIO || cuadros[x_path][y_path+1][z_actual].getEstado() == CHECKPOINT or
+                cuadros[x_path][y_path+1][z_actual].getEstado() == RECORRIDO || (x_path == x_destino && y_path+1 == y_destino)) {
                     Grid = coordToGrid(x_path, y_path+1);
                     if(closedList[Grid] == 999) {
                         openList[Grid] = pathway(x_path, y_path+1, x_destino, y_destino);
@@ -2477,8 +2227,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('O')) {
             if(x_path > 0) {
-                if (cuadros[x_path-1][y_path][z_actual].getEstado() == INICIO or cuadros[x_path-1][y_path][z_actual].getEstado() == CHECKPOINT or
-                cuadros[x_path-1][y_path][z_actual].getEstado() == RECORRIDO or (x_path-1 == x_destino and y_path == y_destino)) {
+                if (cuadros[x_path-1][y_path][z_actual].getEstado() == INICIO || cuadros[x_path-1][y_path][z_actual].getEstado() == CHECKPOINT or
+                cuadros[x_path-1][y_path][z_actual].getEstado() == RECORRIDO || (x_path-1 == x_destino && y_path == y_destino)) {
                     Grid = coordToGrid(x_path-1, y_path);
                     if(closedList[Grid] == 999) {
                         openList[Grid] = pathway(x_path-1, y_path, x_destino, y_destino);
@@ -2550,7 +2300,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         //delay(1000);
         ////lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
-        if(x_path == x_destino and y_path == y_destino) {
+        if(x_path == x_destino && y_path == y_destino) {
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     ////lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
@@ -2576,7 +2326,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 if(!cuadros[x_back][y_back][z_actual].getPared('S')) {
                     if(y_back > 0) {
                         TempGrid = coordToGrid(x_back, y_back-1);
-                        if(closedList[TempGrid] != 999 and backList[lastBackGrid+1] != TempGrid)
+                        if(closedList[TempGrid] != 999 && backList[lastBackGrid+1] != TempGrid)
                         Neighbors[0] = pathway(x_back, y_back-1, x_actual, y_actual);
                     }
                 }
@@ -2584,7 +2334,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 if(!cuadros[x_back][y_back][z_actual].getPared('E')) {
                     if(x_back < X_MAX -1) {
                         TempGrid = coordToGrid(x_back+1, y_back);
-                        if(closedList[TempGrid] != 999 and backList[lastBackGrid+1] != TempGrid)
+                        if(closedList[TempGrid] != 999 && backList[lastBackGrid+1] != TempGrid)
                         Neighbors[1] = pathway(x_back+1, y_back, x_actual, y_actual);
                     }
                 }
@@ -2592,7 +2342,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 if(!cuadros[x_back][y_back][z_actual].getPared('N')) {
                     if(y_back < Y_MAX -1) {
                         TempGrid = coordToGrid(x_back, y_back+1);
-                        if(closedList[TempGrid] != 999 and backList[lastBackGrid+1] != TempGrid)
+                        if(closedList[TempGrid] != 999 && backList[lastBackGrid+1] != TempGrid)
                         Neighbors[2] = pathway(x_back, y_back+1, x_actual, y_actual);
                     }
                 }
@@ -2600,7 +2350,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 if(!cuadros[x_back][y_back][z_actual].getPared('O')) {
                     if(x_back > 0) {
                         TempGrid = coordToGrid(x_back-1, y_back);
-                        if(closedList[TempGrid] != 999 and backList[lastBackGrid+1] != TempGrid)
+                        if(closedList[TempGrid] != 999 && backList[lastBackGrid+1] != TempGrid)
                         Neighbors[3] = pathway(x_back-1, y_back, x_actual, y_actual);
                     }
                 }
@@ -2650,7 +2400,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 delay(3000);*/
                 back_index--;
                 //-----------
-                if(x_back == x_actual and y_back == y_actual) {
+                if(x_back == x_actual && y_back == y_actual) {
                     backList[back_index+1] = 999;
                     ////lcd.println("Entre al final");
                     //delay(500);
@@ -2712,7 +2462,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 //----------- FUNCIONES CUADRO -------------
 
 
-void verificarCSR(){
+void verificarCSR() {
     ArrayCSR = 0;
     for(int x=0; x<X_MAX; x++)
     {
@@ -2729,7 +2479,7 @@ void verificarCSR(){
 }
 
 
-void verificarRampa(){
+void verificarRampa() {
     for (int y=0; y<Y_MAX; y++)
     {
         for(int x=0; x<X_MAX; x++)
@@ -2745,7 +2495,7 @@ void verificarRampa(){
 }
 
 // Detecta paredes y las actualiza en el array cuadros[] en la posicion actual
-void checarParedes(){
+void checarParedes() {
     shortMove = false;
     A_wall = false; B_wall = false; C_wall = false; D_wall = false;
 
@@ -2753,7 +2503,7 @@ void checarParedes(){
         case A_NORTE:
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_C) > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2766,11 +2516,11 @@ void checarParedes(){
         }
 
 
-        if(getSharpCorta(SHARP_C) < 15 and SharpRampa)
+        if(getSharpCorta(SHARP_C) < 15 && SharpRampa)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
 
-        if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_B1) > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2780,7 +2530,7 @@ void checarParedes(){
         if(getSharpCorta(SHARP_B1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_A) > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2792,7 +2542,7 @@ void checarParedes(){
 
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_D1) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2810,17 +2560,17 @@ void checarParedes(){
         break;
         //--------------------------------------------------------------------
         case B_NORTE:
-        if(getSharpCorta(SHARP_C)  > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_C)  > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharpCorta(SHARP_C)  < 15 and SharpRampa)
+        if(getSharpCorta(SHARP_C)  < 15 && SharpRampa)
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharpCorta(SHARP_B1)  > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_B1)  > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2833,7 +2583,7 @@ void checarParedes(){
 
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_A)  > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_A)  > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2849,7 +2599,7 @@ void checarParedes(){
 
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_D1)  > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_D1)  > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
             agregarLast('S');
@@ -2867,19 +2617,19 @@ void checarParedes(){
         break;
         //--------------------------------------------------------------------
         case C_NORTE:
-        if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_C) > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharpCorta(SHARP_C) < 15 and SharpRampa)
+        if(getSharpCorta(SHARP_C) < 15 && SharpRampa)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_B1) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2895,7 +2645,7 @@ void checarParedes(){
 
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_A) > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2909,7 +2659,7 @@ void checarParedes(){
         if(getSharpCorta(SHARP_A) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_D1) > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2924,7 +2674,7 @@ void checarParedes(){
         case D_NORTE:
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_C) > 15 and (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_C) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2936,13 +2686,13 @@ void checarParedes(){
             }
         }
 
-        if(getSharpCorta(SHARP_C) < 15 and SharpRampa)
+        if(getSharpCorta(SHARP_C) < 15 && SharpRampa)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
 
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_B1) > 15 and (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if(getSharpCorta(SHARP_B1) > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2958,7 +2708,7 @@ void checarParedes(){
         if(getSharpCorta(SHARP_B1) < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_A) > 15 and (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_A) > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2970,7 +2720,7 @@ void checarParedes(){
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
 
-        if(getSharpCorta(SHARP_D1) > 15 and (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if(getSharpCorta(SHARP_D1) > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2986,8 +2736,8 @@ void checarParedes(){
 }
 
 
-void checarLasts(){
-    if(x_last2 != 255 and y_last2 != 255) {
+void checarLasts() {
+    if(x_last2 != 255 && y_last2 != 255) {
         x_last = x_last2;
         y_last = y_last2;
         x_last2 = 255;
@@ -2999,7 +2749,7 @@ void checarLasts(){
         Last = false;
     }
 
-    if(x_actual == x_last and y_actual == y_last) {
+    if(x_actual == x_last && y_actual == y_last) {
         x_last = 255;
         y_last = 255;
         Last = false;
@@ -3008,7 +2758,7 @@ void checarLasts(){
 
 
 //Verificar si en el for i es i>1 o i>0 (probar)
-void recorrerX(){
+void recorrerX() {
     ////lcd.println("Recorrer X");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<Y_MAX; j++) {
@@ -3036,15 +2786,15 @@ void recorrerX(){
     if(x_InicioC != 255)
     x_InicioC++;
 
-    if(x_last != 255 and y_last != 255)
+    if(x_last != 255 && y_last != 255)
         x_last++;
 
-    if(x_last2 != 255 and y_last2 != 255)
+    if(x_last2 != 255 && y_last2 != 255)
         x_last2++;
     //boolRecorrerX = true;
 }
 
-void recorrerY(){
+void recorrerY() {
     ////lcd.println("Recorrer Y");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<X_MAX; j++) {
@@ -3072,10 +2822,10 @@ void recorrerY(){
     if(y_InicioC != 255)
     y_InicioC++;
 
-    if(x_last != 255 and y_last != 255)
+    if(x_last != 255 && y_last != 255)
         y_last++;
 
-    if(x_last2 != 255 and y_last2 != 255)
+    if(x_last2 != 255 && y_last2 != 255)
         y_last2++;
     //boolRecorrerY = true;
 }
@@ -3128,7 +2878,7 @@ void gotoInicio(byte x_final, byte y_final){
     }
 }
 
-void RampaMoveX(){
+void RampaMoveX() {
     switch(RampaLastMove)
     {
         case TO_NORTH:
@@ -3149,7 +2899,7 @@ void RampaMoveX(){
     }
 }
 
-void resolverLaberinto(){
+void resolverLaberinto() {
     if(shortMove) {
         ////lcd.println("ENTRE AL SHORTMOVE");
 
@@ -3486,7 +3236,7 @@ void servoMotor() {
     delay(900);
 }
 
-void checarMlx(){
+void checarMlx() {
   if(!cuadros[x_actual][y_actual][z_actual].getMlx())
   {
     servoMotor();
@@ -3592,12 +3342,12 @@ void setFiltro(char filtro){
 }
 
 // Valor que retorna el sensor
-int getColor(){
+int getColor() {
     return (pulseIn(sensorOut, LOW));
 }
 
 // Funcion para calibrar los colores que se usaran
-void calibrarColor(){
+void calibrarColor() {
     while(EstadoColor == ESTADO_OFF) {
         ////lcd.println("Calibrar...");
         lcd.setCursor(0, 0);
@@ -3692,16 +3442,16 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
     switch (cuadro) {
         case COLOR_NEGRO:
-        if(iNone <= iN_NEGRO+margen and iNone >= iN_NEGRO-margen and iRojo <= iR_NEGRO+margen and iRojo >= iR_NEGRO-margen
-        and iVerde <= iV_NEGRO+margen and iVerde >= iV_NEGRO-margen and iAzul <= iA_NEGRO+margen and iAzul >= iA_NEGRO-margen)
+        if(iNone <= iN_NEGRO+margen && iNone >= iN_NEGRO-margen && iRojo <= iR_NEGRO+margen && iRojo >= iR_NEGRO-margen
+        && iVerde <= iV_NEGRO+margen && iVerde >= iV_NEGRO-margen && iAzul <= iA_NEGRO+margen && iAzul >= iA_NEGRO-margen)
             return true;
         else
             return false;
         break;
 
         case COLOR_CHECKPOINT:
-        if(iNone <= iN_CHECKPOINT+margen and iNone >= iN_CHECKPOINT-margen and iRojo <= iR_CHECKPOINT+margen and iRojo >= iR_CHECKPOINT-margen
-        and iVerde <= iV_CHECKPOINT+margen and iVerde >= iV_CHECKPOINT-margen and iAzul <= iA_CHECKPOINT+margen and iAzul >= iA_CHECKPOINT-margen)
+        if(iNone <= iN_CHECKPOINT+margen && iNone >= iN_CHECKPOINT-margen && iRojo <= iR_CHECKPOINT+margen && iRojo >= iR_CHECKPOINT-margen
+        && iVerde <= iV_CHECKPOINT+margen && iVerde >= iV_CHECKPOINT-margen && iAzul <= iA_CHECKPOINT+margen && iAzul >= iA_CHECKPOINT-margen)
             return true;
         else
             return false;
@@ -3808,7 +3558,7 @@ void checarColor() {
 }
 
 // Si el array esta a punto de salir de los parametros, mueve la matriz una linea completa
-void checarArray(){
+void checarArray() {
 
     if (x_actual < 1) {
         for(int i = x_actual; i<1; i++)
@@ -3825,7 +3575,7 @@ void checarArray(){
 }
 
 
-void LackOfProgress() {
+void lackOfProgress() {
 
   for(int i=0; i<TOTAL_GRID_MAX; i++){
 
@@ -3948,7 +3698,7 @@ void setup() {
     pinMode(S2, OUTPUT);         //Establece  pin de Salida
     pinMode(S3, OUTPUT);         //Establece  pin de Salida
     if(!bno.begin())
-           //lcd.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+           //lcd.print("Ooops, no BNO055 detected ... Check your wiring || I2C ADDR!");
     delay(500);
     bno.setExtCrystalUse(true);
 
@@ -4034,10 +3784,12 @@ void loop() {
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
     delay(200);
+
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
@@ -4054,7 +3806,6 @@ void loop() {
     if(cuadros[x_actual][y_actual][z_actual].getPared('O')) {
        lcd.setCursor(6, 0);
        lcd.print("O");
-
    }
     resolverLaberinto();*/
 }
