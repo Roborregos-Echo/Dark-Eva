@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.2.2 --------------------------------
-//--------------------------- 09 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.2.5 --------------------------------
+//--------------------------- 15 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +57,8 @@ void vueltaIzq();
 //******************************************
 //--------------- LABERINTO ----------------
 #define switch_preferencia 20
-const byte DERECHA = 0; const byte IZQUIERDA = 1;
+const byte DERECHA      =   0;
+const byte IZQUIERDA    =   1;
 
 byte Preferencia;
 
@@ -1293,7 +1294,7 @@ void setNewRampa(){
 
 }
 
-void checarRampa2() {
+void checarRampa() {
     if(subirRampa or bajarRampa) {
         lcd.clear();
         SharpRampa = false;
@@ -1457,226 +1458,6 @@ void checarRampa2() {
     }
 }
 
-/*void checarRampa(){
-    if(subirRampa or bajarRampa)
-    {
-
-        SharpRampa = false;
-
-        if(x_last != 255 and y_last != 255)
-        {
-            cuadros[x_last][y_last][z_actual].setEstado(SIN_RECORRER);
-            x_last = 255;
-            y_last = 255;
-            Last = false;
-        }
-
-        if(x_last2 != 255 and y_last2 != 255)
-        {
-            cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
-            x_last2 = 255;
-            y_last2 = 255;
-            Last2 = false;
-        }
-        lcd.clear();
-        lcd.print("     RAMPA");
-        if(firstFloor == 0)
-        {
-            if(subirRampa)
-            firstFloor = ABAJO;
-
-            if(bajarRampa)
-            firstFloor = ARRIBA;
-        }
-
-        switch(LastMove)
-        {
-            case TO_NORTH:
-            lcd.setCursor(0,1);
-            lcd.print("TO_NORTH");
-            setRampa(x_actual, y_actual +1, z_actual);
-            y_actual += (RampaDiff);
-            RampaLastMove = TO_NORTH;
-            break;
-
-            case TO_EAST:
-            lcd.setCursor(0,1);
-            lcd.print("TO_EAST");
-            setRampa(x_actual +1, y_actual, z_actual);
-            x_actual += (RampaDiff);
-            RampaLastMove = TO_EAST;
-            break;
-
-            case TO_SOUTH:
-            lcd.setCursor(0,1);
-            lcd.print("TO_SOUTH");
-            setRampa(x_actual, y_actual -1, z_actual);
-            y_actual -= (RampaDiff);
-            RampaLastMove = TO_SOUTH;
-            break;
-
-            case TO_WEST:
-            lcd.setCursor(0,1);
-            lcd.print("TO_WEST");
-            setRampa(x_actual -1, y_actual, z_actual);
-            x_actual -= (RampaDiff);
-            RampaLastMove = TO_WEST;
-            break;
-        }
-
-        if(firstFloor == ABAJO)
-        {
-            if(subirRampa)
-            {
-                if(Piso3 and !Fusion)
-                {
-                    z_actual--;
-                    setWall(x_actual, y_actual, z_actual);
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                if(Fusion)
-                {
-                    z_actual++;
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                {
-                    z_actual++;
-                    setInicioB();
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-            else
-            if(bajarRampa)
-            {
-                if(!Piso2)
-                {
-                    z_actual++;
-                    setInicioC();
-                    //setWall arriba
-                    switch(LastMove)
-                    {
-                        case TO_NORTH:
-                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual-1);
-                        break;
-
-                        case TO_EAST:
-                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual-1);
-                        break;
-
-                        case TO_SOUTH:
-                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
-                        break;
-
-                        case TO_WEST:
-                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
-                        break;
-                    }
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                {
-                    z_actual--;
-                    setWall(x_actual, y_actual, z_actual);
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-
-        }
-        else
-        if(firstFloor == ARRIBA)
-        {
-            if(bajarRampa)
-            {
-                if(Piso2)
-                {
-                    z_actual += 2;
-                    setInicioC();
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                {
-                    z_actual++;
-                    setInicioB();
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-            else
-            if(subirRampa)
-            {
-                if(z_actual == 1 and Piso2)
-                {
-                    z_actual--;
-                    setWall(x_actual, y_actual, z_actual);
-                    //resolverLaberinto();
-                }
-                else
-                if(z_actual == 1 and !Piso2)
-                {
-                    permisoRampa = false;
-                    setInicioC();
-                    switch(LastMove)
-                    {
-                        case TO_NORTH:
-                        setWall(x_actual, y_actual + (RampaDiff+1), z_actual-1);
-                        break;
-
-                        case TO_EAST:
-                        setWall(x_actual + (RampaDiff+1), y_actual, z_actual-1);
-                        break;
-
-                        case TO_SOUTH:
-                        setWall(x_actual, y_actual - (RampaDiff+1), z_actual);
-                        break;
-
-                        case TO_WEST:
-                        setWall(x_actual - (RampaDiff+1), y_actual, z_actual);
-                        break;
-                    }
-                    A_wall = true;
-                    //resolverLaberinto();
-                }
-                else
-                if(z_actual == 2)
-                {
-                    z_actual -= 2;
-                    setWall(x_actual, y_actual, z_actual);
-                    C_wall = true;
-                    //resolverLaberinto();
-                }
-            }
-        }
-
-        switch(LastMove)
-        {
-            case TO_NORTH:
-            setRampa(x_actual, y_actual -1, z_actual);
-            break;
-
-            case TO_EAST:
-            setRampa(x_actual -1, y_actual, z_actual);
-            break;
-
-            case TO_SOUTH:
-            setRampa(x_actual, y_actual +1, z_actual);
-            break;
-
-            case TO_WEST:
-            setRampa(x_actual +1, y_actual, z_actual);
-            break;
-        }
-    }
-    subirRampa = false;
-    bajarRampa = false;
-}*/
 
 void alinearIMU() {
     lcd.print("alimear imu");
@@ -1774,7 +1555,7 @@ void moverCuadro() {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
-        checarRampa2();
+        checarRampa();
 
         switch (PermisoRampa) {
             case REGRESA_ARRIBA:
@@ -1922,7 +1703,7 @@ void moverCuadro() {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
-        checarRampa2();
+        checarRampa();
 
         switch (PermisoRampa) {
             case REGRESA_ABAJO:
@@ -4030,15 +3811,16 @@ void setup() {
 }
 
 void loop() {
-    Serial.println(analogRead(SHARP_LC));
-    /*lcd.clear();
+    lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
     delay(200);
+
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
@@ -4055,7 +3837,6 @@ void loop() {
     if(cuadros[x_actual][y_actual][z_actual].getPared('O')) {
        lcd.setCursor(6, 0);
        lcd.print("O");
-
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
