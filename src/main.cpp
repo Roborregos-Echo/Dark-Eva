@@ -28,6 +28,7 @@
 #include <Servo.h>
 #include <PID_v1.h>
 #include <EEPROM.h>
+#include <NewPing.h>
 
 
 
@@ -182,6 +183,91 @@ const int SHARP_D1  = 14;
 const int SHARP_D2  = 8;
 const int SHARP_LA  = 12;
 const int SHARP_LC  = 11;
+
+
+//******************************************
+//------------- ULTRASONICOS ---------------
+#define TRIG_A 10
+#define ECHO_A 11
+
+#define TRIG_B 12
+#define ECHO_B 13
+
+#define TRIG_C 14
+#define ECHO_C 15
+
+#define TRIG_D 16
+#define ECHO_D 17
+
+// Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
+#define MAX_DISTANCE 100
+
+int primeraLectura_A, primeraLectura_C;
+int segundaLectura_A, segundaLectura_C;
+int Faltante_CM;
+
+NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
+NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
+NewPing ULTRA_C(TRIG_C, ECHO_C, MAX_DISTANCE);
+NewPing ULTRA_D(TRIG_D, ECHO_D, MAX_DISTANCE);
+
+
+// Siempre meter el delay manualmente, tiene que ser de 50!!!!
+unsigned int getUltrasonico(char cSentido){
+    switch(cSentido)
+    {
+        case 'A':
+        return ULTRA_A.ping() / US_ROUNDTRIP_CM;
+        break;
+
+        case 'B':
+        return ULTRA_B.ping() / US_ROUNDTRIP_CM;
+        break;
+
+        case 'C':
+        return ULTRA_C.ping() / US_ROUNDTRIP_CM;
+        break;
+
+        case 'D':
+        return ULTRA_D.ping() / US_ROUNDTRIP_CM;
+        break;
+    }
+}
+
+void PrimeraLectura(){
+    primeraLectura_A = getUltrasonico('A');
+    primeraLectura_C = getUltrasonico('C');
+}
+
+void comprobarAvance(){
+    if(primeraLectura_A != 0)
+    {
+        segundaLectura_A = getUltrasonico('A');
+        if(segundaLectura_A == 0 or (abs(primeraLectura_A-segundaLectura_A) > 27 and abs(primeraLectura_A-segundaLectura_A) < 33))
+        {
+            Faltante_CM = 0;
+        }
+        else
+        {
+            Faltante_CM = 30-abs(primeraLectura_A-segundaLectura_A);
+        }
+    } else if(primeraLectura_C != 0)
+    {
+        segundaLectura_C = getUltrasonico('C');
+        if(segundaLectura_C == 0 or (abs(primeraLectura_C-segundaLectura_C) > 27 and abs(primeraLectura_C-segundaLectura_C) < 33))
+        {
+            Faltante_CM = 0;
+        }
+        else
+        {
+            Faltante_CM = 30-abs(primeraLectura_C-segundaLectura_C);
+        }
+    }else
+    {
+        Faltante_CM = 0;
+    }
+
+}
 
 
 //******************************************
