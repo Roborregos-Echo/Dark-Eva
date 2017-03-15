@@ -132,8 +132,8 @@ byte y_recorrer[50];
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 Adafruit_DCMotor *MotorAI = AFMS.getMotor(1);
-Adafruit_DCMotor *MotorAD = AFMS.getMotor(4);
-Adafruit_DCMotor *MotorCI = AFMS.getMotor(2);
+Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
+Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
 Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 
 
@@ -320,7 +320,7 @@ const int InterruptDefiner = 11;
 
 //******************************************
 //------------- SERVO MOTOR ----------------
-#define servoPin 9 //PWM
+#define servoPin 8 //PWM
 Servo servo;
 
 
@@ -430,17 +430,17 @@ float getAngulo() {
 //********************************************
 //----------------- MOTORES ------------------
 void avanzar() {
-    MotorAI -> run(FORWARD);
+    MotorAI -> run(BACKWARD);
     MotorAD -> run(FORWARD);
     MotorCI -> run(FORWARD);
-    MotorCD -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
 }
 
 void reversa() {
-    MotorAI -> run(BACKWARD);
+    MotorAI -> run(FORWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(BACKWARD);
-    MotorCD -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
 }
 
 void detener() {
@@ -451,31 +451,31 @@ void detener() {
 }
 
 void vueltaDerecha() {
-    MotorAI -> run(FORWARD);
+    MotorAI -> run(BACKWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(FORWARD);
-    MotorCD -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
 }
 
 void vueltaIzquierda() {
-    MotorAI -> run(BACKWARD);
+    MotorAI -> run(FORWARD);
     MotorAD -> run(FORWARD);
     MotorCI -> run(BACKWARD);
-    MotorCD -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
 }
 
 void horizontalDerecha() {
-    MotorAI -> run(FORWARD);
+    MotorAI -> run(BACKWARD);
     MotorAD -> run(BACKWARD);
     MotorCI -> run(BACKWARD);
-    MotorCD -> run(FORWARD);
+    MotorCD -> run(BACKWARD);
 }
 
 void horizontalIzquierda() {
-    MotorAI -> run(BACKWARD);
+    MotorAI -> run(FORWARD);
     MotorAD -> run(FORWARD);
     MotorCI -> run(FORWARD);
-    MotorCD -> run(BACKWARD);
+    MotorCD -> run(FORWARD);
 }
 
 
@@ -3780,7 +3780,23 @@ void setup() {
 }
 
 void loop() {
-    lcd.clear();
+    Serial.print(getSharpCorta(SHARP_A));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_B1));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_B2));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_C));
+    Serial.print("\t");
+    Serial.print(getSharpCorta(SHARP_D1));
+    Serial.print("\t");
+    Serial.println(getSharpCorta(SHARP_D2));
+    Serial.print(getSharpLarga(SHARP_LA));
+    Serial.print("\t\t\t");
+    Serial.println(getSharpLarga(SHARP_LC));
+    Serial.println("");
+    delay(500);
+    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3807,5 +3823,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
