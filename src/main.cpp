@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.2.5 --------------------------------
-//--------------------------- 15 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.3.0 --------------------------------
+//--------------------------- 17 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -21,8 +21,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-#include <Adafruit_MotorShield.h>
-#include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <Servo.h>
@@ -126,15 +124,6 @@ byte ArrayCSR;
 byte x_recorrer[50];
 byte y_recorrer[50];
 
-
-//******************************************
-//----------- SHIELD ADAFRUIT --------------
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-
-Adafruit_DCMotor *MotorAI = AFMS.getMotor(1);
-Adafruit_DCMotor *MotorAD = AFMS.getMotor(2);
-Adafruit_DCMotor *MotorCI = AFMS.getMotor(4);
-Adafruit_DCMotor *MotorCD = AFMS.getMotor(3);
 
 
 //******************************************
@@ -436,53 +425,113 @@ float getAngulo() {
 
 //********************************************
 //----------------- MOTORES ------------------
+#define Pin1_DERECHA_ADELANTE 50   // PWM
+#define Pin2_DERECHA_ADELANTE 52   // PWM
+
+#define Pin1_DERECHA_ATRAS 42     // PWM
+#define Pin2_DERECHA_ATRAS 44    // PWM
+
+#define Pin1_IZQUIERDA_ADELANTE 46   // PWM
+#define Pin2_IZQUIERDA_ADELANTE 48   // PWM
+
+#define Pin1_IZQUIERDA_ATRAS 40     // PWM
+#define Pin2_IZQUIERDA_ATRAS 38     // PWM
+
+
 void avanzar() {
-    MotorAI -> run(BACKWARD);
-    MotorAD -> run(FORWARD);
-    MotorCI -> run(FORWARD);
-    MotorCD -> run(BACKWARD);
+    analogWrite(Pin1_DERECHA_ADELANTE, 0);
+    analogWrite(Pin1_DERECHA_ATRAS, 0);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 255);
+    analogWrite(Pin2_DERECHA_ATRAS, 255);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
 }
 
 void reversa() {
-    MotorAI -> run(FORWARD);
-    MotorAD -> run(BACKWARD);
-    MotorCI -> run(BACKWARD);
-    MotorCD -> run(FORWARD);
+    analogWrite(Pin1_DERECHA_ADELANTE, 255);
+    analogWrite(Pin1_DERECHA_ATRAS, 255);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 0);
+    analogWrite(Pin2_DERECHA_ATRAS, 0);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
 }
 
 void detener() {
-    MotorAI -> run(BRAKE);
-    MotorAD -> run(BRAKE);
-    MotorCI -> run(BRAKE);
-    MotorCD -> run(BRAKE);
+    analogWrite(Pin1_DERECHA_ADELANTE, 255);
+    analogWrite(Pin1_DERECHA_ATRAS, 255);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 255);
+    analogWrite(Pin2_DERECHA_ATRAS, 255);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
+
+    delay(20);
+
+    analogWrite(Pin1_DERECHA_ADELANTE, 0);
+    analogWrite(Pin1_DERECHA_ATRAS, 0);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 0);
+    analogWrite(Pin2_DERECHA_ATRAS, 0);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
 }
 
 void vueltaDerecha() {
-    MotorAI -> run(BACKWARD);
-    MotorAD -> run(BACKWARD);
-    MotorCI -> run(FORWARD);
-    MotorCD -> run(FORWARD);
+    analogWrite(Pin1_DERECHA_ADELANTE, 255);
+    analogWrite(Pin1_DERECHA_ATRAS, 255);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 0);
+    analogWrite(Pin2_DERECHA_ATRAS, 0);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
 }
 
 void vueltaIzquierda() {
-    MotorAI -> run(FORWARD);
-    MotorAD -> run(FORWARD);
-    MotorCI -> run(BACKWARD);
-    MotorCD -> run(BACKWARD);
+    analogWrite(Pin1_DERECHA_ADELANTE, 0);
+    analogWrite(Pin1_DERECHA_ATRAS, 0);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 255);
+    analogWrite(Pin2_DERECHA_ATRAS, 255);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
 }
 
 void horizontalDerecha() {
-    MotorAI -> run(BACKWARD);
-    MotorAD -> run(BACKWARD);
-    MotorCI -> run(BACKWARD);
-    MotorCD -> run(BACKWARD);
+    analogWrite(Pin1_DERECHA_ADELANTE, 255);
+    analogWrite(Pin1_DERECHA_ATRAS, 0);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 0);
+    analogWrite(Pin2_DERECHA_ATRAS, 255);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
 }
 
 void horizontalIzquierda() {
-    MotorAI -> run(FORWARD);
-    MotorAD -> run(FORWARD);
-    MotorCI -> run(FORWARD);
-    MotorCD -> run(FORWARD);
+    analogWrite(Pin1_DERECHA_ADELANTE, 0);
+    analogWrite(Pin1_DERECHA_ATRAS, 255);
+    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
+    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+
+    analogWrite(Pin2_DERECHA_ADELANTE, 255);
+    analogWrite(Pin2_DERECHA_ATRAS, 0);
+    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
+    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
 }
 
 
@@ -676,7 +725,7 @@ void checarInterr() {
 //******************************************
 //--------------- MOVIMIENTO ---------------
 void velocidad(int ai, int ad, int ci, int cd) {
-    if(ai >= 255)
+    /*if(ai >= 255)
         MotorAI -> setSpeed(255);
     else
         MotorAI -> setSpeed(ai);
@@ -694,7 +743,7 @@ void velocidad(int ai, int ad, int ci, int cd) {
     if(cd >= 255)
         MotorCD -> setSpeed(255);
     else
-        MotorCD -> setSpeed(cd);
+        MotorCD -> setSpeed(cd);*/
 }
 
 void alinear() {
@@ -3689,12 +3738,21 @@ while (digitalRead(BOTON_COLOR) != 1) {
 
 
 void setup() {
-    delay(1000);
     Serial.begin(9600);
-    PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    pinMode(Pin1_DERECHA_ADELANTE, OUTPUT);
+    pinMode(Pin1_DERECHA_ATRAS, OUTPUT);
+    pinMode(Pin1_IZQUIERDA_ADELANTE, OUTPUT);
+    pinMode(Pin1_IZQUIERDA_ATRAS, OUTPUT);
+    pinMode(Pin2_DERECHA_ADELANTE, OUTPUT);
+    pinMode(Pin2_DERECHA_ATRAS, OUTPUT);
+    pinMode(Pin2_IZQUIERDA_ADELANTE, OUTPUT);
+    pinMode(Pin2_IZQUIERDA_ATRAS, OUTPUT);
+    delay(1000);
+
+    //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
+    //pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+    //attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     //attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
@@ -3704,16 +3762,10 @@ void setup() {
     pinMode(S1, OUTPUT);         //Establece  pin de Salida
     pinMode(S2, OUTPUT);         //Establece  pin de Salida
     pinMode(S3, OUTPUT);         //Establece  pin de Salida
-    if(!bno.begin())
-           //lcd.print("Ooops, no BNO055 detected ... Check your wiring || I2C ADDR!");
+    bno.begin();
     delay(500);
     bno.setExtCrystalUse(true);
 
-    AFMS.begin();
-    MotorAI -> run(RELEASE);
-    MotorAD -> run(RELEASE);
-    MotorCI -> run(RELEASE);
-    MotorCD -> run(RELEASE);
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
     lcd.begin();
@@ -3721,7 +3773,6 @@ void setup() {
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
     lcd.print("     E V A");
-
     servo.attach(servoPin);
     if(servo.read() < 90)
     servo.write(0);
@@ -3748,6 +3799,7 @@ void setup() {
         checkList1[i] = 0;
         checkList2[i] = 0;
     }
+
 
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
@@ -3783,7 +3835,6 @@ void setup() {
         Preferencia = DERECHA;
     else
         Preferencia = IZQUIERDA;
-
 }
 
 void loop() {
