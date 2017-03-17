@@ -320,8 +320,8 @@ const int LIMIT_DERECHO = 32;
 
 //******************************************
 //---------------- TCS3200 -----------------
-#define S0 10
-#define S1 9
+#define S0 9
+#define S1 10
 #define S2 12
 #define S3 11
 #define sensorOut 13
@@ -3321,7 +3321,7 @@ void leerValores() {
 
 
 //******************************************
-//---------------TCS3200------------------
+//---------------jdwjj00------------------
 
 /* Cambia la frecuencia del sensor:
 *  0 = filtro apagado
@@ -3756,6 +3756,7 @@ void setup() {
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
     lcd.begin();
+    delay(3000);
     lcd.backlight();
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
@@ -3787,19 +3788,18 @@ void setup() {
         checkList2[i] = 0;
     }
 
-
     x_actual = 1; y_actual = 1; z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
-    pinMode(13, OUTPUT);
-    pinMode(6, INPUT);
+    //pinMode(13, OUTPUT);
+    pinMode(6, OUTPUT);
     pinMode(InterruptDefiner, INPUT);
     pinMode(BOTON_COLOR, INPUT);
     delay(500);
     lcd.clear();
-    lcd.home();
     lcd.print("QUIERE CALIBRAR");
     delay(1000);
+
     if (digitalRead(BOTON_COLOR) == 0) {
         lcd.clear();
         lcd.home();
