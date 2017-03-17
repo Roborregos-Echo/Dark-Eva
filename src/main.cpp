@@ -1,11 +1,11 @@
 ﻿///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////                                         ///////////////////
-///////////////////                 E V A                   ///////////////////
+///////////////////              T E O R Í A                ///////////////////
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.3.0 --------------------------------
+//------------------------------ VERSIÓN 1.3.1 --------------------------------
 //--------------------------- 17 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -42,6 +42,7 @@ void lackOfProgress();
 void vueltaDer();
 void servoMotor();
 void vueltaIzq();
+void checarLimit();
 
 
 
@@ -626,11 +627,11 @@ bool inFire = false;
 bool Lack = false;
 bool first_victim = true;
 
-void Victim_Detected() {
+void victim_Detected() {
      inFire = true;
 }
 
-void Lack_Interrupt() {
+void lack_Interrupt() {
     lcd.println("INTERRUPT BOTON");
     Lack = false;
 }
@@ -683,6 +684,48 @@ void checarInterr() {
         steps = pos;
     }
 }
+
+
+void checarLimit() {
+    if(digitalRead(LIMIT_IZQUIERDO) == 1 || digitalRead(LIMIT_DERECHO) == 1) {
+        detener();
+        lcd.clear();
+        lcd.print("  LIMIT  ");
+        unsigned long pos = steps;
+        steps = 0;
+        for (int i = 0; i < 4; i++) {
+            lcd.noBacklight();
+            delay(100);
+            lcd.backlight();
+            delay(100);
+        }
+
+        if(digitalRead(LIMIT_IZQUIERDO) == 1 && digitalRead(LIMIT_DERECHO) == 1) {
+            lcd.setCursor(1, 0);
+            lcd.print("  IZQ     DER ");
+            while (steps <= 500) {
+                reversa();
+            }
+            detener();
+        } else if (digitalRead(LIMIT_IZQUIERDO) == 1 ){
+            lcd.setCursor(1, 0);
+            lcd.print("  IZQ");
+            while (steps <= 500) {
+                reversa();
+            }
+            detener();
+        } else if (digitalRead(LIMIT_DERECHO) == 1 ){
+            lcd.setCursor(1, 0);
+            lcd.print("           DER");
+            while (steps <= 500) {
+                reversa();
+            }
+            detener();
+        }
+        steps = pos;
+    }
+}
+
 
 
 //******************************************
@@ -762,20 +805,10 @@ void alinear() {
         /*if (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2)) > 1.5 ) {
             while (getSharpCorta(SHARP_B2) < getSharpCorta(SHARP_B1)) {
                 vueltaDerecha();
-                while (Lack) {
-                    detener();
-                    lackOfProgress();
-                    return;
-                }
             }
             detener();
             while (getSharpCorta(SHARP_B1) < getSharpCorta(SHARP_B2)) {
                 vueltaIzquierda();
-                while (Lack) {
-                    detener();
-                    lackOfProgress();
-                    return;
-                }
             }
             detener();
         }*/
@@ -803,20 +836,10 @@ void alinear() {
         /*if (abs(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2)) > 1.5 ) {
             while (getSharpCorta(SHARP_D2) < getSharpCorta(SHARP_D1)) {
                 vueltaIzquierda();
-                while (Lack) {
-                    detener();
-                    lackOfProgress();
-                    return;
-                }
             }
             detener();
             while (getSharpCorta(SHARP_D1) < getSharpCorta(SHARP_D2)) {
                 vueltaDerecha();
-                while (Lack) {
-                    detener();
-                    lackOfProgress();
-                    return;
-                }
             }
             detener();
         }*/
@@ -1122,21 +1145,11 @@ void vueltaAtras() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            while (Lack) {
-                detener();
-                lackOfProgress();
-                return;
-            }
         }
         detener();
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            while (Lack) {
-                detener();
-                lackOfProgress();
-                return;
-            }
         }
 
         detener();
@@ -1538,9 +1551,9 @@ void moverCuadro() {
         }
         izqPID.Compute();
         derPID.Compute();
-
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
+        checarLimit();
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1638,8 +1651,6 @@ void moverCuadro() {
 
                     velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
                 }
-                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 lcd.print("111111111");
                 while (vec.y() > 10.0) {
@@ -1853,6 +1864,7 @@ void moverCuadro() {
 
             velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
             checarInterr();
+            checarLimit();
         }
     }
 
@@ -1874,6 +1886,7 @@ void moverCuadro() {
 
         velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
         checarInterr();
+        checarLimit();
     }
     detener();
     checarColor();
@@ -1887,12 +1900,6 @@ void reversaCuadro() {
     while (steps <= 4800) {
         lcd.setCursor(0, 1);
         lcd.print(steps);
-        /*while (Lack) {
-            detener();
-            lackOfProgress();
-            return;
-        }*/
-
         /*if(getAngulo() > 320)
             inDer = - (360 - getAngulo());
         else
@@ -1934,8 +1941,10 @@ void absoluteMove(char cLado) {
             y_actual--;
             vueltaDer();
             checarInterr();
+            checarLimit();
             vueltaDer();
             checarInterr();
+            checarLimit();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -1966,8 +1975,10 @@ void absoluteMove(char cLado) {
             x_actual++;
             vueltaDer();
             checarInterr();
+            checarLimit();
             vueltaDer();
             checarInterr();
+            checarLimit();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -1996,8 +2007,10 @@ void absoluteMove(char cLado) {
             y_actual++;
             vueltaDer();
             checarInterr();
+            checarLimit();
             vueltaDer();
             checarInterr();
+            checarLimit();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -2056,8 +2069,10 @@ void absoluteMove(char cLado) {
             x_actual--;
             vueltaDer();
             checarInterr();
+            checarLimit();
             vueltaDer();
             checarInterr();
+            checarLimit();
             //vueltaAtras();
             alinear();
             moverCuadro();
@@ -3032,8 +3047,10 @@ void resolverLaberinto() {
                 }
                 vueltaDer();
                 checarInterr();
+                checarLimit();
                 vueltaDer();
                 checarInterr();
+                checarLimit();
                 moverCuadro();
                 checarLasts();
             }
@@ -3144,8 +3161,10 @@ void resolverLaberinto() {
                     }
                     vueltaDer();
                     checarInterr();
+                    checarLimit();
                     vueltaDer();
                     checarInterr();
+                    checarLimit();
                     moverCuadro();
                     checarLasts();
                 }
@@ -3720,8 +3739,8 @@ void setup() {
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     //pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //attachInterrupt(digitalPinToInterrupt(InterruptNano), Victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
-    //attachInterrupt(digitalPinToInterrupt(InterruptBoton), Lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
+    //attachInterrupt(digitalPinToInterrupt(InterruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+    //attachInterrupt(digitalPinToInterrupt(InterruptBoton), lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
@@ -3804,7 +3823,7 @@ void setup() {
     else
         Preferencia = IZQUIERDA;
     pinMode(ENABLE_DERECHA_ADELANTE, OUTPUT);
-    pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
+    pinMode(ENABLE_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(ENABLE_DERECHA_ATRAS, OUTPUT);
     pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
 }
