@@ -132,8 +132,8 @@ byte y_recorrer[50];
 
 const int VEL_MOTOR                 =   180;
 
-const int VEL_MOTOR_RAMPA           =   235;
-const int VEL_MOTOR_RAMPA_ENCODER   =   218;
+const int VEL_MOTOR_RAMPA           =   240;
+const int VEL_MOTOR_RAMPA_ENCODER   =   230;
 
 const int VEL_MOTOR_VUELTA          =   108;
 const int VEL_MOTOR_VUELTA_ENCODER  =   105;
@@ -154,7 +154,7 @@ bool permisoRampa   = true;
 
 bool factibleSubir = false;
 
-const float PRECISION_IMU = 3.0;
+const float PRECISION_IMU = 4.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
@@ -325,7 +325,7 @@ const int LIMIT_DERECHO = 32;
 #define S2 12
 #define S3 11
 #define sensorOut 13
-#define BOTON_COLOR 35
+#define BOTON_COLOR 22
 
 const byte ESTADO_OFF           = 0;
 const byte ESTADO_NEGRO         = 1;
@@ -475,7 +475,7 @@ void detener() {
     digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
     digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 
-    delay(20);
+    delay(300);
 
     digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
     digitalWrite(Pin1_DERECHA_ATRAS, LOW);
@@ -722,7 +722,7 @@ void checarLimit() {
             }
             detener();
         }
-        steps = pos;
+        steps = pos - 600;
     }
 }
 
@@ -3396,7 +3396,7 @@ void calibrarColor() {
         lcd.setCursor(0, 0);
         lcd.print("   Calibrar...");
         BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
+        if(BotonColor == 0) {
             //*Limpia la pantalla
             EstadoColor = ESTADO_NEGRO;
             delay(500);
@@ -3408,7 +3408,7 @@ void calibrarColor() {
     while(EstadoColor == ESTADO_NEGRO) {
         ////lcd.println("Calibrar Negro");
         BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
+        if(BotonColor == 0) {
             setFiltro('N');
             iN_NEGRO = getColor();
 
@@ -3434,7 +3434,7 @@ void calibrarColor() {
     while(EstadoColor == ESTADO_CHECKPOINT) {
         ////lcd.println("Calibrar Checkpoint");
         BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
+        if(BotonColor == 0) {
             setFiltro('N');
             iN_CHECKPOINT = getColor();
 
@@ -3698,7 +3698,7 @@ void lackOfProgress() {
   }
   }
   void imprimirValores1() {
-      while (digitalRead(BOTON_COLOR) != 1) {
+      while (digitalRead(BOTON_COLOR) != 0) {
           lcd.clear();
           lcd.setCursor(5, 0);
           lcd.print(getSharpCorta(SHARP_C));
@@ -3709,7 +3709,7 @@ void lackOfProgress() {
   }
 
   void imprimirValores2() {
-while (digitalRead(BOTON_COLOR) != 1) {
+while (digitalRead(BOTON_COLOR) != 0) {
           lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(getSharpCorta(SHARP_B2));
@@ -3734,7 +3734,7 @@ void setup() {
     pinMode(Pin2_DERECHA_ATRAS, OUTPUT);
     pinMode(Pin2_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(Pin2_IZQUIERDA_ATRAS, OUTPUT);
-    delay(1000);
+    delay(2000);
 
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     //pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
@@ -3759,7 +3759,7 @@ void setup() {
     lcd.backlight();
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
-    lcd.print("     E V A");
+    lcd.print("   T E O R I A");
     servo.attach(servoPin);
     if(servo.read() < 90)
     servo.write(0);
@@ -3800,7 +3800,7 @@ void setup() {
     lcd.home();
     lcd.print("QUIERE CALIBRAR");
     delay(1000);
-    if (digitalRead(BOTON_COLOR) == 1) {
+    if (digitalRead(BOTON_COLOR) == 0) {
         lcd.clear();
         lcd.home();
         delay(1000);
@@ -3808,9 +3808,9 @@ void setup() {
         delay(2000);
         calibrarColor();
         delay(500);
-        //imprimirValores1();
-        //delay(500);
-        //imprimirValores2();
+        imprimirValores1();
+        delay(500);
+        imprimirValores2();
     } else {
         leerValores();
         lcd.clear();
