@@ -21,8 +21,8 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 #include <Servo.h>
 #include <PID_v1.h>
 #include <EEPROM.h>
@@ -171,9 +171,6 @@ const int SHARP_B2  = 0; // CONFIRMADO
 const int SHARP_C   = 2; // CONFIRMADO
 const int SHARP_D1  = 9; // CONFIRMADO
 const int SHARP_D2  = 1; // CONFIRMADO
-
-const int SHARP_LA  = 12;
-const int SHARP_LC  = 11;
 
 
 //******************************************
@@ -425,113 +422,117 @@ float getAngulo() {
 
 //********************************************
 //----------------- MOTORES ------------------
-#define Pin1_DERECHA_ADELANTE 50   // PWM
-#define Pin2_DERECHA_ADELANTE 52   // PWM
+#define Pin1_DERECHA_ADELANTE 50
+#define Pin2_DERECHA_ADELANTE 52
+#define ENABLE_DERECHA_ADELANTE 7   // PWM
 
-#define Pin1_DERECHA_ATRAS 42     // PWM
-#define Pin2_DERECHA_ATRAS 44    // PWM
+#define Pin1_DERECHA_ATRAS 42
+#define Pin2_DERECHA_ATRAS 44
+#define ENABLE_DERECHA_ATRAS 5   // PWM
 
-#define Pin1_IZQUIERDA_ADELANTE 46   // PWM
-#define Pin2_IZQUIERDA_ADELANTE 48   // PWM
+#define Pin1_IZQUIERDA_ADELANTE 46
+#define Pin2_IZQUIERDA_ADELANTE 48
+#define ENABLE_IZQUIERDA_ADELANTE 6   // PWM
 
-#define Pin1_IZQUIERDA_ATRAS 40     // PWM
-#define Pin2_IZQUIERDA_ATRAS 38     // PWM
+#define Pin1_IZQUIERDA_ATRAS 40
+#define Pin2_IZQUIERDA_ATRAS 38
+#define ENABLE_IZQUIERDA_ATRAS 4   // PWM
 
 
 void avanzar() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 0);
-    analogWrite(Pin1_DERECHA_ATRAS, 0);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin1_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, LOW);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 255);
-    analogWrite(Pin2_DERECHA_ATRAS, 255);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin2_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin2_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 }
 
 void reversa() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 255);
-    analogWrite(Pin1_DERECHA_ATRAS, 255);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin1_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin1_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, HIGH);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 0);
-    analogWrite(Pin2_DERECHA_ATRAS, 0);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin2_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin2_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, LOW);
 }
 
 void detener() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 255);
-    analogWrite(Pin1_DERECHA_ATRAS, 255);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin1_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin1_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, HIGH);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 255);
-    analogWrite(Pin2_DERECHA_ATRAS, 255);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin2_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin2_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 
     delay(20);
 
-    analogWrite(Pin1_DERECHA_ADELANTE, 0);
-    analogWrite(Pin1_DERECHA_ATRAS, 0);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin1_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, LOW);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 0);
-    analogWrite(Pin2_DERECHA_ATRAS, 0);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin2_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin2_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, LOW);
 }
 
 void vueltaDerecha() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 255);
-    analogWrite(Pin1_DERECHA_ATRAS, 255);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin1_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin1_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, LOW);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 0);
-    analogWrite(Pin2_DERECHA_ATRAS, 0);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin2_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin2_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 }
 
 void vueltaIzquierda() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 0);
-    analogWrite(Pin1_DERECHA_ATRAS, 0);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin1_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, HIGH);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 255);
-    analogWrite(Pin2_DERECHA_ATRAS, 255);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin2_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin2_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, LOW);
 }
 
 void horizontalDerecha() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 255);
-    analogWrite(Pin1_DERECHA_ATRAS, 0);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin1_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin1_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, HIGH);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 0);
-    analogWrite(Pin2_DERECHA_ATRAS, 255);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin2_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin2_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, LOW);
 }
 
 void horizontalIzquierda() {
-    analogWrite(Pin1_DERECHA_ADELANTE, 0);
-    analogWrite(Pin1_DERECHA_ATRAS, 255);
-    analogWrite(Pin1_IZQUIERDA_ADELANTE, 255);
-    analogWrite(Pin1_IZQUIERDA_ATRAS, 0);
+    digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
+    digitalWrite(Pin1_DERECHA_ATRAS, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ADELANTE, HIGH);
+    digitalWrite(Pin1_IZQUIERDA_ATRAS, LOW);
 
-    analogWrite(Pin2_DERECHA_ADELANTE, 255);
-    analogWrite(Pin2_DERECHA_ATRAS, 0);
-    analogWrite(Pin2_IZQUIERDA_ADELANTE, 0);
-    analogWrite(Pin2_IZQUIERDA_ATRAS, 255);
+    digitalWrite(Pin2_DERECHA_ADELANTE, HIGH);
+    digitalWrite(Pin2_DERECHA_ATRAS, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ADELANTE, LOW);
+    digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 }
 
 
@@ -575,7 +576,7 @@ float getSharpCorta(int iSharp) {
 
 float getSharpLarga(int iSharp) {
     // resultado = 20472 * pow(sharpRead[4], -1.045
-    int sharpRead[30];
+    /*int sharpRead[30];
     float promedio = 0;
     float resultado;
     for(int i = 0; i < 30; i++) {
@@ -603,8 +604,8 @@ float getSharpLarga(int iSharp) {
         resultado = 17921 * pow(promedio, -1.072);
     else
         resultado = -1;
-
-    return resultado;
+*/
+    return -1;
 }
 
 
@@ -635,115 +636,82 @@ void Lack_Interrupt() {
 }
 
 void checarInterr() {
-    unsigned long pos = 0;
-    if(inFire == true) {
-        if (!cuadros[x_actual][y_actual][z_actual].getMlx()) {
-            if(digitalRead(InterruptDefiner) == 0) {
-                lcd.clear();
-                lcd.print("0000000");
-                detener();
-                pos = steps;
-                steps = 0;
-                while (steps <= 500) {
-                    reversa();
-                    lcd.home();
-                    lcd.print(steps);
-                }
-                detener();
-
-                for (int i = 0; i < 8; i++) {
-                    lcd.noBacklight();
-                    delay(100);
-                    lcd.backlight();
-                    delay(100);
-                }
-                vueltaIzq();
-                delay(250);
-                if(first_victim)
-                {
-                    servoMotor();
-                    delay(1200);
-                    servoMotor();
-                }
-                else
-                servoMotor();
-                vueltaDer();
-                for (int i = 0; i < 2; i++) {
-                    lcd.noBacklight();
-                    delay(100);
-                    lcd.backlight();
-                    delay(100);
-                }
-                inFire = false;
-                steps = pos;
-            } else if (digitalRead(InterruptDefiner) == 1){
-                lcd.clear();
-                lcd.print("111111");
-                detener();
-                pos = steps;
-                steps = 0;
-                while (steps <= 500) {
-                    reversa();
-                    lcd.home();
-                    lcd.print(steps);
-                }
-                detener();
-                for (int i = 0; i < 8; i++) {
-                    lcd.noBacklight();
-                    delay(100);
-                    lcd.backlight();
-                    delay(100);
-                }
-                vueltaDer();
-                if(first_victim)
-                {
-                    servoMotor();
-                    delay(600);
-                    servoMotor();
-                }
-                else
-                servoMotor();
-                vueltaIzq();
-                for (int i = 0; i < 2; i++) {
-                    lcd.noBacklight();
-                    delay(100);
-                    lcd.backlight();
-                    delay(100);
-                }
-                inFire = false;
-                steps = pos;
-            }
-            cuadros[x_actual][y_actual][z_actual].setMlx(true);
+    if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getMlx()) {
+        detener();
+        lcd.clear();
+        for (int i = 0; i < 8; i++) {
+            lcd.noBacklight();
+            delay(100);
+            lcd.backlight();
+            delay(100);
         }
-    }
-    inFire = false;
-    first_victim = false;
-}
+        unsigned long pos = steps;
+        steps = 0;
 
+        if(digitalRead(InterruptDefiner) == 0) {
+            lcd.print("000000");
+            while (steps <= 500) {
+                reversa();
+            }
+            detener();
+            vueltaIzq();
+            delay(250);
+            servoMotor();
+            if(first_victim) {
+                delay(1000);
+                servoMotor();
+                first_victim = false;
+            }
+            vueltaDer();
+        } else if (digitalRead(InterruptDefiner) == 1){
+            lcd.print("111111");
+            while (steps <= 500) {
+                reversa();
+            }
+            detener();
+            vueltaDer();
+            servoMotor();
+            if(first_victim) {
+                delay(1000);
+                servoMotor();
+                first_victim = false;
+            }
+            vueltaIzq();
+        }
+        cuadros[x_actual][y_actual][z_actual].setMlx(true);
+        inFire = false;
+        steps = pos;
+    }
+}
 
 
 //******************************************
 //--------------- MOVIMIENTO ---------------
 void velocidad(int ai, int ad, int ci, int cd) {
-    /*if(ai >= 255)
-        MotorAI -> setSpeed(255);
-    else
-        MotorAI -> setSpeed(ai);
+    /*analogWrite(ENABLE_DERECHA_ADELANTE, 145);
+    analogWrite(ENABLE_DERECHA_ATRAS, 155);
+    analogWrite(ENABLE_IZQUIERDA_ADELANTE, 155);
+    analogWrite(ENABLE_IZQUIERDA_ATRAS, 155);*/
 
-    if(ad >= 255)
-        MotorAD -> setSpeed(255);
+    if(ad > 255)
+        analogWrite(ENABLE_DERECHA_ADELANTE, 255);
     else
-        MotorAD -> setSpeed(ad);
+        analogWrite(ENABLE_DERECHA_ADELANTE, ad);
 
-    if(ci >= 255)
-        MotorCI -> setSpeed(255);
+    if(cd > 255)
+        analogWrite(ENABLE_DERECHA_ATRAS, 255);
     else
-        MotorCI -> setSpeed(ci);
+        analogWrite(ENABLE_DERECHA_ATRAS, cd);
 
-    if(cd >= 255)
-        MotorCD -> setSpeed(255);
+    if(ai > 255)
+        analogWrite(ENABLE_IZQUIERDA_ADELANTE, 255);
     else
-        MotorCD -> setSpeed(cd);*/
+        analogWrite(ENABLE_IZQUIERDA_ADELANTE, ai);
+
+    if(ci > 255)
+        analogWrite(ENABLE_IZQUIERDA_ATRAS, 255);
+    else
+        analogWrite(ENABLE_IZQUIERDA_ATRAS, ci);
 }
 
 void alinear() {
@@ -857,7 +825,7 @@ void alinear() {
 
     if (getSharpCorta(SHARP_A) < 20) {
         unsigned long inicio = millis();
-        while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5 && getSharpLarga(SHARP_LA) < 60)) {
+        while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5 /*&& getSharpLarga(SHARP_LA) < 60*/)) {
             while (getSharpCorta(SHARP_A) < 8.5) {
                 reversa();
                 if (millis() >= inicio + 1000) {
@@ -867,7 +835,7 @@ void alinear() {
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_A) > 9.5 && getSharpLarga(SHARP_LA) < 60) {
+            while (getSharpCorta(SHARP_A) > 9.5 /*&& getSharpLarga(SHARP_LA) < 60*/) {
                 avanzar();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -3835,6 +3803,10 @@ void setup() {
         Preferencia = DERECHA;
     else
         Preferencia = IZQUIERDA;
+    pinMode(ENABLE_DERECHA_ADELANTE, OUTPUT);
+    pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
+    pinMode(ENABLE_DERECHA_ATRAS, OUTPUT);
+    pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
 }
 
 void loop() {
