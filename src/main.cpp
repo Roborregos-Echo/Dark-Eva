@@ -131,16 +131,16 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   200;
+const int VEL_MOTOR                 =   210;
 
 const int VEL_MOTOR_RAMPA           =   240;
 const int VEL_MOTOR_RAMPA_ENCODER   =   230;
 
-const int VEL_MOTOR_VUELTA          =   150;
-const int VEL_MOTOR_VUELTA_ENCODER  =   150;
+const int VEL_MOTOR_VUELTA          =   145;
+const int VEL_MOTOR_VUELTA_ENCODER  =   145;
 
-const int VEL_MOTOR_ALINEAR          =   90;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   90;
+const int VEL_MOTOR_ALINEAR          =   85;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   85;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -152,7 +152,7 @@ unsigned long steps = 0;
 bool bajarRampa     = false;
 bool subirRampa     = false;
 
-const float PRECISION_IMU = 4.0;
+const float PRECISION_IMU = 4.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
@@ -755,22 +755,22 @@ void alinear() {
             detener();
         }
     } else if(getSharpCorta(SHARP_B1) < 20 && getUltrasonico('B') < 20) {
-        while (!(getSharpCorta(SHARP_B1) > 8 && getSharpCorta(SHARP_B1) < 10)) {
+        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             unsigned long inicio = millis();
             lcd.clear();
             lcd.print(4444);
-            while (getSharpCorta(SHARP_B1) < 8) {
+            while (getSharpCorta(SHARP_B1) < 6.5) {
                 lcd.clear();
                 lcd.print(5555);
                 horizontalIzquierda();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_B1) > 10) {
+            while (getSharpCorta(SHARP_B1) > 8.5) {
                 lcd.clear();
                 lcd.print(6666);
                 horizontalDerecha();
@@ -793,10 +793,10 @@ void alinear() {
             detener();
         }*/
     } else if(getSharpCorta(SHARP_D1) < 20 && getUltrasonico('D') < 20) {
-        while (!(getSharpCorta(SHARP_D1) > 8 && getSharpCorta(SHARP_D1) < 10)) {
+        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             unsigned long inicio = millis();
 
-            while (getSharpCorta(SHARP_D1) < 8) {
+            while (getSharpCorta(SHARP_D1) < 6.5) {
                 lcd.clear();
                 lcd.print(77777);
                 horizontalDerecha();
@@ -807,7 +807,7 @@ void alinear() {
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_D1) >  10) {
+            while (getSharpCorta(SHARP_D1) >  8.5) {
                 lcd.clear();
                 lcd.print(9999);
                 horizontalIzquierda();
@@ -834,9 +834,9 @@ void alinear() {
     if (getSharpCorta(SHARP_A) < 20 && getUltrasonico('A') < 20) {
         unsigned long inicio = millis();
         delay(50);
-        while (!(getSharpCorta(SHARP_A) > 8 && getSharpCorta(SHARP_A) < 10 && getUltrasonico('A') < 20)) {
+        while (!(getSharpCorta(SHARP_A) > 6.5 && getSharpCorta(SHARP_A) < 8.5 && getUltrasonico('A') < 20)) {
             inicio = millis();
-            while (getSharpCorta(SHARP_A) < 8) {
+            while (getSharpCorta(SHARP_A) < 6.5) {
                 lcd.clear();
                 lcd.print(75757575);
                 reversa();
@@ -847,7 +847,7 @@ void alinear() {
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_A) > 10 && getUltrasonico('A') < 20) {
+            while (getSharpCorta(SHARP_A) > 8.5) {
                 avanzar();
                 lcd.clear();
                 lcd.print(36363636);
