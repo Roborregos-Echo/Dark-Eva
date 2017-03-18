@@ -673,15 +673,15 @@ void checarLimit() {
         } else if (digitalRead(LIMIT_IZQUIERDO) == 1 ){
             lcd.setCursor(1, 0);
             lcd.print("  IZQ");
-            while (steps <= 500) {
-                reversa();
+            while (steps <= 300) {
+                horizontalDerecha();
             }
             detener();
         } else if (digitalRead(LIMIT_DERECHO) == 1 ){
             lcd.setCursor(1, 0);
             lcd.print("           DER");
-            while (steps <= 500) {
-                reversa();
+            while (steps <= 300) {
+                horizontalIzquierda();
             }
             detener();
         }
@@ -3545,6 +3545,9 @@ void lackOfProgress() {
   }
   }
   void imprimirValores1() {
+      lcd.clear();
+      lcd.print("     SHARPS");
+      delay(1000);
       while (digitalRead(BOTON_COLOR) != 0) {
           lcd.clear();
           lcd.setCursor(5, 0);
@@ -3553,6 +3556,7 @@ void lackOfProgress() {
           lcd.print(getSharpCorta(SHARP_A));
           delay(500);
       }
+      delay(500);
   }
 
   void imprimirValores2() {
@@ -3568,7 +3572,41 @@ while (digitalRead(BOTON_COLOR) != 0) {
       lcd.print(getSharpCorta(SHARP_D1));
       delay(500);
   }
+  delay(500);
 }
+
+   void imprimirValores3() {
+           lcd.clear();
+           lcd.print("  ULTRASONICOS");
+           delay(1000);
+       while(digitalRead(BOTON_COLOR) != 0){
+           lcd.clear();
+           lcd.setCursor(0, 0);
+           lcd.print(getUltrasonico('A'));
+           lcd.setCursor(7,0);
+           lcd.print(getUltrasonico('B'));
+           lcd.setCursor(0, 1);
+           lcd.print(getUltrasonico('C'));
+           lcd.setCursor(7,1);
+           lcd.print(getUltrasonico('D'));
+           delay(500);
+       }
+       delay(500);
+   }
+
+   void HacerPruebas() {
+       lcd.clear();
+       lcd.print(" Quieres hacer");
+       lcd.setCursor(0, 1);
+       lcd.print("    pruebas?");
+       delay(800);
+       if(digitalRead(BOTON_COLOR) == 0)
+       {
+           imprimirValores1();
+           imprimirValores2();
+           imprimirValores3();
+       }
+   }
 
 
 void setup() {
@@ -3579,6 +3617,7 @@ void setup() {
     lcd.setCursor(0, 1);
     lcd.print("   T E O R I A");
 
+    HacerPruebas();
     //pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //attachInterrupt(digitalPinToInterrupt(InterruptBoton), lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
