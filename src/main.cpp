@@ -1647,7 +1647,7 @@ void moverCuadro() {
                 detener();
                 delay(200);
                 vueltaDer();
-                delay( 200);
+                delay(200);
                 vueltaDer();
                 break;
         }
