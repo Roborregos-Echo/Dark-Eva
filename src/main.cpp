@@ -675,7 +675,8 @@ void checarLimit() {
             while (steps <= 300) {
                 reversa();
             }
-            while (steps <= 600) {
+            detener();
+            while (steps <= 900) {
                 horizontalDerecha();
             }
             detener();
@@ -685,7 +686,8 @@ void checarLimit() {
             while (steps <= 300) {
                 reversa();
             }
-            while (steps <= 600) {
+            detener();
+            while (steps <= 900) {
                 horizontalIzquierda();
             }
             detener();
