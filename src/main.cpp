@@ -136,11 +136,11 @@ const int VEL_MOTOR                 =   200;
 const int VEL_MOTOR_RAMPA           =   240;
 const int VEL_MOTOR_RAMPA_ENCODER   =   230;
 
-const int VEL_MOTOR_VUELTA          =   108;
-const int VEL_MOTOR_VUELTA_ENCODER  =   105;
+const int VEL_MOTOR_VUELTA          =   150;
+const int VEL_MOTOR_VUELTA_ENCODER  =   147;
 
-const int VEL_MOTOR_ALINEAR          =   80;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   77;
+const int VEL_MOTOR_ALINEAR          =   60;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   58;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -156,8 +156,8 @@ const float PRECISION_IMU = 3.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
-PID izqPID(&inIzq, &outIzq, &setIzq, 50, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 50, 0, 0, REVERSE);
+PID izqPID(&inIzq, &outIzq, &setIzq, 25, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 25, 0, 0, REVERSE);
 
 
 //******************************************
@@ -570,7 +570,7 @@ float getSharpCorta(int iSharp) {
 
     promedio /= 10;
 
-    if (promedio >= 75 && promedio <= 580)
+    if (promedio >= 175 && promedio <= 550)
         resultado = 2429 * (pow(promedio, -1.004));
     else
         resultado = 30;
@@ -722,10 +722,14 @@ void velocidad(int ai, int ad, int ci, int cd) {
 
 void alinear() {
     velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
-    if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20) {
+    if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20 && getUltrasonico('B') < 20 && getUltrasonico('D') < 20) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
+            lcd.clear();
+            lcd.print(1111);
             unsigned long inicio = millis();
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1) {
+                lcd.clear();
+                lcd.print(2222);
                 horizontalDerecha();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -735,6 +739,8 @@ void alinear() {
             detener();
             inicio = millis();
             while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1) {
+                lcd.clear();
+                lcd.print(3333);
                 horizontalIzquierda();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -743,10 +749,14 @@ void alinear() {
             }
             detener();
         }
-    } else if(getSharpCorta(SHARP_B1) < 20) {
-        while (!(getSharpCorta(SHARP_B1) > 9.0 && getSharpCorta(SHARP_B1) < 10.0)) {
+    } else if(getSharpCorta(SHARP_B1) < 20 && getUltrasonico('B') < 20) {
+        while (!(getSharpCorta(SHARP_B1) > 8.5 && getSharpCorta(SHARP_B1) < 10.5)) {
             unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_B1) < 9) {
+            lcd.clear();
+            lcd.print(4444);
+            while (getSharpCorta(SHARP_B1) < 8.5) {
+                lcd.clear();
+                lcd.print(5555);
                 horizontalIzquierda();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -755,7 +765,9 @@ void alinear() {
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_B1) > 10) {
+            while (getSharpCorta(SHARP_B1) > 10.5) {
+                lcd.clear();
+                lcd.print(6666);
                 horizontalDerecha();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -775,10 +787,13 @@ void alinear() {
             }
             detener();
         }*/
-    } else if(getSharpCorta(SHARP_D1) < 20) {
-        while (!(getSharpCorta(SHARP_D1) > 9.0 && getSharpCorta(SHARP_D1) < 10.0)) {
+    } else if(getSharpCorta(SHARP_D1) < 20 && getUltrasonico('D') < 20) {
+        while (!(getSharpCorta(SHARP_D1) > 8.5 && getSharpCorta(SHARP_D1) < 10.5)) {
             unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_D1) < 9) {
+
+            while (getSharpCorta(SHARP_D1) < 8.5) {
+                lcd.clear();
+                lcd.print(77777);
                 horizontalDerecha();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -787,7 +802,9 @@ void alinear() {
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_D1) > 10) {
+            while (getSharpCorta(SHARP_D1) >  10.5) {
+                lcd.clear();
+                lcd.print(9999);
                 horizontalIzquierda();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -808,11 +825,13 @@ void alinear() {
         }*/
     }
 
-
-    if (getSharpCorta(SHARP_A) < 20) {
+    delay(50);
+    if (getSharpCorta(SHARP_A) < 20 && getUltrasonico('A') < 20) {
         unsigned long inicio = millis();
         while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5 /*&& getSharpLarga(SHARP_LA) < 60*/)) {
             while (getSharpCorta(SHARP_A) < 8.5) {
+                lcd.clear();
+                lcd.print(75757575);
                 reversa();
                 if (millis() >= inicio + 1000) {
                     detener();
@@ -823,6 +842,8 @@ void alinear() {
             inicio = millis();
             while (getSharpCorta(SHARP_A) > 9.5 /*&& getSharpLarga(SHARP_LA) < 60*/) {
                 avanzar();
+                lcd.clear();
+                lcd.print(36363636);
                 if (millis() >= inicio + 1000) {
                     detener();
                     return;
@@ -3648,7 +3669,7 @@ void setup() {
         lcd.clear();
         lcd.print("SUELTE EL BOTON");
         delay(800);
-        calibrarColor();
+        //calibrarColor();
         imprimirValores1();
         delay(500);
         imprimirValores2();
@@ -3673,7 +3694,38 @@ void setup() {
 }
 
 void loop() {
-    lcd.clear();
+    steps = 0;
+    while (steps <= 5800) {
+        movimientoDerecho();
+        checarInterr();
+        checarLimit();
+        lcd.clear();
+        lcd.print(steps);
+    }
+    detener();
+    delay(2000);
+    steps = 0;
+    while (steps <= 5600) {
+        movimientoDerecho();
+        checarInterr();
+        checarLimit();
+        lcd.clear();
+        lcd.print(steps);
+    }
+    detener();
+    delay(2000);
+    steps = 0;
+    while (steps <= 5400) {
+        movimientoDerecho();
+        checarInterr();
+        checarLimit();
+        lcd.clear();
+        lcd.print(steps);
+    }
+    detener();
+    delay(2000);
+    //movimientoDerecho();
+    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3700,5 +3752,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
