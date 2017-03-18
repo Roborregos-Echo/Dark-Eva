@@ -3641,28 +3641,14 @@ while (digitalRead(BOTON_COLOR) != 0) {
 
 void setup() {
     Serial.begin(9600);
-<<<<<<< HEAD
-
     lcd.begin();
     lcd.backlight();
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
     lcd.print("   T E O R I A");
 
-    /*pinMode(Pin1_DERECHA_ADELANTE, OUTPUT);
-    pinMode(Pin1_DERECHA_ATRAS, OUTPUT);
-    pinMode(Pin1_IZQUIERDA_ADELANTE, OUTPUT);
-    pinMode(Pin1_IZQUIERDA_ATRAS, OUTPUT);
-    pinMode(Pin2_DERECHA_ADELANTE, OUTPUT);
-    pinMode(Pin2_DERECHA_ATRAS, OUTPUT);
-    pinMode(Pin2_IZQUIERDA_ADELANTE, OUTPUT);
-    pinMode(Pin2_IZQUIERDA_ATRAS, OUTPUT);
-    delay(1000);
-
-=======
     //pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //attachInterrupt(digitalPinToInterrupt(InterruptBoton), lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
->>>>>>> 6a0d3ff0e8c9a415a0679fc8b041f991719f9019
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     //pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //attachInterrupt(digitalPinToInterrupt(InterruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
@@ -3689,26 +3675,12 @@ void setup() {
     pinMode(InterruptDefiner, INPUT);
     pinMode(BOTON_COLOR, INPUT);
 
-<<<<<<< HEAD
-    servo.attach(servoPin);
-    if(servo.read() < 90)
-    servo.write(0);*/
-
-    /*if(servo.read() >= 90)
-    servo.write(180);
-=======
-    lcd.begin();
-    lcd.backlight();
-    lcd.print("   ROBORREGOS");
-    lcd.setCursor(0, 1);
-    lcd.print("   T E O R I A");
-
     servo.attach(servoPin);
     if(servo.read() < 90)
         servo.write(0);
+
     if(servo.read() >= 90)
         servo.write(180);
->>>>>>> 6a0d3ff0e8c9a415a0679fc8b041f991719f9019
 
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
@@ -3758,13 +3730,6 @@ void setup() {
         Preferencia = DERECHA;
     else
         Preferencia = IZQUIERDA;
-<<<<<<< HEAD
-    pinMode(ENABLE_DERECHA_ADELANTE, OUTPUT);
-    pinMode(ENABLE_IZQUIERDA_ADELANTE, OUTPUT);
-    pinMode(ENABLE_DERECHA_ATRAS, OUTPUT);
-    pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);*/
-=======
-
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
     delay(1000);
@@ -3773,7 +3738,6 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(1000);
->>>>>>> 6a0d3ff0e8c9a415a0679fc8b041f991719f9019
 }
 
 void loop() {
