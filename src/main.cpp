@@ -3686,11 +3686,6 @@ void setup() {
     if (digitalRead(BOTON_COLOR) == 0) {
         lcd.clear();
         lcd.print("SUELTE EL BOTON");
-        delay(800);
-        calibrarColor();
-        imprimirValores1();
-        delay(500);
-        imprimirValores2();
     } else {
         leerValores();
         lcd.clear();
