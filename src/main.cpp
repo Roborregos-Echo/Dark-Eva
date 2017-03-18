@@ -194,6 +194,7 @@ const int SHARP_D2  = 1; // CONFIRMADO
 int primeraLectura_A, primeraLectura_C;
 int segundaLectura_A, segundaLectura_C;
 int faltante_CM;
+int faltanteVariable = 5;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -226,14 +227,16 @@ void primeraLectura() {
 void comprobarAvance() {
     if(primeraLectura_A != 0) {
         segundaLectura_A = getUltrasonico('A');
-        if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > 27 && abs(primeraLectura_A - segundaLectura_A) < 33)) {
+        if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > (30-(faltanteVariable+1)) &&
+        abs(primeraLectura_A - segundaLectura_A) < (30+(faltanteVariable+1)))) {
             faltante_CM = 0;
         } else {
             faltante_CM = 30 - abs(primeraLectura_A - segundaLectura_A);
         }
     } else if(primeraLectura_C != 0) {
         segundaLectura_C = getUltrasonico('C');
-        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > 27 && abs(primeraLectura_C - segundaLectura_C) < 33)) {
+        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > (30-(faltanteVariable+1)) &&
+        abs(primeraLectura_C - segundaLectura_C) < (30+(faltanteVariable+1)))) {
             faltante_CM = 0;
         } else {
             faltante_CM = 30 - abs(primeraLectura_C - segundaLectura_C);
@@ -3726,7 +3729,14 @@ while (digitalRead(BOTON_COLOR) != 0) {
 
 void setup() {
     Serial.begin(9600);
-    pinMode(Pin1_DERECHA_ADELANTE, OUTPUT);
+
+    lcd.begin();
+    lcd.backlight();
+    lcd.print("   ROBORREGOS");
+    lcd.setCursor(0, 1);
+    lcd.print("   T E O R I A");
+
+    /*pinMode(Pin1_DERECHA_ADELANTE, OUTPUT);
     pinMode(Pin1_DERECHA_ATRAS, OUTPUT);
     pinMode(Pin1_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(Pin1_IZQUIERDA_ATRAS, OUTPUT);
@@ -3734,7 +3744,7 @@ void setup() {
     pinMode(Pin2_DERECHA_ATRAS, OUTPUT);
     pinMode(Pin2_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(Pin2_IZQUIERDA_ATRAS, OUTPUT);
-    delay(2000);
+    delay(1000);
 
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
     //pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
@@ -3755,17 +3765,11 @@ void setup() {
 
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
-    lcd.begin();
-    delay(3000);
-    lcd.backlight();
-    lcd.print("   ROBORREGOS");
-    lcd.setCursor(0, 1);
-    lcd.print("   T E O R I A");
     servo.attach(servoPin);
     if(servo.read() < 90)
-    servo.write(0);
+    servo.write(0);*/
 
-    if(servo.read() >= 90)
+    /*if(servo.read() >= 90)
     servo.write(180);
 
     izqPID.SetMode(AUTOMATIC);
@@ -3825,11 +3829,22 @@ void setup() {
     pinMode(ENABLE_DERECHA_ADELANTE, OUTPUT);
     pinMode(ENABLE_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(ENABLE_DERECHA_ATRAS, OUTPUT);
-    pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
+    pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);*/
 }
 
 void loop() {
     lcd.clear();
+    lcd.print("    Primera");
+    delay(2000);
+    primeraLectura();
+    lcd.clear();
+    lcd.print("       Ya");
+    delay(1500);
+    comprobarAvance();
+    lcd.clear();
+    lcd.print("      "+  String(faltante_CM));
+    delay(1000);
+    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3856,5 +3871,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
