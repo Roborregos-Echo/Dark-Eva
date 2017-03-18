@@ -130,7 +130,7 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   180;
+const int VEL_MOTOR                 =   200;
 
 const int VEL_MOTOR_RAMPA           =   240;
 const int VEL_MOTOR_RAMPA_ENCODER   =   230;
@@ -154,12 +154,12 @@ bool permisoRampa   = true;
 
 bool factibleSubir = false;
 
-const float PRECISION_IMU = 4.0;
+const float PRECISION_IMU = 3.0;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer, inRam, outRam, setRam;
-PID izqPID(&inIzq, &outIzq, &setIzq, 10, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 10, 0, 0, REVERSE);
+PID izqPID(&inIzq, &outIzq, &setIzq, 50, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 50, 0, 0, REVERSE);
 //PID ramPID(&inRam, &outRam, &setRam, 30, 0, 0, REVERSE);
 
 
@@ -1551,7 +1551,7 @@ void moverCuadro() {
         }
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+        velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
         checarInterr();
         checarLimit();
     }
@@ -1625,7 +1625,7 @@ void moverCuadro() {
                     izqPID.Compute();
                     derPID.Compute();
 
-                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
                 }
                 detener();
                 delay(400);
@@ -1649,7 +1649,7 @@ void moverCuadro() {
                     izqPID.Compute();
                     derPID.Compute();
 
-                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
                 }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 lcd.print("111111111");
@@ -1771,7 +1771,7 @@ void moverCuadro() {
                     izqPID.Compute();
                     derPID.Compute();
 
-                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
                 }
                 detener();
                 alinearIMU();
@@ -1795,7 +1795,7 @@ void moverCuadro() {
                     izqPID.Compute();
                     derPID.Compute();
 
-                    velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+                    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
                 }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 lcd.print("111111111");
@@ -1862,7 +1862,7 @@ void moverCuadro() {
             izqPID.Compute();
             derPID.Compute();
 
-            velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+            velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
             checarInterr();
             checarLimit();
         }
@@ -1884,7 +1884,7 @@ void moverCuadro() {
         izqPID.Compute();
         derPID.Compute();
 
-        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);
+        velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
         checarInterr();
         checarLimit();
     }
@@ -1912,7 +1912,7 @@ void reversaCuadro() {
 
         izqPID.Compute();
         derPID.Compute();
-        velocidad(VEL_MOTOR + outIzq, VEL_MOTOR + outDer, VEL_MOTOR + outIzq, VEL_MOTOR + outDer);*/
+        velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);*/
     }
     detener();
 }
@@ -3829,7 +3829,22 @@ void setup() {
 }
 
 void loop() {
+    lcd.print(getAngulo());
+    avanzar();
+    if(getAngulo() > 320) {
+        inIzq = - (360 - getAngulo());
+        inDer = - (360 - getAngulo());
+    }
+    else {
+        inIzq = getAngulo();
+        inDer = getAngulo();
+    }
+    izqPID.Compute();
+    derPID.Compute();
+    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
     lcd.clear();
+
+    /*lcd.clear();
 
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -3856,5 +3871,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
