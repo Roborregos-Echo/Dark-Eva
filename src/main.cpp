@@ -674,6 +674,9 @@ void checarLimit() {
             lcd.setCursor(1, 0);
             lcd.print("  IZQ");
             while (steps <= 300) {
+                reversa();
+            }
+            while (steps <= 600) {
                 horizontalDerecha();
             }
             detener();
@@ -681,6 +684,9 @@ void checarLimit() {
             lcd.setCursor(1, 0);
             lcd.print("           DER");
             while (steps <= 300) {
+                reversa();
+            }
+            while (steps <= 600) {
                 horizontalIzquierda();
             }
             detener();
