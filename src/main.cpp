@@ -131,16 +131,16 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   200;
+const int VEL_MOTOR                 =   215;
 
 const int VEL_MOTOR_RAMPA           =   240;
 const int VEL_MOTOR_RAMPA_ENCODER   =   230;
 
-const int VEL_MOTOR_VUELTA          =   108;
-const int VEL_MOTOR_VUELTA_ENCODER  =   105;
+const int VEL_MOTOR_VUELTA          =   145;
+const int VEL_MOTOR_VUELTA_ENCODER  =   145;
 
-const int VEL_MOTOR_ALINEAR          =   80;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   77;
+const int VEL_MOTOR_ALINEAR          =   85;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   85;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -152,12 +152,12 @@ unsigned long steps = 0;
 bool bajarRampa     = false;
 bool subirRampa     = false;
 
-const float PRECISION_IMU = 3.0;
+const float PRECISION_IMU = 4.5;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
-PID izqPID(&inIzq, &outIzq, &setIzq, 50, 0, 0, DIRECT);
-PID derPID(&inDer, &outDer, &setDer, 50, 0, 0, REVERSE);
+PID izqPID(&inIzq, &outIzq, &setIzq, 15, 0, 0, DIRECT);
+PID derPID(&inDer, &outDer, &setDer, 15, 0, 0, REVERSE);
 
 
 //******************************************
@@ -465,7 +465,6 @@ void reversa() {
 
 void detener() {
     velocidad(255, 255, 255, 255);
-    delay(1);
 
     digitalWrite(Pin1_DERECHA_ADELANTE, HIGH);
     digitalWrite(Pin1_DERECHA_ATRAS, HIGH);
@@ -477,7 +476,7 @@ void detener() {
     digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
     digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 
-    delay(200);
+    delay(100);
 
     digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
     digitalWrite(Pin1_DERECHA_ATRAS, LOW);
@@ -569,7 +568,7 @@ float getSharpCorta(int iSharp) {
 
     promedio /= 10;
 
-    if (promedio >= 75 && promedio <= 580)
+    if (promedio >= 175 && promedio <= 550)
         resultado = 2429 * (pow(promedio, -1.004));
     else
         resultado = 30;
@@ -728,43 +727,52 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void alinear() {
-    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA_ENCODER, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
-    if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20) {
-        while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1) {
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+    if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20 && getUltrasonico('B') < 20 && getUltrasonico('D') < 20) {
+        while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
             unsigned long inicio = millis();
-            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1) {
+            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1.5) {
+                lcd.clear();
+                lcd.print(111111);
                 horizontalDerecha();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
+
             inicio = millis();
-            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1) {
+            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1.5) {
+                lcd.clear();
+                lcd.print(222222);
                 horizontalIzquierda();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
         }
-    } else if(getSharpCorta(SHARP_B1) < 20) {
-        while (!(getSharpCorta(SHARP_B1) > 9.0 && getSharpCorta(SHARP_B1) < 10.0)) {
+    } else if(getSharpCorta(SHARP_B1) < 20 && getUltrasonico('B') < 20) {
+        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_B1) < 9) {
+            while (getSharpCorta(SHARP_B1) < 6.5) {
+                lcd.clear();
+                lcd.print(333333);
                 horizontalIzquierda();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_B1) > 10) {
+            while (getSharpCorta(SHARP_B1) > 8.5) {
+                lcd.clear();
+                lcd.print(444444);
                 horizontalDerecha();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
@@ -782,21 +790,27 @@ void alinear() {
             }
             detener();
         }*/
-    } else if(getSharpCorta(SHARP_D1) < 20) {
-        while (!(getSharpCorta(SHARP_D1) > 9.0 && getSharpCorta(SHARP_D1) < 10.0)) {
+    } else if(getSharpCorta(SHARP_D1) < 20 && getUltrasonico('D') < 20) {
+        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_D1) < 9) {
+
+            while (getSharpCorta(SHARP_D1) < 6.5) {
+                lcd.clear();
+                lcd.print(555555);
                 horizontalDerecha();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
+
             inicio = millis();
-            while (getSharpCorta(SHARP_D1) > 10) {
+            while (getSharpCorta(SHARP_D1) >  8.5) {
+                lcd.clear();
+                lcd.print(666666);
                 horizontalIzquierda();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
@@ -815,29 +829,33 @@ void alinear() {
         }*/
     }
 
-
-    if (getSharpCorta(SHARP_A) < 20) {
+    delay(50);
+    if (getSharpCorta(SHARP_A) < 20 && getUltrasonico('A') < 20) {
         unsigned long inicio = millis();
-        while (!(getSharpCorta(SHARP_A) > 8.5 && getSharpCorta(SHARP_A) < 9.5 /*&& getSharpLarga(SHARP_LA) < 60*/)) {
-            while (getSharpCorta(SHARP_A) < 8.5) {
+        delay(50);
+        while (!(getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 9)) {
+            inicio = millis();
+            while (getSharpCorta(SHARP_A) < 7) {
+                lcd.clear();
+                lcd.print(777777);
                 reversa();
-                if (millis() >= inicio + 1000) {
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
             inicio = millis();
-            while (getSharpCorta(SHARP_A) > 9.5 /*&& getSharpLarga(SHARP_LA) < 60*/) {
+            while (getSharpCorta(SHARP_A) > 9) {
                 avanzar();
-                if (millis() >= inicio + 1000) {
+                lcd.clear();
+                lcd.print(888888);
+                if (millis() >= inicio + 800) {
                     detener();
                     return;
                 }
             }
             detener();
-            //lcd.home();
-            //lcd.print("ALINEAR AVANZAR");
         }
         detener();
     }
@@ -1623,7 +1641,7 @@ void movimientoDerecho(bool b) {
 
 void moverCuadro() {
     steps = 0;
-    while (steps <= 3600) {
+    while (steps <= 3400) {
         movimientoDerecho();
         checarInterr();
         checarLimit();
@@ -1658,7 +1676,7 @@ void moverCuadro() {
                 }
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
-                while (steps <= 3000) {
+                while (steps <= 2000) {
                     movimientoDerecho();
                 }
                 detener();
@@ -1670,7 +1688,7 @@ void moverCuadro() {
                 delay(200);
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
-                while (steps <= 5000) {
+                while (steps <= 2000) {
                     movimientoDerecho();
                 }
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1841,7 +1859,7 @@ void moverCuadro() {
     } else {
         steps = 0;
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-        while (steps <= 1000) {
+        while (steps <= 850) {
             movimientoDerecho();
             checarInterr();
             checarLimit();
@@ -1851,7 +1869,7 @@ void moverCuadro() {
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
     avanzar();
-    while (steps <= 1000) {
+    while (steps <= 850) {
         movimientoDerecho();
         checarInterr();
         checarLimit();
@@ -3635,6 +3653,7 @@ void lackOfProgress() {
   }
 
   void imprimirValores2() {
+       delay(1000);
 while (digitalRead(BOTON_COLOR) != 0) {
           lcd.clear();
       lcd.setCursor(0, 0);
@@ -3669,7 +3688,7 @@ while (digitalRead(BOTON_COLOR) != 0) {
        delay(500);
    }
 
-   void HacerPruebas() {
+   void hacerPruebas() {
        lcd.clear();
        lcd.print(" Quieres hacer");
        lcd.setCursor(0, 1);
@@ -3686,13 +3705,6 @@ while (digitalRead(BOTON_COLOR) != 0) {
 
 void setup() {
     Serial.begin(9600);
-    lcd.begin();
-    lcd.backlight();
-    lcd.print("   ROBORREGOS");
-    lcd.setCursor(0, 1);
-    lcd.print("   T E O R I A");
-
-    HacerPruebas();
     //pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //attachInterrupt(digitalPinToInterrupt(InterruptBoton), lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
@@ -3720,6 +3732,14 @@ void setup() {
     pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
     pinMode(InterruptDefiner, INPUT);
     pinMode(BOTON_COLOR, INPUT);
+
+    lcd.begin();
+    lcd.backlight();
+    lcd.print("   ROBORREGOS");
+    lcd.setCursor(0, 1);
+    lcd.print("   T E O R I A");
+
+    hacerPruebas();
 
     servo.attach(servoPin);
     if(servo.read() < 90)
@@ -3761,6 +3781,11 @@ void setup() {
     if (digitalRead(BOTON_COLOR) == 0) {
         lcd.clear();
         lcd.print("SUELTE EL BOTON");
+        delay(800);
+        calibrarColor();
+        imprimirValores1();
+        delay(500);
+        imprimirValores2();
     } else {
         leerValores();
         lcd.clear();
