@@ -131,7 +131,7 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   215;
+const int VEL_MOTOR                 =   220;
 
 const int VEL_MOTOR_RAMPA           =   240;
 const int VEL_MOTOR_RAMPA_ENCODER   =   230;
@@ -669,30 +669,33 @@ void checarLimit() {
                 reversa();
             }
             detener();
+            //TODO: PONER PARED
+            steps = 99999;
         } else if (digitalRead(LIMIT_IZQUIERDO) == 1 ){
             lcd.setCursor(1, 0);
             lcd.print("  IZQ");
-            while (steps <= 300) {
+            while (steps <= 500) {
                 reversa();
             }
             detener();
-            while (steps <= 900) {
+            while (steps <= 1000) {
                 horizontalDerecha();
             }
             detener();
+            steps = pos - 500;
         } else if (digitalRead(LIMIT_DERECHO) == 1 ){
             lcd.setCursor(1, 0);
             lcd.print("           DER");
-            while (steps <= 300) {
+            while (steps <= 500) {
                 reversa();
             }
             detener();
-            while (steps <= 900) {
+            while (steps <= 1000) {
                 horizontalIzquierda();
             }
             detener();
+            steps = pos - 500;
         }
-        steps = pos - 600;
     }
 }
 
@@ -1551,7 +1554,7 @@ void movimientoDerecho(bool b) {
 
 void moverCuadro() {
     steps = 0;
-    while (steps <= 3400) {
+    while (steps <= 3500) {
         movimientoDerecho();
         checarInterr();
         checarLimit();
