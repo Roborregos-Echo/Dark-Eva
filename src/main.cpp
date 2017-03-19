@@ -28,7 +28,7 @@
 #include <EEPROM.h>
 #include <NewPing.h>
 
-
+    
 
 //********************************************
 //********************************************
@@ -265,8 +265,7 @@ const byte BAJAR_SUBIR      = 3;
 const byte REGRESA_ARRIBA   = 4;
 const byte REGRESA_ABAJO    = 5;
 
-byte x_rampa[2];
-byte y_rampa[2];
+byte x_rampa, y_rampa;
 
 bool RampaA = false;
 bool RampaB = false;
@@ -287,7 +286,7 @@ byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
 byte RampaLastMove;
 
-byte rampaid = 0;
+bool rampaid = false;
 
 
 //******************************************
@@ -1285,6 +1284,97 @@ void setNewRampa() {
                 break;
         }
     }
+}
+
+
+void setNewPos2(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        y_actual += RampaDiff;
+        break;
+
+        case TO_EAST:
+        x_actual += RampaDiff;
+        break;
+
+        case TO_SOUTH:
+        y_actual -= RampaDiff;
+        break;
+
+        case TO_WEST:
+        x_actual -= RampaDiff;
+        break;
+    }
+}
+
+void setRampa2(){
+    switch(LastMove)
+    {
+        case TO_NORTH:
+        cuadros[x_actual][y_actual-1][z_actual].setEstado(RAMPA);
+        break;
+
+        case TO_EAST:
+        cuadros[x_actual-1][y_actual][z_actual].setEstado(RAMPA);
+        break;
+
+        case TO_SOUTH:
+        cuadros[x_actual][y_actual-1][z_actual].setEstado(RAMPA);
+        break;
+
+        case TO_WEST:
+        cuadros[x_actual+1][y_actual][z_actual].setEstado(RAMPA);
+        break;
+    }
+}
+
+void checarRampa2(){
+    if(subirRampa || bajarRampa)
+    {
+        lcd.clear();
+
+        // Determina si empezo abajo o arriba
+        if(firstFloor == 0) {
+            if(subirRampa)
+                firstFloor = ABAJO;
+
+            if(bajarRampa)
+                firstFloor = ARRIBA;
+        }
+
+        if(firstFloor == ABAJO)
+        {
+            if(subirRampa)
+            {
+                z_actual++;
+                setNewPos2();
+                setRampa2();
+            }
+            else
+            if(bajarRampa)
+            {
+                z_actual--;
+                setNewPos2();
+            }
+        }else if(firstFloor == ARRIBA)
+        {
+            if(subirRampa)
+            {
+                z_actual--;
+                setNewPos2();
+            }
+            else
+            if(bajarRampa)
+            {
+                z_actual++;
+                setNewPos2();
+                setRampa2();
+            }
+        }
+
+    }
+
 }
 
 void checarRampa() {
@@ -2412,9 +2502,9 @@ void verificarRampa() {
     for (int y=0; y<Y_MAX; y++) {
         for(int x=0; x<X_MAX; x++) {
             if(cuadros[x][y][z_actual].getEstado() == RAMPA) {
-                x_rampa[rampaid] = x;
-                y_rampa[rampaid] = y;
-                rampaid++;
+                x_rampa = x;
+                y_rampa = y;
+                rampaid = true;
             }
         }
     }
@@ -3087,34 +3177,11 @@ void resolverLaberinto() {
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
                 // GOTO RAMPA
-                int LowestRampa = 999;
-                int iRampa;
-
                 verificarRampa();
-                if (rampaid > 0)
+                if (rampaid)
                 {
-                    for(int i=0; i<rampaid; i++)
-                    {
-                        byte var = 0;
-                        Pathfinding(x_rampa[i], y_rampa[i], var);
-                        if(var < LowestRampa)
-                        {
-                            LowestRampa = var;
-                            iRampa = i;
-                        }
-                    }
                     byte var = 255;
-
-                    if(z_actual == 0)
-                        Piso1 = true;
-                    else
-                    if(z_actual == 1)
-                        Piso2 = true;
-                    else
-                    if(z_actual == 2)
-                        Piso3 = true;
-
-                    Pathfinding(x_rampa[iRampa], y_rampa[iRampa], var);
+                    Pathfinding(x_rampa, y_rampa, var);
                 }
                 else{
                 ////lcd.println("GOTO-INICIO");
