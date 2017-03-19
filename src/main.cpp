@@ -28,7 +28,7 @@
 #include <EEPROM.h>
 #include <NewPing.h>
 
-    
+
 
 //********************************************
 //********************************************
@@ -133,8 +133,8 @@ byte y_recorrer[50];
 
 const int VEL_MOTOR                 =   220;
 
-const int VEL_MOTOR_RAMPA           =   240;
-const int VEL_MOTOR_RAMPA_ENCODER   =   230;
+const int VEL_MOTOR_RAMPA           =   245;
+const int VEL_MOTOR_RAMPA_ENCODER   =   245;
 
 const int VEL_MOTOR_VUELTA          =   145;
 const int VEL_MOTOR_VUELTA_ENCODER  =   145;
@@ -145,6 +145,13 @@ const int VEL_MOTOR_ALINEAR_ENCODER  =   85;
 const int ENC1   = 18;
 const int ENC2   = 19;
 unsigned long steps = 0;
+
+const int MOV_FRENTE = 0;
+const int MOV_RAMPA_SUBIR = 1;
+const int MOV_RAMPA_BAJAR = 2;
+const int MOV_RAMPA_NO_SUBIR = 3;
+const int MOV_RAMPA_NO_BAJAR = 4;
+const int MOV_REVERSA = 5;
 
 
 //******************************************
@@ -1614,38 +1621,101 @@ void alinearIMU() {
     }
 }
 
-void movimientoDerecho() {
-    avanzar();
-    if(getAngulo() > 320) {
-        inIzq = - (360 - getAngulo());
-        inDer = - (360 - getAngulo());
-    } else {
-        inIzq = getAngulo();
-        inDer = getAngulo();
-    }
-    izqPID.Compute();
-    derPID.Compute();
-    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
-}
+void movimientoDerecho(int fuente) {
+    switch (fuente) {
+        case MOV_FRENTE:
+            avanzar();
+            if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            } else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+            izqPID.Compute();
+            derPID.Compute();
+            velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
+            break;
+        case MOV_RAMPA_SUBIR:
+            avanzar();
+            if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            } else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+            izqPID.Compute();
+            derPID.Compute();
+            velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+            break;
+        case MOV_RAMPA_BAJAR:
+            avanzar();
+            if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            }
+            else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+            izqPID.Compute();
+            derPID.Compute();
 
-void movimientoDerecho(bool b) {
-    avanzar();
-    if(getAngulo() > 320) {
-        inIzq = - (360 - getAngulo());
-        inDer = - (360 - getAngulo());
-    } else {
-        inIzq = getAngulo();
-        inDer = getAngulo();
+            velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+            break;
+        case MOV_RAMPA_NO_SUBIR:
+            reversa();
+            /*if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            }
+            else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+            izqPID.Compute();
+            derPID.Compute();*/
+
+            velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+            break;
+        case MOV_RAMPA_NO_BAJAR:
+            reversa();
+            if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            }
+            else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+            izqPID.Compute();
+            derPID.Compute();
+
+            velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+            break;
+        case MOV_REVERSA:
+            reversa();
+            /*if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            }
+            else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+            izqPID.Compute();
+            derPID.Compute();*/
+
+            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
+            break;
     }
-    izqPID.Compute();
-    derPID.Compute();
-    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
 }
 
 void moverCuadro() {
     steps = 0;
     while (steps <= 3500) {
-        movimientoDerecho();
+        movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
     }
@@ -1667,21 +1737,23 @@ void moverCuadro() {
 
             case SUBIR:
                 while (vec.y() < -10.0) {
-                    movimientoDerecho(true);
+                    movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 break;
 
             case SUBIR_BAJAR:
                 while (vec.y() < -10.0) {
-                    movimientoDerecho(true);
+                    movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 2000) {
-                    movimientoDerecho();
+                    movimientoDerecho(MOV_FRENTE);
                 }
+
                 detener();
                 delay(200);
                 alinearIMU();
@@ -1689,14 +1761,16 @@ void moverCuadro() {
                 delay(200);
                 vueltaDer();
                 delay(200);
+
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 2000) {
-                    movimientoDerecho();
+                    movimientoDerecho(MOV_FRENTE);
                 }
+
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 while (vec.y() > 10.0) {
-                    movimientoDerecho();
+                    movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 detener();
@@ -1704,21 +1778,9 @@ void moverCuadro() {
                 break;
 
             case REGRESA_ABAJO:
-            detener();
+                detener();
                 while (vec.y() < -10.0) {
-                    reversa();
-                    if(getAngulo() > 320) {
-                        inIzq = - (360 - getAngulo());
-                        inDer = - (360 - getAngulo());
-                    }
-                    else {
-                        inIzq = getAngulo();
-                        inDer = getAngulo();
-                    }
-                    izqPID.Compute();
-                    derPID.Compute();
-
-                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    movimientoDerecho(MOV_RAMPA_NO_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 detener();
@@ -1745,59 +1807,23 @@ void moverCuadro() {
 
             case BAJAR:
                 while (vec.y() > 10.0) {
-                    avanzar();
-                    if(getAngulo() > 320) {
-                        inIzq = - (360 - getAngulo());
-                        inDer = - (360 - getAngulo());
-                    }
-                    else {
-                        inIzq = getAngulo();
-                        inDer = getAngulo();
-                    }
-                    izqPID.Compute();
-                    derPID.Compute();
-
-                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 break;
 
             case BAJAR_SUBIR:
                 while (vec.y() > 10.0) {
-                    lcd.clear();
-                    lcd.print(vec.y());
-                    avanzar();
-                    if(getAngulo() > 320) {
-                        inIzq = - (360 - getAngulo());
-                        inDer = - (360 - getAngulo());
-                    }
-                    else {
-                        inIzq = getAngulo();
-                        inDer = getAngulo();
-                    }
-                    izqPID.Compute();
-                    derPID.Compute();
-
-                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 3000) {
-                    avanzar();
-                    if(getAngulo() > 320) {
-                        inIzq = - (360 - getAngulo());
-                        inDer = - (360 - getAngulo());
-                    }
-                    else {
-                        inIzq = getAngulo();
-                        inDer = getAngulo();
-                    }
-                    izqPID.Compute();
-                    derPID.Compute();
-
-                    velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
+                    movimientoDerecho(MOV_FRENTE);
                 }
+
                 detener();
                 alinearIMU();
                 delay(200);
@@ -1805,29 +1831,16 @@ void moverCuadro() {
                 delay(200);
                 vueltaDer();
                 delay(200);
+
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 3000) {
-                    movimientoDerecho();
+                    movimientoDerecho(MOV_FRENTE);
                 }
-                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-                lcd.print("111111111");
-                while (vec.y() < -10.0) {
-                    lcd.clear();
-                    lcd.print(vec.y());
-                    avanzar();
-                    if(getAngulo() > 320) {
-                        inIzq = - (360 - getAngulo());
-                        inDer = - (360 - getAngulo());
-                    }
-                    else {
-                        inIzq = getAngulo();
-                        inDer = getAngulo();
-                    }
-                    izqPID.Compute();
-                    derPID.Compute();
 
-                    velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+                vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                while (vec.y() < -10.0) {
+                    movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 detener();
@@ -1835,23 +1848,12 @@ void moverCuadro() {
                 break;
 
             case REGRESA_ARRIBA:
-            detener();
+                detener();
                 while (vec.y() > 10.0) {
-                    reversa();
-                    if(getAngulo() > 320) {
-                        inIzq = - (360 - getAngulo());
-                        inDer = - (360 - getAngulo());
-                    }
-                    else {
-                        inIzq = getAngulo();
-                        inDer = getAngulo();
-                    }
-                    izqPID.Compute();
-                    derPID.Compute();
-
-                    velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+                    movimientoDerecho(MOV_RAMPA_NO_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+
                 detener();
                 delay(200);
                 vueltaDer();
@@ -1862,8 +1864,8 @@ void moverCuadro() {
     } else {
         steps = 0;
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-        while (steps <= 850) {
-            movimientoDerecho();
+        while (steps <= 975) {
+            movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
         }
@@ -1872,8 +1874,8 @@ void moverCuadro() {
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
     avanzar();
-    while (steps <= 850) {
-        movimientoDerecho();
+    while (steps <= 975) {
+        movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
     }
@@ -1885,23 +1887,8 @@ void moverCuadro() {
 
 void reversaCuadro() {
     steps = 0;
-    reversa();
     while (steps <= 4800) {
-        lcd.setCursor(0, 1);
-        lcd.print(steps);
-        /*if(getAngulo() > 320)
-            inDer = - (360 - getAngulo());
-        else
-            inDer = getAngulo();
-
-        if(getAngulo() > 320)
-            inIzq = - (360 - getAngulo());
-        else
-            inIzq = getAngulo();
-
-        izqPID.Compute();
-        derPID.Compute();
-        velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);*/
+        movimientoDerecho(MOV_REVERSA);
     }
     detener();
 }
@@ -3807,6 +3794,7 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(1000);
+    alinear();
 }
 
 void loop() {
