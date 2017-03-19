@@ -28,7 +28,7 @@
 #include <EEPROM.h>
 #include <NewPing.h>
 
-    
+
 
 //********************************************
 //********************************************
@@ -1347,12 +1347,14 @@ void checarRampa2(){
                 z_actual++;
                 setNewPos2();
                 setRampa2();
+                PermisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
             {
                 z_actual--;
                 setNewPos2();
+                PermisoRampa = BAJAR;
             }
         }else if(firstFloor == ARRIBA)
         {
@@ -1360,6 +1362,7 @@ void checarRampa2(){
             {
                 z_actual--;
                 setNewPos2();
+                PermisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
@@ -1367,8 +1370,10 @@ void checarRampa2(){
                 z_actual++;
                 setNewPos2();
                 setRampa2();
+                PermisoRampa = BAJAR;
             }
         }
+
 
     }
 
