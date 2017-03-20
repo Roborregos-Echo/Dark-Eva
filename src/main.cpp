@@ -1284,6 +1284,20 @@ void checarRampa2() {
     if(subirRampa || bajarRampa) {
         lcd.clear();
 
+        if(x_last != 255)
+        {
+            x_last = 255;
+            y_last = 255;
+            Last = false;
+        }
+
+        if(x_last2 != 255)
+        {
+            x_last2 = 255;
+            y_last2 = 255;
+            Last2 = false;
+        }
+
         // Determina si empezo abajo o arriba
         if(firstFloor == 0) {
             if(subirRampa)
