@@ -1280,19 +1280,26 @@ void setRampa2() {
     }
 }
 
+
 void checarRampa2() {
     if(subirRampa || bajarRampa) {
         lcd.clear();
 
+        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
+
         if(x_last != 255)
         {
-            cuadros[x_last][y_last][z_actual].setEstado(SIN_RECORRER);
+            if(cuadros[x_last][y_last][z_actual].getEstado() != RECORRIDO)
+                cuadros[x_last][y_last][z_actual].setEstado(SIN_RECORRER);
+
             Last = false;
         }
 
         if(x_last2 != 255)
         {
-            cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
+            if(cuadros[x_last][y_last][z_actual].getEstado() != RECORRIDO)
+                cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
+                
             Last2 = false;
         }
 
