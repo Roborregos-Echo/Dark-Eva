@@ -2526,7 +2526,7 @@ void checarParedes() {
                 C_wall = true;
             }
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         lectura = getUltrasonico('B');
@@ -2537,7 +2537,7 @@ void checarParedes() {
         } else {
             B_wall = true;
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         lectura = getUltrasonico('A');
@@ -2548,7 +2548,7 @@ void checarParedes() {
         } else {
             A_wall = true;
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
@@ -2566,7 +2566,7 @@ void checarParedes() {
             }
         }
 
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         break;
@@ -2580,7 +2580,7 @@ void checarParedes() {
         } else {
             C_wall = true;
         }
-        if((lectura != 0 || lectura < 15))
+        if((lectura != 0 && lectura < 15))
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         lectura = getUltrasonico('B');
@@ -2591,7 +2591,7 @@ void checarParedes() {
         } else {
             B_wall = true;
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
 
@@ -2609,7 +2609,7 @@ void checarParedes() {
                 A_wall = true;
             }
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
@@ -2627,7 +2627,7 @@ void checarParedes() {
             }
         }
 
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         break;
@@ -2641,7 +2641,7 @@ void checarParedes() {
         } else {
             C_wall = true;
         }
-        if((lectura != 0 || lectura < 15))
+        if((lectura != 0 && lectura < 15))
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
@@ -2658,7 +2658,7 @@ void checarParedes() {
                 B_wall = true;
             }
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
@@ -2675,7 +2675,7 @@ void checarParedes() {
                 A_wall = true;
             }
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         lectura = getUltrasonico('D');
@@ -2686,7 +2686,7 @@ void checarParedes() {
         } else {
             D_wall = true;
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         break;
@@ -2707,7 +2707,7 @@ void checarParedes() {
             }
         }
 
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
 
@@ -2727,7 +2727,7 @@ void checarParedes() {
         }
 
 
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         lectura = getUltrasonico('A');
@@ -2739,7 +2739,7 @@ void checarParedes() {
             A_wall = true;
         }
 
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         lectura = getUltrasonico('D');
@@ -2750,7 +2750,7 @@ void checarParedes() {
         } else {
             D_wall = true;
         }
-        if(lectura != 0 || lectura < 15)
+        if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
         break;
     }
