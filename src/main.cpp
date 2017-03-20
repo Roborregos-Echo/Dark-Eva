@@ -766,8 +766,8 @@ void alinear() {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
             unsigned long inicio = millis();
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1.5) {
-                lcd.clear();
-                lcd.print(111111);
+                //lcd.clear();
+                //lcd.print(111111);
                 horizontalDerecha();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -778,8 +778,8 @@ void alinear() {
 
             inicio = millis();
             while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1.5) {
-                lcd.clear();
-                lcd.print(222222);
+                //lcd.clear();
+                //lcd.print(222222);
                 horizontalIzquierda();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -793,8 +793,8 @@ void alinear() {
         while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_B1) < 6.5) {
-                lcd.clear();
-                lcd.print(333333);
+                //lcd.clear();
+                //lcd.print(333333);
                 horizontalIzquierda();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -804,8 +804,8 @@ void alinear() {
             detener();
             inicio = millis();
             while (getSharpCorta(SHARP_B1) > 8.5) {
-                lcd.clear();
-                lcd.print(444444);
+                //lcd.clear();
+                //lcd.print(444444);
                 horizontalDerecha();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -829,8 +829,8 @@ void alinear() {
         while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_D1) < 6.5) {
-                lcd.clear();
-                lcd.print(555555);
+                //lcd.clear();
+                //lcd.print(555555);
                 horizontalDerecha();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -840,8 +840,8 @@ void alinear() {
             detener();
             inicio = millis();
             while (getSharpCorta(SHARP_D1) >  8.5) {
-                lcd.clear();
-                lcd.print(666666);
+                //lcd.clear();
+                //lcd.print(666666);
                 horizontalIzquierda();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -867,8 +867,8 @@ void alinear() {
         while (!(getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 9)) {
             inicio = millis();
             while (getSharpCorta(SHARP_A) < 7) {
-                lcd.clear();
-                lcd.print(777777);
+                //lcd.clear();
+                //lcd.print(777777);
                 reversa();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -879,8 +879,8 @@ void alinear() {
             inicio = millis();
             while (getSharpCorta(SHARP_A) > 9) {
                 avanzar();
-                lcd.clear();
-                lcd.print(888888);
+                //lcd.clear();
+                //lcd.print(888888);
                 if (millis() >= inicio + 800) {
                     detener();
                     return;
@@ -1557,6 +1557,7 @@ void alinearIMU() {
                     break;
             }
             steps = 0;
+            delay(50);
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
             if (alfa) {
@@ -1737,7 +1738,7 @@ void moverCuadro() {
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    if(vec.y() < -8.0) {
+    if(vec.y() < -6.5) {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
@@ -1753,7 +1754,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR:
-                while (vec.y() < -8.0) {
+                while (vec.y() < -6.5) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1807,7 +1808,7 @@ void moverCuadro() {
                 vueltaDer();
                 break;*/
         }
-    } else if(vec.y() > 8.0) {
+    } else if(vec.y() > 6.5) {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
@@ -1824,7 +1825,7 @@ void moverCuadro() {
                 break;
 
             case BAJAR:
-                while (vec.y() > 8.0) {
+                while (vec.y() > 6.5) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1893,8 +1894,8 @@ void moverCuadro() {
     steps = 0;
     avanzar();
     while (steps <= 975) {
-        movimientoDerecho(MOV_FRENTE);
-        checarInterr();
+        //movimientoDerecho(MOV_FRENTE);
+        //checarInterr();
         checarLimit();
     }
     detener();
