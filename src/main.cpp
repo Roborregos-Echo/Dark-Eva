@@ -44,7 +44,7 @@ void servoMotor();
 void vueltaIzq();
 void checarLimit();
 void velocidad(int ai, int ad, int ci, int cd);
-    
+
 
 
 //********************************************
@@ -277,7 +277,7 @@ byte x_rampa, y_rampa;
 bool RampaA = false;
 bool RampaB = false;
 
-byte PermisoRampa;
+byte permisoRampa;
 
 bool Piso1 = false;
 bool Piso2 = false;
@@ -1357,14 +1357,14 @@ void checarRampa2(){
                 z_actual++;
                 setNewPos2();
                 setRampa2();
-                PermisoRampa = SUBIR;
+                permisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
             {
                 z_actual--;
                 setNewPos2();
-                PermisoRampa = BAJAR;
+                permisoRampa = BAJAR;
             }
         }else if(firstFloor == ARRIBA)
         {
@@ -1372,7 +1372,7 @@ void checarRampa2(){
             {
                 z_actual--;
                 setNewPos2();
-                PermisoRampa = SUBIR;
+                permisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
@@ -1380,7 +1380,7 @@ void checarRampa2(){
                 z_actual++;
                 setNewPos2();
                 setRampa2();
-                PermisoRampa = BAJAR;
+                permisoRampa = BAJAR;
             }
         }
 
@@ -1405,12 +1405,12 @@ void checarRampa() {
         if(firstFloor == ABAJO) {
             if(subirRampa) {
                 if(z_actual == 0 && !Piso1) {
-                    PermisoRampa = SUBIR_BAJAR;
+                    permisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 0 && Piso1) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     if(!Piso2)
@@ -1419,19 +1419,19 @@ void checarRampa() {
                     z_actual += 2;
                     setNewRampa();
                 } else if(z_actual == 2) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     z_actual--;
                 }
             } else if(bajarRampa) {
                 if(z_actual==1 && !Piso2) {
-                    PermisoRampa = BAJAR_SUBIR;
+                    permisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 1 && Piso2) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     switch(LastMove) {
@@ -1469,7 +1469,7 @@ void checarRampa() {
                             break;
                     }
                 } else if(z_actual == 2) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     z_actual -= 2;
@@ -1478,12 +1478,12 @@ void checarRampa() {
         } else if(firstFloor == ARRIBA) {
             if(bajarRampa) {
                 if(z_actual == 0 && !Piso1) {
-                    PermisoRampa = BAJAR_SUBIR;
+                    permisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 0 && Piso1) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     if(!Piso2)
@@ -1492,19 +1492,19 @@ void checarRampa() {
                         z_actual += 2;
                     setNewRampa();
                 } else if(z_actual == 2) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     z_actual--;
                 }
             } else if(subirRampa) {
                 if(z_actual==1 && !Piso2) {
-                    PermisoRampa = SUBIR_BAJAR;
+                    permisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 1 && Piso2) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     switch(LastMove) {
@@ -1543,7 +1543,7 @@ void checarRampa() {
                             break;
                     }
                 } else if(z_actual == 2) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     z_actual -= 2;
@@ -1730,9 +1730,9 @@ void moverCuadro() {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
-        checarRampa();
+        checarRampa2();
 
-        switch (PermisoRampa) {
+        switch (permisoRampa) {
             case REGRESA_ARRIBA:
             case BAJAR_SUBIR:
             case BAJAR:
@@ -1799,9 +1799,9 @@ void moverCuadro() {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
-        checarRampa();
+        checarRampa2();
 
-        switch (PermisoRampa) {
+        switch (permisoRampa) {
             case REGRESA_ABAJO:
             case SUBIR_BAJAR:
             case SUBIR:
@@ -3793,12 +3793,12 @@ void setup() {
         Preferencia = IZQUIERDA;
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
-    delay(1000);
+    delay(1500);
     bno.begin();
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(1000);
+    delay(500);
     alinear();
 }
 
