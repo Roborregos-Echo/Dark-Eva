@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.3.2 --------------------------------
-//--------------------------- 19 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.3.5 --------------------------------
+//--------------------------- 20 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -136,11 +136,11 @@ const int VEL_MOTOR                 =   220;
 const int VEL_MOTOR_RAMPA           =   245;
 const int VEL_MOTOR_RAMPA_ENCODER   =   245;
 
-const int VEL_MOTOR_VUELTA          =   145;
-const int VEL_MOTOR_VUELTA_ENCODER  =   145;
+const int VEL_MOTOR_VUELTA          =   140;
+const int VEL_MOTOR_VUELTA_ENCODER  =   140;
 
-const int VEL_MOTOR_ALINEAR          =   85;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   85;
+const int VEL_MOTOR_ALINEAR          =   75;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   75;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -629,10 +629,6 @@ void checarInterr() {
             vueltaDer();
         } else if (digitalRead(interruptDefiner) == 1){
             lcd.print("111111");
-            while (steps <= 500) {
-                reversa();
-            }
-            detener();
             vueltaDer();
             servoMotor();
             if(first_victim) {
@@ -650,7 +646,16 @@ void checarInterr() {
 
 
 void checarLimit() {
-    if(digitalRead(LIMIT_IZQUIERDO) == 1 || digitalRead(LIMIT_DERECHO) == 1) {
+    bool izq = false;
+    bool der = false;
+
+    if(digitalRead(LIMIT_IZQUIERDO) == 1)
+        izq = true;
+
+    if(digitalRead(LIMIT_DERECHO) == 1)
+        der = true;
+
+    if(izq || der) {
         detener();
         lcd.clear();
         lcd.print("  LIMIT  ");
@@ -658,21 +663,21 @@ void checarLimit() {
         steps = 0;
         for (int i = 0; i < 4; i++) {
             lcd.noBacklight();
-            delay(100);
+            delay(50);
             lcd.backlight();
-            delay(100);
+            delay(50);
         }
 
-        if(digitalRead(LIMIT_IZQUIERDO) == 1 && digitalRead(LIMIT_DERECHO) == 1) {
+        if(izq && der) {
             lcd.setCursor(1, 0);
             lcd.print("  IZQ     DER ");
-            while (steps <= 500) {
+            while (steps <= 700) {
                 reversa();
             }
             detener();
             //TODO: PONER PARED
-            steps = 99999;
-        } else if (digitalRead(LIMIT_IZQUIERDO) == 1 ){
+            steps = 9999;
+        } else if (izq){
             lcd.setCursor(1, 0);
             lcd.print("  IZQ");
             while (steps <= 500) {
@@ -684,7 +689,7 @@ void checarLimit() {
             }
             detener();
             steps = pos - 500;
-        } else if (digitalRead(LIMIT_DERECHO) == 1 ){
+        } else if (der){
             lcd.setCursor(1, 0);
             lcd.print("           DER");
             while (steps <= 500) {
@@ -736,58 +741,58 @@ void alinear() {
 
     switch (iOrientacion) {
         case A_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
                 alfa = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
                 bravo = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
                 charlie = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
                 delta = true;
             break;
 
         case B_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
                 alfa = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
                 bravo = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('0'))
                 charlie = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
                 delta = true;
             break;
 
         case C_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
                 alfa = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
                 bravo = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
                 charlie = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
                 delta = true;
             break;
 
         case D_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
                 alfa = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
                 bravo = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
                 charlie = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
                 delta = true;
             break;
     }
@@ -947,165 +952,6 @@ void alinear() {
     }*/
 }
 
-void alinearViejo() {
-    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
-
-    if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20 && getUltrasonico('B') < 20 && getUltrasonico('D') < 20) {
-        while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
-            unsigned long inicio = millis();
-            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1.5) {
-                lcd.clear();
-                lcd.print(111111);
-                horizontalDerecha();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-
-            inicio = millis();
-            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1.5) {
-                lcd.clear();
-                lcd.print(222222);
-                horizontalIzquierda();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-        }
-    } else if(getSharpCorta(SHARP_B1) < 20 && getUltrasonico('B') < 20) {
-        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
-            unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_B1) < 6.5) {
-                lcd.clear();
-                lcd.print(333333);
-                horizontalIzquierda();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-            inicio = millis();
-            while (getSharpCorta(SHARP_B1) > 8.5) {
-                lcd.clear();
-                lcd.print(444444);
-                horizontalDerecha();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-        }
-
-        /*if (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2)) > 1.5 ) {
-            while (getSharpCorta(SHARP_B2) < getSharpCorta(SHARP_B1)) {
-                vueltaDerecha();
-            }
-            detener();
-            while (getSharpCorta(SHARP_B1) < getSharpCorta(SHARP_B2)) {
-                vueltaIzquierda();
-            }
-            detener();
-        }*/
-    } else if(getSharpCorta(SHARP_D1) < 20 && getUltrasonico('D') < 20) {
-        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
-            unsigned long inicio = millis();
-
-            while (getSharpCorta(SHARP_D1) < 6.5) {
-                lcd.clear();
-                lcd.print(555555);
-                horizontalDerecha();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-
-            inicio = millis();
-            while (getSharpCorta(SHARP_D1) >  8.5) {
-                lcd.clear();
-                lcd.print(666666);
-                horizontalIzquierda();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-        }
-        /*if (abs(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2)) > 1.5 ) {
-            while (getSharpCorta(SHARP_D2) < getSharpCorta(SHARP_D1)) {
-                vueltaIzquierda();
-            }
-            detener();
-            while (getSharpCorta(SHARP_D1) < getSharpCorta(SHARP_D2)) {
-                vueltaDerecha();
-            }
-            detener();
-        }*/
-    }
-
-    delay(50);
-    if (getSharpCorta(SHARP_A) < 20 && getUltrasonico('A') < 20) {
-        unsigned long inicio = millis();
-        delay(50);
-        while (!(getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 9)) {
-            inicio = millis();
-            while (getSharpCorta(SHARP_A) < 7) {
-                lcd.clear();
-                lcd.print(777777);
-                reversa();
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-            inicio = millis();
-            while (getSharpCorta(SHARP_A) > 9) {
-                avanzar();
-                lcd.clear();
-                lcd.print(888888);
-                if (millis() >= inicio + 800) {
-                    detener();
-                    return;
-                }
-            }
-            detener();
-        }
-        detener();
-    }
-
-    /*if (getSharpCorta(SHARP_C) < 14) {
-        //lcd.clear();
-        //lcd.home();
-        //lcd.print("SHARP C");
-        while (!(getSharpCorta(SHARP_C) > 8 && getSharpCorta(SHARP_C) < 10)) {
-            lcd.home();
-            lcd.print("1");
-            while (getSharpCorta(SHARP_C) < 8.5)
-                avanzar();
-            detener();
-            lcd.home();
-            lcd.print("2");
-            while (getSharpCorta(SHARP_C) > 9.5 && getSharpLarga(SHARP_LC) < 30) {
-                reversa();
-                lcd.clear();
-                lcd.setCursor(0, 1);
-                lcd.print(getSharpCorta(SHARP_C));
-            }
-            detener();
-            lcd.home();
-            lcd.print("3");
-        }
-    }*/
-}
 
 
 void vueltaIzq() {
@@ -2102,7 +1948,6 @@ void moverCuadro() {
     }
     detener();
     checarColor();
-    alinear();
 }
 
 
@@ -2116,6 +1961,7 @@ void reversaCuadro() {
 
 
 void absoluteMove(char cLado) {
+    alinear();
     switch (iOrientacion) {
         case A_NORTE:
         switch(cLado) {
@@ -2403,10 +2249,16 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if(x_destino == x_actual && y_destino == y_actual) {
             pathFinished = true;
-            lcd.setCursor(0, 1);
-            lcd.print("Sali rapido");
-            delay(200);
-            ////lcd.println("Sali rapidamente");
+            lcd.clear();
+            for (int i = 0; i < 8; i++) {
+                lcd.noBacklight();
+                delay(75);
+                lcd.backlight();
+                delay(75);
+            }
+            lcd.print(" T E O R I A ES");
+            lcd.print("P R A C T I C A");
+            delay(2000000);
         }
 
         for (int i = 0; i<4; i++)
@@ -3918,6 +3770,10 @@ while (digitalRead(BOTON_COLOR) != 0) {
            imprimirValores1();
            imprimirValores2();
            imprimirValores3();
+       } else {
+           leerValores();
+           lcd.clear();
+           lcd.print("VALORES ANADIDOS");
        }
    }
 
@@ -3925,9 +3781,8 @@ while (digitalRead(BOTON_COLOR) != 0) {
 void setup() {
     Serial.begin(9600);
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    delay(1000);
     //pinMode(interruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
@@ -3956,8 +3811,6 @@ void setup() {
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
     lcd.print("   T E O R I A");
-
-    hacerPruebas();
 
     servo.attach(servoPin);
     if(servo.read() < 90)
@@ -3991,24 +3844,8 @@ void setup() {
     z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
-    delay(1500);
-    lcd.clear();
-    lcd.print("QUIERE CALIBRAR?");
-    delay(800);
-
-    if (digitalRead(BOTON_COLOR) == 0) {
-        lcd.clear();
-        lcd.print("SUELTE EL BOTON");
-        delay(800);
-        calibrarColor();
-        imprimirValores1();
-        delay(500);
-        imprimirValores2();
-    } else {
-        leerValores();
-        lcd.clear();
-        lcd.print("VALORES ANADIDOS");
-    }
+    delay(1400);
+    hacerPruebas();
 
     if(digitalRead(switch_preferencia) == 0)
         Preferencia = DERECHA;
@@ -4016,12 +3853,12 @@ void setup() {
         Preferencia = IZQUIERDA;
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
-    delay(1500);
+    delay(1400);
     bno.begin();
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(500);
+    delay(350);
     //alinear();
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
@@ -4034,7 +3871,7 @@ void loop() {
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-    delay(200);
+    delay(150);
 
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
