@@ -44,7 +44,7 @@ void servoMotor();
 void vueltaIzq();
 void checarLimit();
 void velocidad(int ai, int ad, int ci, int cd);
-    
+
 
 
 //********************************************
@@ -1354,33 +1354,37 @@ void checarRampa2(){
         {
             if(subirRampa)
             {
-                z_actual++;
-                setNewPos2();
-                setRampa2();
-                PermisoRampa = SUBIR;
+              lcd.print("SUBIENDO");
+              z_actual++;
+              setNewPos2();
+              setRampa2();
+              PermisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
             {
-                z_actual--;
-                setNewPos2();
-                PermisoRampa = BAJAR;
+              lcd.print("BAJANDO");
+              z_actual--;
+              setNewPos2();
+              PermisoRampa = BAJAR;
             }
         }else if(firstFloor == ARRIBA)
         {
             if(subirRampa)
             {
-                z_actual--;
-                setNewPos2();
-                PermisoRampa = SUBIR;
+              lcd.print("SUBIENDO");
+              z_actual--;
+              setNewPos2();
+              PermisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
             {
-                z_actual++;
-                setNewPos2();
-                setRampa2();
-                PermisoRampa = BAJAR;
+              lcd.print("BAJANDO");
+              z_actual++;
+              setNewPos2();
+              setRampa2();
+              PermisoRampa = BAJAR;
             }
         }
 
