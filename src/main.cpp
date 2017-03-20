@@ -35,15 +35,14 @@
 //------------------ HEADERS -----------------
 //********************************************
 //********************************************
-void resolverLaberinto();
-void servoMotor();
-void checarColor();
-void lackOfProgress();
-void vueltaDer();
-void servoMotor();
-void vueltaIzq();
-void checarLimit();
 void velocidad(int ai, int ad, int ci, int cd);
+void resolverLaberinto();
+void lackOfProgress();
+void checarLimit();
+void checarColor();
+void servoMotor();
+void vueltaDer();
+void vueltaIzq();
 
 
 
@@ -125,7 +124,6 @@ bool A_wall, B_wall, C_wall, D_wall;
 byte ArrayCSR;
 byte x_recorrer[50];
 byte y_recorrer[50];
-
 
 
 //******************************************
@@ -617,22 +615,21 @@ void checarInterr() {
         steps = 0;
 
         if(digitalRead(interruptDefiner) == 0) {
-            lcd.print("000000");
+            lcd.print("VICTIMA DERECHA");
             vueltaIzq();
-            delay(200);
             servoMotor();
             if(first_victim) {
-                delay(900);
+                delay(800);
                 servoMotor();
                 first_victim = false;
             }
             vueltaDer();
         } else if (digitalRead(interruptDefiner) == 1){
-            lcd.print("111111");
+            lcd.print("VICTIMA IZQUIERDA");
             vueltaDer();
             servoMotor();
             if(first_victim) {
-                delay(900);
+                delay(800);
                 servoMotor();
                 first_victim = false;
             }
@@ -1154,84 +1151,6 @@ void vueltaDer() {
     }
 }
 
-void vueltaAtras() {
-    float posInicial, posFinal, limInf, limSup;
-    posInicial = getAngulo();
-    lcd.setCursor(8, 1);
-    lcd.print("Vuel Atr");
-    switch(iOrientacion) {
-        case A_NORTE:
-            posFinal = 180;
-            setIzq = 180;
-            setDer = 180;
-            break;
-
-        case B_NORTE:
-            posFinal = 90;
-            setIzq = 90;
-            setDer = 90;
-            break;
-
-        case C_NORTE:
-            posFinal = 0;
-            setIzq = 0;
-            setDer = 0;
-            break;
-
-        case D_NORTE:
-            posFinal = 270;
-            setIzq = 270;
-            setDer = 270;
-            break;
-    }
-
-    if (posFinal - PRECISION_IMU <= 0)
-        limInf = posFinal + 360 - PRECISION_IMU;
-    else
-        limInf = posFinal - PRECISION_IMU;
-
-    if (posFinal + PRECISION_IMU > 360)
-        limSup =  posFinal - 360 + PRECISION_IMU;
-    else
-        limSup = posFinal + PRECISION_IMU;
-
-    velocidad(VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA, VEL_MOTOR_VUELTA);
-    vueltaDerecha();
-
-    if(limSup > limInf) {
-        while(!(posInicial >= limInf && posInicial <= limSup)) {
-            posInicial = getAngulo();
-        }
-        detener();
-    } else {
-        while(!(posInicial >= limInf || posInicial <= limSup)) {
-            posInicial = getAngulo();
-        }
-        detener();
-    }
-    velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-    detener();
-
-    switch(iOrientacion) {
-        case A_NORTE:
-            iOrientacion = C_NORTE;
-            break;
-
-        case B_NORTE:
-            iOrientacion = D_NORTE;
-            break;
-
-        case C_NORTE:
-            iOrientacion = A_NORTE;
-            break;
-
-        case D_NORTE:
-            iOrientacion = B_NORTE;
-            break;
-    }
-}
-
-
 void setWall(byte x, byte y, byte z) {
     switch(LastMove) {
         case TO_NORTH:
@@ -1352,9 +1271,8 @@ void setNewRampa() {
 }
 
 
-void setNewPos2(){
-    switch(LastMove)
-    {
+void setNewPos2() {
+    switch(LastMove) {
         case TO_NORTH:
         y_actual += RampaDiff;
         break;
@@ -1373,9 +1291,8 @@ void setNewPos2(){
     }
 }
 
-void setRampa2(){
-    switch(LastMove)
-    {
+void setRampa2() {
+    switch(LastMove) {
         case TO_NORTH:
         cuadros[x_actual][y_actual-1][z_actual].setEstado(RAMPA);
         break;
@@ -1394,9 +1311,8 @@ void setRampa2(){
     }
 }
 
-void checarRampa2(){
-    if(subirRampa || bajarRampa)
-    {
+void checarRampa2() {
+    if(subirRampa || bajarRampa) {
         lcd.clear();
 
         // Determina si empezo abajo o arriba
@@ -1446,10 +1362,7 @@ void checarRampa2(){
               permisoRampa = BAJAR;
             }
         }
-
-
     }
-
 }
 
 void checarRampa() {
@@ -1617,6 +1530,7 @@ void checarRampa() {
 
 
 void alinearIMU() {
+    lcd.clear();
     lcd.print("alimear imu");
     byte ultimaOrientacion = iOrientacion;
     switch (iOrientacion) {
@@ -1699,10 +1613,12 @@ void movimientoDerecho(int fuente) {
                 inIzq = getAngulo();
                 inDer = getAngulo();
             }
+
             izqPID.Compute();
             derPID.Compute();
             velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
             break;
+
         case MOV_RAMPA_SUBIR:
             avanzar();
             if(getAngulo() > 320) {
@@ -1712,10 +1628,12 @@ void movimientoDerecho(int fuente) {
                 inIzq = getAngulo();
                 inDer = getAngulo();
             }
+
             izqPID.Compute();
             derPID.Compute();
             velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
             break;
+
         case MOV_RAMPA_BAJAR:
             avanzar();
             if(getAngulo() > 320) {
@@ -1726,26 +1644,17 @@ void movimientoDerecho(int fuente) {
                 inIzq = getAngulo();
                 inDer = getAngulo();
             }
+
             izqPID.Compute();
             derPID.Compute();
-
             velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
             break;
+
         case MOV_RAMPA_NO_SUBIR:
             reversa();
-            /*if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
-            }
-            else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
-            }
-            izqPID.Compute();
-            derPID.Compute();*/
-
             velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
             break;
+
         case MOV_RAMPA_NO_BAJAR:
             reversa();
             if(getAngulo() > 320) {
@@ -1763,17 +1672,6 @@ void movimientoDerecho(int fuente) {
             break;
         case MOV_REVERSA:
             reversa();
-            /*if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
-            }
-            else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
-            }
-            izqPID.Compute();
-            derPID.Compute();*/
-
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             break;
     }
@@ -1809,7 +1707,7 @@ void moverCuadro() {
                 }
                 break;
 
-            case SUBIR_BAJAR:
+            /*case SUBIR_BAJAR:
                 while (vec.y() < -10.0) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1855,7 +1753,7 @@ void moverCuadro() {
                 vueltaDer();
                 delay(200);
                 vueltaDer();
-                break;
+                break;*/
         }
     } else if(vec.y() > 10.0) {
         lcd.home();
@@ -1879,7 +1777,7 @@ void moverCuadro() {
                 }
                 break;
 
-            case BAJAR_SUBIR:
+            /*case BAJAR_SUBIR:
                 while (vec.y() > 10.0) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1926,7 +1824,7 @@ void moverCuadro() {
                 vueltaDer();
                 delay(200);
                 vueltaDer();
-                break;
+                break;*/
         }
     } else {
         steps = 0;
@@ -3287,12 +3185,11 @@ void resolverLaberinto() {
 //******************************************
 
 void servoMotor() {
-    delay(200);
     if(servo.read() == 0)
         servo.write(180);
     else
         servo.write(0);
-    delay(900);
+    delay(500);
 }
 
 void checarMlx() {
@@ -3844,7 +3741,7 @@ void setup() {
     z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
-    delay(1400);
+    delay(1000);
     hacerPruebas();
 
     if(digitalRead(switch_preferencia) == 0)
@@ -3853,13 +3750,12 @@ void setup() {
         Preferencia = IZQUIERDA;
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
-    delay(1400);
+    delay(1500);
     bno.begin();
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(350);
-    //alinear();
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
