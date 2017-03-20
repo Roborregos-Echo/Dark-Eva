@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.3.2 --------------------------------
-//--------------------------- 18 / MARZO / 2017 -----------------------------
+//--------------------------- 19 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -146,12 +146,12 @@ const int ENC1   = 18;
 const int ENC2   = 19;
 unsigned long steps = 0;
 
-const int MOV_FRENTE = 0;
-const int MOV_RAMPA_SUBIR = 1;
-const int MOV_RAMPA_BAJAR = 2;
-const int MOV_RAMPA_NO_SUBIR = 3;
-const int MOV_RAMPA_NO_BAJAR = 4;
-const int MOV_REVERSA = 5;
+const int MOV_FRENTE                =   0;
+const int MOV_RAMPA_SUBIR           =   1;
+const int MOV_RAMPA_BAJAR           =   2;
+const int MOV_RAMPA_NO_SUBIR        =   3;
+const int MOV_RAMPA_NO_BAJAR        =   4;
+const int MOV_REVERSA               =   5;
 
 
 //******************************************
@@ -710,11 +710,6 @@ void checarLimit() {
 //******************************************
 //--------------- MOVIMIENTO ---------------
 void velocidad(int ai, int ad, int ci, int cd) {
-    /*analogWrite(ENABLE_DERECHA_ADELANTE, 145);
-    analogWrite(ENABLE_DERECHA_ATRAS, 155);
-    analogWrite(ENABLE_IZQUIERDA_ADELANTE, 155);
-    analogWrite(ENABLE_IZQUIERDA_ATRAS, 155);*/
-
     if(ad > 255)
         analogWrite(ENABLE_DERECHA_ADELANTE, 255);
     else
@@ -737,7 +732,229 @@ void velocidad(int ai, int ad, int ci, int cd) {
 }
 
 void alinear() {
+    bool alfa       =   false;
+    bool bravo      =   false;
+    bool charlie    =   false;
+    bool delta      =   false;
+
     velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+
+    switch (iOrientacion) {
+        case A_NORTE:
+            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+                alfa = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+                bravo = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+                charlie = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+                delta = true;
+            break;
+
+        case B_NORTE:
+            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+                alfa = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+                bravo = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+                charlie = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+                delta = true;
+            break;
+
+        case C_NORTE:
+            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+                alfa = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+                bravo = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+                charlie = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+                delta = true;
+            break;
+
+        case D_NORTE:
+            if(cuadros[x_actual][y_actual][z_actual].getPared('D'))
+                alfa = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('A'))
+                bravo = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('B'))
+                charlie = true;
+
+            if(cuadros[x_actual][y_actual][z_actual].getPared('C'))
+                delta = true;
+            break;
+    }
+
+    if(bravo && delta) {
+        while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
+            unsigned long inicio = millis();
+            while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1.5) {
+                lcd.clear();
+                lcd.print(111111);
+                horizontalDerecha();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+
+            inicio = millis();
+            while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1.5) {
+                lcd.clear();
+                lcd.print(222222);
+                horizontalIzquierda();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+        }
+    } else if(bravo) {
+        while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
+            unsigned long inicio = millis();
+            while (getSharpCorta(SHARP_B1) < 6.5) {
+                lcd.clear();
+                lcd.print(333333);
+                horizontalIzquierda();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+            inicio = millis();
+            while (getSharpCorta(SHARP_B1) > 8.5) {
+                lcd.clear();
+                lcd.print(444444);
+                horizontalDerecha();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+        }
+
+        /*if (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_B2)) > 1.5 ) {
+            while (getSharpCorta(SHARP_B2) < getSharpCorta(SHARP_B1)) {
+                vueltaDerecha();
+            }
+            detener();
+            while (getSharpCorta(SHARP_B1) < getSharpCorta(SHARP_B2)) {
+                vueltaIzquierda();
+            }
+            detener();
+        }*/
+    } else if(delta) {
+        while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
+            unsigned long inicio = millis();
+
+            while (getSharpCorta(SHARP_D1) < 6.5) {
+                lcd.clear();
+                lcd.print(555555);
+                horizontalDerecha();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+
+            inicio = millis();
+            while (getSharpCorta(SHARP_D1) >  8.5) {
+                lcd.clear();
+                lcd.print(666666);
+                horizontalIzquierda();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+        }
+        /*if (abs(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_D2)) > 1.5 ) {
+            while (getSharpCorta(SHARP_D2) < getSharpCorta(SHARP_D1)) {
+                vueltaIzquierda();
+            }
+            detener();
+            while (getSharpCorta(SHARP_D1) < getSharpCorta(SHARP_D2)) {
+                vueltaDerecha();
+            }
+            detener();
+        }*/
+    }
+
+    if (alfa) {
+        unsigned long inicio;
+        while (!(getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 9)) {
+            inicio = millis();
+            while (getSharpCorta(SHARP_A) < 7) {
+                lcd.clear();
+                lcd.print(777777);
+                reversa();
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+            inicio = millis();
+            while (getSharpCorta(SHARP_A) > 9) {
+                avanzar();
+                lcd.clear();
+                lcd.print(888888);
+                if (millis() >= inicio + 800) {
+                    detener();
+                    return;
+                }
+            }
+            detener();
+        }
+        detener();
+    }
+
+    /*if (getSharpCorta(SHARP_C) < 14) {
+        //lcd.clear();
+        //lcd.home();
+        //lcd.print("SHARP C");
+        while (!(getSharpCorta(SHARP_C) > 8 && getSharpCorta(SHARP_C) < 10)) {
+            lcd.home();
+            lcd.print("1");
+            while (getSharpCorta(SHARP_C) < 8.5)
+                avanzar();
+            detener();
+            lcd.home();
+            lcd.print("2");
+            while (getSharpCorta(SHARP_C) > 9.5 && getSharpLarga(SHARP_LC) < 30) {
+                reversa();
+                lcd.clear();
+                lcd.setCursor(0, 1);
+                lcd.print(getSharpCorta(SHARP_C));
+            }
+            detener();
+            lcd.home();
+            lcd.print("3");
+        }
+    }*/
+}
+
+void alinearViejo() {
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+
     if(getSharpCorta(SHARP_B1) < 20 && getSharpCorta(SHARP_D1) < 20 && getUltrasonico('B') < 20 && getUltrasonico('D') < 20) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
             unsigned long inicio = millis();
@@ -3554,10 +3771,8 @@ void checarArray() {
 
 
 void lackOfProgress() {
-
-  for(int i=0; i<TOTAL_GRID_MAX; i++){
-
-    int Num, Div;
+  for(int i = 0; i < TOTAL_GRID_MAX; i++) {
+    int num, Div;
     int list[5];
     byte Count = 0;
 
@@ -3565,87 +3780,86 @@ void lackOfProgress() {
     byte y = totalGridToCoord(i, 'y');
     byte z = totalGridToCoord(i, 'z');
 
-    Num = checkList1[i];
+    num = checkList1[i];
 
-    while(Num != 0)
-    {
-      Div = Num / 2;
-      list[Count] = Num % 2;
-      Num = Div;
+    while(num != 0) {
+      Div = num / 2;
+      list[Count] = num % 2;
+      num = Div;
       Count++;
     }
 
     if(list[4])
-    cuadros[x][y][z].setMlx(true);
+        cuadros[x][y][z].setMlx(true);
     else
-    cuadros[x][y][z].setMlx(false);
+        cuadros[x][y][z].setMlx(false);
 
     if(list[3])
-    cuadros[x][y][z].setPared('S', true);
+        cuadros[x][y][z].setPared('S', true);
     else
-    cuadros[x][y][z].setPared('S', false);
+        cuadros[x][y][z].setPared('S', false);
 
     if(list[2])
-    cuadros[x][y][z].setPared('E', true);
+        cuadros[x][y][z].setPared('E', true);
     else
-    cuadros[x][y][z].setPared('E', false);
+        cuadros[x][y][z].setPared('E', false);
 
     if(list[1])
-    cuadros[x][y][z].setPared('N', true);
+        cuadros[x][y][z].setPared('N', true);
     else
-    cuadros[x][y][z].setPared('N', false);
+        cuadros[x][y][z].setPared('N', false);
 
     if(list[0])
-    cuadros[x][y][z].setPared('O', true);
+        cuadros[x][y][z].setPared('O', true);
     else
-    cuadros[x][y][z].setPared('O', false);
+        cuadros[x][y][z].setPared('O', false);
 
-    switch(checkList2[i])
-    {
+    switch(checkList2[i]) {
       case NO_EXISTE:
-      cuadros[x][y][z].setEstado(NO_EXISTE);
-      break;
+          cuadros[x][y][z].setEstado(NO_EXISTE);
+          break;
 
       case SIN_RECORRER:
-      cuadros[x][y][z].setEstado(SIN_RECORRER);
-      break;
+          cuadros[x][y][z].setEstado(SIN_RECORRER);
+          break;
 
       case RECORRIDO:
-      cuadros[x][y][z].setEstado(RECORRIDO);
-      break;
+          cuadros[x][y][z].setEstado(RECORRIDO);
+          break;
 
       case CHECKPOINT:
-      cuadros[x][y][z].setEstado(CHECKPOINT);
-      break;
+          cuadros[x][y][z].setEstado(CHECKPOINT);
+          break;
 
       case NEGRO:
-      cuadros[x][y][z].setEstado(NEGRO);
-      break;
+          cuadros[x][y][z].setEstado(NEGRO);
+          break;
 
       case RAMPA:
-      cuadros[x][y][z].setEstado(RAMPA);
-      break;
+          cuadros[x][y][z].setEstado(RAMPA);
+          break;
 
       case INICIO:
-      cuadros[x][y][z].setEstado(INICIO);
-      break;
-  }
-  }
-  }
-  void imprimirValores1() {
-      lcd.clear();
-      lcd.print("     SHARPS");
-      delay(1000);
-      while (digitalRead(BOTON_COLOR) != 0) {
-          lcd.clear();
-          lcd.setCursor(5, 0);
-          lcd.print(getSharpCorta(SHARP_C));
-          lcd.setCursor(5, 1);
-          lcd.print(getSharpCorta(SHARP_A));
-          delay(500);
+          cuadros[x][y][z].setEstado(INICIO);
+          break;
       }
+  }
+}
+
+void imprimirValores1() {
+  lcd.clear();
+  lcd.print("     SHARPS");
+  delay(1000);
+  while (digitalRead(BOTON_COLOR) != 0) {
+      lcd.clear();
+      lcd.setCursor(5, 0);
+      lcd.print(getSharpCorta(SHARP_C));
+      lcd.setCursor(5, 1);
+      lcd.print(getSharpCorta(SHARP_A));
       delay(500);
   }
+  delay(500);
+}
 
   void imprimirValores2() {
        delay(1000);
@@ -3689,8 +3903,7 @@ while (digitalRead(BOTON_COLOR) != 0) {
        lcd.setCursor(0, 1);
        lcd.print("    pruebas?");
        delay(800);
-       if(digitalRead(BOTON_COLOR) == 0)
-       {
+       if(digitalRead(BOTON_COLOR) == 0) {
            imprimirValores1();
            imprimirValores2();
            imprimirValores3();
@@ -3799,12 +4012,17 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(500);
-    alinear();
+    //alinear();
 }
 
 void loop() {
     lcd.clear();
+    lcd.print(digitalRead(2));
+    lcd.print("      ");
+    lcd.print(digitalRead(11));
+    delay(500);
 
+    /*lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
 
@@ -3830,5 +4048,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();
+    resolverLaberinto();*/
 }
