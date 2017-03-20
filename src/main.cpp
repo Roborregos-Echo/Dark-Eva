@@ -277,14 +277,13 @@ byte x_rampa, y_rampa;
 bool RampaA = false;
 bool RampaB = false;
 
-byte PermisoRampa;
+byte permisoRampa;
 
 bool Piso1 = false;
 bool Piso2 = false;
 bool Piso3 = false;
 bool Fusion = false;        // Cambiar a true cuando se junten los pisos
 bool GridOriginal[GRID_MAX];
-bool SharpRampa = true;
 
 byte firstFloor = 0;
 byte RampaDiff = 6;
@@ -1358,7 +1357,7 @@ void checarRampa2(){
               z_actual++;
               setNewPos2();
               setRampa2();
-              PermisoRampa = SUBIR;
+              permisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
@@ -1366,7 +1365,8 @@ void checarRampa2(){
               lcd.print("BAJANDO");
               z_actual--;
               setNewPos2();
-              PermisoRampa = BAJAR;
+              permisoRampa = BAJAR;
+
             }
         }else if(firstFloor == ARRIBA)
         {
@@ -1375,7 +1375,7 @@ void checarRampa2(){
               lcd.print("SUBIENDO");
               z_actual--;
               setNewPos2();
-              PermisoRampa = SUBIR;
+              permisoRampa = SUBIR;
             }
             else
             if(bajarRampa)
@@ -1384,7 +1384,7 @@ void checarRampa2(){
               z_actual++;
               setNewPos2();
               setRampa2();
-              PermisoRampa = BAJAR;
+              permisoRampa = BAJAR;
             }
         }
 
@@ -1396,7 +1396,6 @@ void checarRampa2(){
 void checarRampa() {
     if(subirRampa || bajarRampa) {
         lcd.clear();
-        SharpRampa = false;
 
         if(firstFloor == 0) {
             if(subirRampa)
@@ -1409,12 +1408,12 @@ void checarRampa() {
         if(firstFloor == ABAJO) {
             if(subirRampa) {
                 if(z_actual == 0 && !Piso1) {
-                    PermisoRampa = SUBIR_BAJAR;
+                    permisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 0 && Piso1) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     if(!Piso2)
@@ -1423,19 +1422,19 @@ void checarRampa() {
                     z_actual += 2;
                     setNewRampa();
                 } else if(z_actual == 2) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     z_actual--;
                 }
             } else if(bajarRampa) {
                 if(z_actual==1 && !Piso2) {
-                    PermisoRampa = BAJAR_SUBIR;
+                    permisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 1 && Piso2) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     switch(LastMove) {
@@ -1473,7 +1472,7 @@ void checarRampa() {
                             break;
                     }
                 } else if(z_actual == 2) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     z_actual -= 2;
@@ -1482,12 +1481,12 @@ void checarRampa() {
         } else if(firstFloor == ARRIBA) {
             if(bajarRampa) {
                 if(z_actual == 0 && !Piso1) {
-                    PermisoRampa = BAJAR_SUBIR;
+                    permisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 0 && Piso1) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     if(!Piso2)
@@ -1496,19 +1495,19 @@ void checarRampa() {
                         z_actual += 2;
                     setNewRampa();
                 } else if(z_actual == 2) {
-                    PermisoRampa = BAJAR;
+                    permisoRampa = BAJAR;
                     lcd.print("BAJAR");
                     delay(100);
                     z_actual--;
                 }
             } else if(subirRampa) {
                 if(z_actual==1 && !Piso2) {
-                    PermisoRampa = SUBIR_BAJAR;
+                    permisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
                     delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 1 && Piso2) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     switch(LastMove) {
@@ -1547,7 +1546,7 @@ void checarRampa() {
                             break;
                     }
                 } else if(z_actual == 2) {
-                    PermisoRampa = SUBIR;
+                    permisoRampa = SUBIR;
                     lcd.print("SUBIR");
                     delay(100);
                     z_actual -= 2;
@@ -1734,9 +1733,9 @@ void moverCuadro() {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
-        checarRampa();
+        checarRampa2();
 
-        switch (PermisoRampa) {
+        switch (permisoRampa) {
             case REGRESA_ARRIBA:
             case BAJAR_SUBIR:
             case BAJAR:
@@ -1803,9 +1802,9 @@ void moverCuadro() {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
-        checarRampa();
+        checarRampa2();
 
-        switch (PermisoRampa) {
+        switch (permisoRampa) {
             case REGRESA_ABAJO:
             case SUBIR_BAJAR:
             case SUBIR:
@@ -2510,11 +2509,13 @@ void verificarRampa() {
 void checarParedes() {
     shortMove = false;
     A_wall = false; B_wall = false; C_wall = false; D_wall = false;
+    int lectura;
 
     switch(iOrientacion) {
         case A_NORTE:
         if(y_actual > 0) {
-            if(getSharpCorta(SHARP_C) > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('C');
+            if((lectura == 0 || lectura > 15 ) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2525,35 +2526,35 @@ void checarParedes() {
                 C_wall = true;
             }
         }
-
-
-        if(getSharpCorta(SHARP_C) < 15 && SharpRampa)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-
-        if(getSharpCorta(SHARP_B1) > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('B');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharpCorta(SHARP_A) > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('A');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             A_wall = true;
         }
-        if(getSharpCorta(SHARP_A) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_D1) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('D');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2565,36 +2566,39 @@ void checarParedes() {
             }
         }
 
-        if(getSharpCorta(SHARP_D1) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         break;
         //--------------------------------------------------------------------
         case B_NORTE:
-        if(getSharpCorta(SHARP_C)  > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('C');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharpCorta(SHARP_C)  < 15 && SharpRampa)
+        if((lectura != 0 || lectura < 15))
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        if(getSharpCorta(SHARP_B1)  > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('B');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             B_wall = true;
         }
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(lectura != 0 || lectura < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
 
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_A)  > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('A');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2605,12 +2609,13 @@ void checarParedes() {
                 A_wall = true;
             }
         }
-        if(getSharpCorta(SHARP_A) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_D1)  > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('D');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
             agregarLast('S');
@@ -2622,25 +2627,27 @@ void checarParedes() {
             }
         }
 
-        if(getSharpCorta(SHARP_D1)  < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         break;
         //--------------------------------------------------------------------
         case C_NORTE:
-        if(getSharpCorta(SHARP_C) > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('C');
+        if((lectura == 0 || lectura > 15)&& (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             C_wall = true;
         }
-        if(getSharpCorta(SHARP_C) < 15 && SharpRampa)
+        if((lectura != 0 || lectura < 15))
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_B1) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('B');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2651,12 +2658,13 @@ void checarParedes() {
                 B_wall = true;
             }
         }
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(lectura != 0 || lectura < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_A) > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('A');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2667,17 +2675,18 @@ void checarParedes() {
                 A_wall = true;
             }
         }
-        if(getSharpCorta(SHARP_A) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_D1) > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('D');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharpCorta(SHARP_D1) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         break;
@@ -2685,7 +2694,8 @@ void checarParedes() {
         case D_NORTE:
         if(x_actual > 0)
         {
-            if(getSharpCorta(SHARP_C) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('C');
+            if((lectura == 0 || lectura > 15) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2697,13 +2707,14 @@ void checarParedes() {
             }
         }
 
-        if(getSharpCorta(SHARP_C) < 15 && SharpRampa)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
 
         if(y_actual > 0)
         {
-            if(getSharpCorta(SHARP_B1) > 15 && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            lectura = getUltrasonico('B');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2716,10 +2727,11 @@ void checarParedes() {
         }
 
 
-        if(getSharpCorta(SHARP_B1) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        if(getSharpCorta(SHARP_A) > 15 && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('A');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2727,23 +2739,22 @@ void checarParedes() {
             A_wall = true;
         }
 
-        if(getSharpCorta(SHARP_A) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-
-        if(getSharpCorta(SHARP_D1) > 15 && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        lectura = getUltrasonico('D');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
         } else {
             D_wall = true;
         }
-        if(getSharpCorta(SHARP_D1) < 15)
+        if(lectura != 0 || lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
         break;
     }
 
-    SharpRampa = true;
 }
 
 
@@ -3797,12 +3808,12 @@ void setup() {
         Preferencia = IZQUIERDA;
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
-    delay(1000);
+    delay(1500);
     bno.begin();
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(1000);
+    delay(500);
     alinear();
 }
 
