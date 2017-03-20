@@ -1765,6 +1765,7 @@ void moverCuadro() {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                steps = 0;
                 break;
 
             /*case SUBIR_BAJAR:
@@ -1836,6 +1837,7 @@ void moverCuadro() {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
+                steps = 0;
                 break;
 
             /*case BAJAR_SUBIR:
