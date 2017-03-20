@@ -2187,6 +2187,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     ////lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     ////lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
+    lcd.print("                ");
     lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
     bool pathFinished = false;
     int Grid;
@@ -2502,6 +2503,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                 }
                             }
                             lcd.setCursor(0, 1);
+                            lcd.print("          ");
                             lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
                         }
                     } else {
