@@ -306,8 +306,8 @@ byte checkList2[GRID_MAX];
 //-------------- INTERRUPTS ----------------
 
 // Interupcion del nano;
-#define InterruptNano 2
-const int InterruptDefiner = 11;
+#define interruptNano 2
+const int interruptDefiner = 3;
 
 
 //******************************************
@@ -616,12 +616,8 @@ void checarInterr() {
         unsigned long pos = steps;
         steps = 0;
 
-        if(digitalRead(InterruptDefiner) == 0) {
+        if(digitalRead(interruptDefiner) == 0) {
             lcd.print("000000");
-            while (steps <= 500) {
-                reversa();
-            }
-            detener();
             vueltaIzq();
             delay(200);
             servoMotor();
@@ -631,7 +627,7 @@ void checarInterr() {
                 first_victim = false;
             }
             vueltaDer();
-        } else if (digitalRead(InterruptDefiner) == 1){
+        } else if (digitalRead(interruptDefiner) == 1){
             lcd.print("111111");
             while (steps <= 500) {
                 reversa();
@@ -3928,11 +3924,10 @@ while (digitalRead(BOTON_COLOR) != 0) {
 
 void setup() {
     Serial.begin(9600);
-    //pinMode(InterruptBoton, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //attachInterrupt(digitalPinToInterrupt(InterruptBoton), lack_Interrupt, LOW); //Declara la funcion a ejectura en interruptD
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    //pinMode(InterruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
-    //attachInterrupt(digitalPinToInterrupt(InterruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
+    delay(1000);
+    //pinMode(interruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
     setFrecuencia(20);           //Establece la frecuencia del TCS3200
@@ -3953,7 +3948,7 @@ void setup() {
     pinMode(ENABLE_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(ENABLE_DERECHA_ATRAS, OUTPUT);
     pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
-    pinMode(InterruptDefiner, INPUT);
+    pinMode(interruptDefiner, INPUT);
     pinMode(BOTON_COLOR, INPUT);
 
     lcd.begin();
@@ -4028,16 +4023,11 @@ void setup() {
     lcd.print("CALIBRADO");
     delay(500);
     //alinear();
+    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
 void loop() {
     lcd.clear();
-    lcd.print(digitalRead(2));
-    lcd.print("      ");
-    lcd.print(digitalRead(11));
-    delay(500);
-
-    /*lcd.clear();
     if(cuadros[x_actual][y_actual][z_actual].getEstado() != INICIO)
        cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
 
@@ -4063,5 +4053,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-    resolverLaberinto();*/
+    resolverLaberinto();
 }
