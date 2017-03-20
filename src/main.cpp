@@ -137,8 +137,8 @@ const int VEL_MOTOR_RAMPA_ENCODER   =   245;
 const int VEL_MOTOR_VUELTA          =   140;
 const int VEL_MOTOR_VUELTA_ENCODER  =   140;
 
-const int VEL_MOTOR_ALINEAR          =   75;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   75;
+const int VEL_MOTOR_ALINEAR          =   100;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   100;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -163,6 +163,10 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55);
 double setIzq, setDer, inIzq, inDer, outIzq, outDer;
 PID izqPID(&inIzq, &outIzq, &setIzq, 15, 0, 0, DIRECT);
 PID derPID(&inDer, &outDer, &setDer, 15, 0, 0, REVERSE);
+
+int cuadrosVisitados = 0;
+int vueltasDadas = 0;
+bool rampaCambio = false;
 
 
 //******************************************
@@ -728,7 +732,9 @@ void velocidad(int ai, int ad, int ci, int cd) {
         analogWrite(ENABLE_IZQUIERDA_ATRAS, ci);
 }
 
+
 void alinear() {
+    int lecturaUltra, lecturaSharp;
     bool alfa       =   false;
     bool bravo      =   false;
     bool charlie    =   false;
@@ -736,63 +742,25 @@ void alinear() {
 
     velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
-    switch (iOrientacion) {
-        case A_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-                alfa = true;
+    lecturaUltra = getUltrasonico('A');
+    lecturaSharp = getSharpCorta(SHARP_A);
+    if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+        alfa = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-                bravo = true;
+    lecturaUltra = getUltrasonico('B');
+    lecturaSharp = getSharpCorta(SHARP_B1);
+    if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+        bravo = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-                charlie = true;
+    lecturaUltra = getUltrasonico('C');
+    lecturaSharp = getSharpCorta(SHARP_A);
+    if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+        charlie = true;
 
-            if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-                delta = true;
-            break;
-
-        case B_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-                alfa = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-                bravo = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('0'))
-                charlie = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-                delta = true;
-            break;
-
-        case C_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-                alfa = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-                bravo = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-                charlie = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-                delta = true;
-            break;
-
-        case D_NORTE:
-            if(cuadros[x_actual][y_actual][z_actual].getPared('O'))
-                alfa = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('N'))
-                bravo = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('E'))
-                charlie = true;
-
-            if(cuadros[x_actual][y_actual][z_actual].getPared('S'))
-                delta = true;
-            break;
-    }
+    lecturaUltra = getUltrasonico('D1');
+    lecturaSharp = getSharpCorta(SHARP_A);
+    if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+        delta = true;
 
     if(bravo && delta) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
@@ -821,6 +789,7 @@ void alinear() {
             detener();
         }
     } else if(bravo) {
+        delay(50);
         while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_B1) < 6.5) {
@@ -859,7 +828,6 @@ void alinear() {
     } else if(delta) {
         while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             unsigned long inicio = millis();
-
             while (getSharpCorta(SHARP_D1) < 6.5) {
                 lcd.clear();
                 lcd.print(555555);
@@ -870,7 +838,6 @@ void alinear() {
                 }
             }
             detener();
-
             inicio = millis();
             while (getSharpCorta(SHARP_D1) >  8.5) {
                 lcd.clear();
@@ -952,6 +919,7 @@ void alinear() {
 
 
 void vueltaIzq() {
+    vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
     posInicial = getAngulo();
     lcd.setCursor(8, 1);
@@ -1052,6 +1020,7 @@ void vueltaIzq() {
 }
 
 void vueltaDer() {
+    vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
     lcd.setCursor(8, 1);
     lcd.print("Vuel Der");
@@ -1530,75 +1499,144 @@ void checarRampa() {
 
 
 void alinearIMU() {
-    lcd.clear();
-    lcd.print("alimear imu");
-    byte ultimaOrientacion = iOrientacion;
-    switch (iOrientacion) {
-        case B_NORTE:
-            vueltaDer();
-            break;
+    if (rampaCambio || cuadrosVisitados > 20 || vueltasDadas > 10) {
+        int lecturaUltra, lecturaSharp;
+        bool alfa       =   false;
+        bool bravo      =   false;
+        bool charlie    =   false;
+        bool delta      =   false;
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
-        case C_NORTE:
-            vueltaDer();
-            vueltaDer();
-            break;
 
-        case D_NORTE:
-            vueltaIzq();
-            break;
-    }
+        lecturaUltra = getUltrasonico('A');
+        lecturaSharp = getSharpCorta(SHARP_A);
+        if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+            alfa = true;
 
-    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
-    if (getSharpCorta(SHARP_A) < 10) {
-        steps = 0;
-        while (steps <= 1200) {
-            lcd.print("1");
-            avanzar();
+        lecturaUltra = getUltrasonico('B');
+        lecturaSharp = getSharpCorta(SHARP_B1);
+        if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+            bravo = true;
+
+        lecturaUltra = getUltrasonico('C');
+        lecturaSharp = getSharpCorta(SHARP_A);
+        if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+            charlie = true;
+
+        lecturaUltra = getUltrasonico('D1');
+        lecturaSharp = getSharpCorta(SHARP_A);
+        if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
+            delta = true;
+
+        if(rampaCambio) {
+            byte ultimaOrientacion = iOrientacion;
+            switch (iOrientacion) {
+                case B_NORTE:
+                    vueltaDer();
+                    break;
+
+                case C_NORTE:
+                    vueltaDer();
+                    vueltaDer();
+                    break;
+
+                case D_NORTE:
+                    vueltaIzq();
+                    break;
+            }
+            steps = 0;
+            velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+
+            if (alfa) {
+                while (steps <= 1200) {
+                    avanzar();
+                    lcd.clear();
+                    lcd.print(steps);
+                }
+            } else if (bravo) {
+                while (steps <= 1200) {
+                    horizontalDerecha();
+                }
+            } else if (delta) {
+                while (steps <= 1200) {
+                    horizontalIzquierda();
+                }
+            } else if (charlie) {
+                while (steps <= 1200) {
+                    reversa();
+                }
+            } else if (delta) {
+                while (steps <= 1200) {
+                    horizontalIzquierda();
+                }
+            }
+            detener();
+
+            lcd.clear();
+            lcd.print("CALIBRANDO IMU");
+            delay(1500);
+            bno.begin();
+            lcd.clear();
+            lcd.print("CALIBRADO");
+            delay(350);
+
+            switch (ultimaOrientacion) {
+                case B_NORTE:
+                    vueltaIzq();
+                    break;
+
+                case C_NORTE:
+                    vueltaDer();
+                    vueltaDer();
+                    break;
+
+                case D_NORTE:
+                    vueltaDer();
+                    break;
+            }
+            vueltasDadas = 0;
+            cuadrosVisitados = 0;
+            rampaCambio = false;
+        } else if ((cuadrosVisitados > 20 || vueltasDadas > 10) && iOrientacion == A_NORTE) {
+            steps = 0;
+            velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+
+            if (alfa) {
+                while (steps <= 1200) {
+                    avanzar();
+                }
+            } else if (bravo) {
+                while (steps <= 1200) {
+                    horizontalDerecha();
+                }
+            } else if (delta) {
+                while (steps <= 1200) {
+                    horizontalIzquierda();
+                }
+            } else if (charlie) {
+                while (steps <= 1200) {
+                    reversa();
+                }
+            } else if (delta) {
+                while (steps <= 1200) {
+                    horizontalIzquierda();
+                }
+            }
+            detener();
+
+
+            lcd.clear();
+            lcd.print("CALIBRANDO IMU");
+            delay(1500);
+            bno.begin();
+            lcd.clear();
+            lcd.print("CALIBRADO");
+            delay(350);
+
+            vueltasDadas = 0;
+            cuadrosVisitados = 0;
         }
-        detener();
-    } else if (getSharpCorta(SHARP_B1) < 10) {
-        steps = 0;
-        while (steps <= 1200) {
-            lcd.print("2");
-            horizontalDerecha();
-        }
-        detener();
-    } else if (getSharpCorta(SHARP_C) < 10) {
-        steps = 0;
-        while (steps <= 1200) {
-            lcd.print("2");
-            reversa();
-        }
-        detener();
-    } else if (getSharpCorta(SHARP_D1) < 10) {
-        steps = 0;
-        while (steps <= 1200) {
-            lcd.print("3");
-            horizontalIzquierda();
-        }
-        detener();
-    }
-
-    lcd.clear();
-    lcd.home();
-    lcd.print("   BNO");
-    bno.begin();
-    delay(1000);
-    alinear();
-
-    switch (ultimaOrientacion) {
-        case B_NORTE:
-            vueltaIzq();
-            break;
-
-        case C_NORTE:
-            vueltaDer();
-            vueltaDer();
-            break;
-
-        case D_NORTE:
-            vueltaDer();
-            break;
+        alinear();
     }
 }
 
@@ -1678,6 +1716,7 @@ void movimientoDerecho(int fuente) {
 }
 
 void moverCuadro() {
+    cuadrosVisitados++;
     steps = 0;
     while (steps <= 3500) {
         movimientoDerecho(MOV_FRENTE);
@@ -1686,10 +1725,11 @@ void moverCuadro() {
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    if(vec.y() < -10.0) {
+    if(vec.y() < -8.0) {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
+        rampaCambio = true;
         checarRampa2();
 
         switch (permisoRampa) {
@@ -1701,7 +1741,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR:
-                while (vec.y() < -10.0) {
+                while (vec.y() < -8.0) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1755,10 +1795,11 @@ void moverCuadro() {
                 vueltaDer();
                 break;*/
         }
-    } else if(vec.y() > 10.0) {
+    } else if(vec.y() > 8.0) {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
+        rampaCambio = true;
         checarRampa2();
 
         switch (permisoRampa) {
@@ -1771,7 +1812,7 @@ void moverCuadro() {
                 break;
 
             case BAJAR:
-                while (vec.y() > 10.0) {
+                while (vec.y() > 8.0) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1845,6 +1886,8 @@ void moverCuadro() {
         checarLimit();
     }
     detener();
+    alinearIMU();
+    alinear();
     checarColor();
 }
 
@@ -1859,7 +1902,6 @@ void reversaCuadro() {
 
 
 void absoluteMove(char cLado) {
-    alinear();
     switch (iOrientacion) {
         case A_NORTE:
         switch(cLado) {
@@ -2155,8 +2197,9 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 delay(75);
             }
             lcd.print(" T E O R I A ES");
+            lcd.setCursor(0, 1);
             lcd.print("P R A C T I C A");
-            delay(2000000);
+            delay(20000);
         }
 
         for (int i = 0; i<4; i++)
@@ -2717,7 +2760,6 @@ void checarParedes() {
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
         break;
     }
-
 }
 
 
