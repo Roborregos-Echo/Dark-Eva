@@ -1755,6 +1755,7 @@ void movimientoDerecho(int fuente) {
 }
 
 void moverCuadro() {
+    primeraLectura();
     cuadrosVisitados++;
     steps = 0;
     while (steps <= 3500) {
@@ -1927,6 +1928,9 @@ void moverCuadro() {
         checarLimit();
     }
     detener();
+    if(!rampaCambio) {
+
+    }
     alinearIMU();
     alinear();
     checarColor();
