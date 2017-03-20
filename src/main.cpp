@@ -288,7 +288,7 @@ bool Fusion = false;        // Cambiar a true cuando se junten los pisos
 bool GridOriginal[GRID_MAX];
 
 byte firstFloor = 0;
-byte RampaDiff = 6;
+byte RampaDiff = 4;
 byte PisoReal  = 0;
 byte MoveL1, MoveL2;
 byte LastMove;            // 0,1,0
@@ -2147,7 +2147,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     ////lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     ////lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
-    lcd.print("    " + String(x_destino) + "," + String(y_destino));
+    lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
     bool pathFinished = false;
     int Grid;
     byte x_path = x_actual;
