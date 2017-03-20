@@ -1299,7 +1299,7 @@ void checarRampa2() {
         {
             if(cuadros[x_last][y_last][z_actual].getEstado() != RECORRIDO)
                 cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
-                
+
             Last2 = false;
         }
 
@@ -1576,18 +1576,26 @@ void alinearIMU() {
             } else if (bravo) {
                 while (steps <= 1200) {
                     horizontalDerecha();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (delta) {
                 while (steps <= 1200) {
                     horizontalIzquierda();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (charlie) {
                 while (steps <= 1200) {
                     reversa();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (delta) {
                 while (steps <= 1200) {
                     horizontalIzquierda();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             }
             detener();
@@ -1598,7 +1606,7 @@ void alinearIMU() {
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(350);
+            delay(150);
 
             switch (ultimaOrientacion) {
                 case B_NORTE:
@@ -1624,24 +1632,35 @@ void alinearIMU() {
             if (alfa) {
                 while (steps <= 1200) {
                     avanzar();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (bravo) {
                 while (steps <= 1200) {
                     horizontalDerecha();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (delta) {
                 while (steps <= 1200) {
                     horizontalIzquierda();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (charlie) {
                 while (steps <= 1200) {
                     reversa();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
             } else if (delta) {
                 while (steps <= 1200) {
                     horizontalIzquierda();
+                    lcd.clear();
+                    lcd.print(steps);
                 }
-            }
+            } else
+                return;
             detener();
 
 
