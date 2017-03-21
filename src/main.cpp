@@ -142,7 +142,7 @@ const int VEL_MOTOR_ALINEAR_ENCODER  =   100;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
-unsigned long steps = 0;
+volatile unsigned long steps = 0;
 
 const int MOV_FRENTE                =   0;
 const int MOV_RAMPA_SUBIR           =   1;
@@ -199,8 +199,9 @@ const int SHARP_D2  = 1;
 int primeraLectura_A, primeraLectura_C;
 int segundaLectura_A, segundaLectura_C;
 int faltante_CM;
-int faltanteVariable = 5;
+int faltanteVariable = 3;
 char faltanteChar;
+
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -234,8 +235,8 @@ void comprobarAvance() {
     if(primeraLectura_A != 0) {
         faltanteChar = 'A';
         segundaLectura_A = getUltrasonico('A');
-        if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > (30-(faltanteVariable+1)) &&
-        abs(primeraLectura_A - segundaLectura_A) < (30+(faltanteVariable+1)))) {
+        if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > (30 - faltanteVariable) &&
+        abs(primeraLectura_A - segundaLectura_A) < (30 + faltanteVariable))) {
             faltante_CM = 0;
         } else {
             faltante_CM = 30 - abs(primeraLectura_A - segundaLectura_A);
@@ -243,8 +244,8 @@ void comprobarAvance() {
     } else if(primeraLectura_C != 0) {
         faltanteChar = 'C';
         segundaLectura_C = getUltrasonico('C');
-        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > (30-(faltanteVariable+1)) &&
-        abs(primeraLectura_C - segundaLectura_C) < (30+(faltanteVariable+1)))) {
+        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > (30 - faltanteVariable) &&
+        abs(primeraLectura_C - segundaLectura_C) < (30 + faltanteVariable))) {
             faltante_CM = 0;
         } else {
             faltante_CM = 30 - abs(primeraLectura_C - segundaLectura_C);
@@ -626,7 +627,7 @@ void checarInterr() {
             vueltaIzq();
             servoMotor();
             if(first_victim) {
-                delay(800);
+                delay(500);
                 servoMotor();
                 first_victim = false;
             }
@@ -636,7 +637,7 @@ void checarInterr() {
             vueltaDer();
             servoMotor();
             if(first_victim) {
-                delay(800);
+                delay(500);
                 servoMotor();
                 first_victim = false;
             }
@@ -978,7 +979,7 @@ void vueltaIzq() {
                 detener();
                 vueltaIzquierda();
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-                delay(1000);
+                delay(500);
                 velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
             }
         }
@@ -994,7 +995,7 @@ void vueltaIzq() {
                 detener();
                 vueltaDerecha();
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-                delay(1000);
+                delay(500);
                 velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
             }
         }
@@ -1079,7 +1080,7 @@ void vueltaDer() {
                 detener();
                 vueltaIzquierda();
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-                delay(1000);
+                delay(500);
                 velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
             }
         }
@@ -1095,7 +1096,7 @@ void vueltaDer() {
                 detener();
                 vueltaIzquierda();
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-                delay(1000);
+                delay(500);
                 velocidad(VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR + 35, VEL_MOTOR +35);
             }
         }
@@ -1373,12 +1374,10 @@ void checarRampa() {
                 if(z_actual == 0 && !Piso1) {
                     permisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
-                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 0 && Piso1) {
                     permisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(100);
                     if(!Piso2)
                     z_actual++;
                     else
@@ -1387,19 +1386,16 @@ void checarRampa() {
                 } else if(z_actual == 2) {
                     permisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(100);
                     z_actual--;
                 }
             } else if(bajarRampa) {
                 if(z_actual==1 && !Piso2) {
                     permisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
-                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 1 && Piso2) {
                     permisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(100);
                     switch(LastMove) {
                         case TO_NORTH:
                             if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
@@ -1437,7 +1433,6 @@ void checarRampa() {
                 } else if(z_actual == 2) {
                     permisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(100);
                     z_actual -= 2;
                 }
             }
@@ -1446,12 +1441,10 @@ void checarRampa() {
                 if(z_actual == 0 && !Piso1) {
                     permisoRampa = BAJAR_SUBIR;
                     lcd.print("BAJAR_SUBIR");
-                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 0 && Piso1) {
                     permisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(100);
                     if(!Piso2)
                         z_actual++;
                     else
@@ -1460,19 +1453,16 @@ void checarRampa() {
                 } else if(z_actual == 2) {
                     permisoRampa = BAJAR;
                     lcd.print("BAJAR");
-                    delay(100);
                     z_actual--;
                 }
             } else if(subirRampa) {
                 if(z_actual==1 && !Piso2) {
                     permisoRampa = SUBIR_BAJAR;
                     lcd.print("SUBIR_BAJAR");
-                    delay(100);
                     cuadros[x_actual][y_actual][z_actual].setEstado(RAMPA);
                 } else if(z_actual == 1 && Piso2) {
                     permisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(100);
                     switch(LastMove) {
                         case TO_NORTH:
                             if(cuadros[x_actual][y_actual + (RampaDiff-1)][0].getEstado() != NO_EXISTE) {
@@ -1511,7 +1501,6 @@ void checarRampa() {
                 } else if(z_actual == 2) {
                     permisoRampa = SUBIR;
                     lcd.print("SUBIR");
-                    delay(100);
                     z_actual -= 2;
                 }
             }
@@ -1567,14 +1556,11 @@ void alinearIMU() {
                     break;
             }
             steps = 0;
-            delay(50);
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
             if (alfa) {
-                while (steps <= 1200) {
+                while (steps <= 200) {
                     avanzar();
-                    lcd.clear();
-                    lcd.print(steps);
                 }
             } else if (bravo) {
                 while (steps <= 1200) {
@@ -1673,7 +1659,7 @@ void alinearIMU() {
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(350);
+            delay(150);
 
             vueltasDadas = 0;
             cuadrosVisitados = 0;
@@ -1758,6 +1744,7 @@ void movimientoDerecho(int fuente) {
 }
 
 void moverCuadro() {
+    primeraLectura();
     cuadrosVisitados++;
     steps = 0;
     while (steps <= 3500) {
@@ -1923,13 +1910,15 @@ void moverCuadro() {
 
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
-    avanzar();
     while (steps <= 975) {
-        //movimientoDerecho(MOV_FRENTE);
-        //checarInterr();
+        movimientoDerecho(MOV_FRENTE);
+        checarInterr();
         checarLimit();
     }
     detener();
+    if(!rampaCambio) {
+
+    }
     alinearIMU();
     alinear();
     checarColor();
@@ -2244,7 +2233,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             lcd.print(" T E O R I A ES");
             lcd.setCursor(0, 1);
             lcd.print("P R A C T I C A");
-            delay(20000);
+            delay(40000);
         }
 
         for (int i = 0; i<4; i++)
@@ -3843,7 +3832,7 @@ void setup() {
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(350);
+    delay(150);
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
@@ -3855,7 +3844,7 @@ void loop() {
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-    delay(150);
+    delay(50);
 
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
