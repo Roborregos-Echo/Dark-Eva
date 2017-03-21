@@ -150,6 +150,8 @@ const int MOV_RAMPA_BAJAR           =   2;
 const int MOV_RAMPA_NO_SUBIR        =   3;
 const int MOV_RAMPA_NO_BAJAR        =   4;
 const int MOV_REVERSA               =   5;
+const int MOV_FRENTE_ALINEAR        =   6;
+const int MOV_REVERSA_ALINEAR       =   7;
 
 
 //******************************************
@@ -1739,6 +1741,24 @@ void movimientoDerecho(int fuente) {
             reversa();
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             break;
+        case MOV_FRENTE_ALINEAR:
+            avanzar();
+            if(getAngulo() > 320) {
+                inIzq = - (360 - getAngulo());
+                inDer = - (360 - getAngulo());
+            } else {
+                inIzq = getAngulo();
+                inDer = getAngulo();
+            }
+
+            izqPID.Compute();
+            derPID.Compute();
+            velocidad(VEL_MOTOR_ALINEAR + outIzq - outDer, VEL_MOTOR_ALINEAR + outDer - outIzq, VEL_MOTOR_ALINEAR + outIzq - outDer, VEL_MOTOR_ALINEAR + outDer - outIzq);
+            break;
+        case MOV_REVERSA_ALINEAR:
+            reversa();
+            velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+            break;
     }
 }
 
@@ -1915,8 +1935,51 @@ void moverCuadro() {
         checarLimit();
     }
     detener();
-    if(!rampaCambio) {
-
+    comprobarAvance();
+    if(!rampaCambio && faltante_CM != 0) {
+        if (faltanteChar == 'A') {
+            int posInicial = getUltrasonico('A');
+            int posActual = posInicial;
+            if(posActual > posInicial - faltante_CM) {
+                while (posActual > posInicial - faltante_CM) {
+                    delay(50);
+                    movimientoDerecho(MOV_FRENTE_ALINEAR);
+                    checarInterr();
+                    checarLimit();
+                    posActual = getUltrasonico('A');
+                }
+                detener();
+                }
+            else if(posActual < posInicial - faltante_CM) {
+                while (posActual < posInicial - faltante_CM) {
+                    delay(50);
+                    movimientoDerecho(MOV_REVERSA_ALINEAR);
+                    posActual = getUltrasonico('A');
+                }
+                detener();
+                }
+        } else {
+            int posInicial = getUltrasonico('C');
+            int posActual = posInicial;
+            if(posActual < posInicial + faltante_CM) {
+                while (posActual < posInicial + faltante_CM) {
+                    delay(50);
+                    movimientoDerecho(MOV_FRENTE_ALINEAR);
+                    checarInterr();
+                    checarLimit();
+                    posActual = getUltrasonico('C');
+                }
+                detener();
+                }
+            else if(posActual > posInicial + faltante_CM) {
+                while (posActual > posInicial + faltante_CM) {
+                    delay(50);
+                    movimientoDerecho(MOV_REVERSA_ALINEAR);
+                    posActual = getUltrasonico('C');
+                }
+                detener();
+                }
+        }
     }
     alinearIMU();
     alinear();
