@@ -1912,8 +1912,22 @@ void moverCuadro() {
         checarLimit();
     }
     detener();
-    if(!rampaCambio) {
-
+    comprobarAvance();
+    if(!rampaCambio && faltante_CM != 0) {
+        int posInicial = getUltrasonico('A');
+        int posActual = posInicial;
+        while (posActual > posInicial - faltante_CM) {
+            delay(50);
+            movimientoDerecho(MOV_FRENTE);
+            checarInterr();
+            checarLimit();
+            posActual = getUltrasonico('A');
+        }
+        while (posActual > posInicial + faltante_CM) {
+            delay(50);
+            movimientoDerecho(MOV_REVERSA);
+            posActual = getUltrasonico('A');
+        }
     }
     alinearIMU();
     alinear();
