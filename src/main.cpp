@@ -200,6 +200,8 @@ int primeraLectura_A, primeraLectura_C;
 int segundaLectura_A, segundaLectura_C;
 int faltante_CM;
 int faltanteVariable = 3;
+char faltanteChar;
+
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -231,6 +233,7 @@ void primeraLectura() {
 
 void comprobarAvance() {
     if(primeraLectura_A != 0) {
+        faltanteChar = 'A';
         segundaLectura_A = getUltrasonico('A');
         if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > (30 - faltanteVariable) &&
         abs(primeraLectura_A - segundaLectura_A) < (30 + faltanteVariable))) {
@@ -239,6 +242,7 @@ void comprobarAvance() {
             faltante_CM = 30 - abs(primeraLectura_A - segundaLectura_A);
         }
     } else if(primeraLectura_C != 0) {
+        faltanteChar = 'C';
         segundaLectura_C = getUltrasonico('C');
         if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > (30 - faltanteVariable) &&
         abs(primeraLectura_C - segundaLectura_C) < (30 + faltanteVariable))) {
