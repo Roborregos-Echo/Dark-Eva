@@ -237,6 +237,7 @@ void comprobarAvance() {
         abs(primeraLectura_A - segundaLectura_A) <= (30 + faltanteVariable))
             faltante_CM = 0;
 
+
         if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) > (30 - faltanteVariable) &&
         abs(primeraLectura_A - segundaLectura_A) < (30 + faltanteVariable))) {
             faltante_CM = 0;
