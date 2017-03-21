@@ -240,13 +240,8 @@ void comprobarAvance() {
         }
     } else if(primeraLectura_C != 0) {
         segundaLectura_C = getUltrasonico('C');
-        if(segundaLectura_C == 0 )
-        {
-            if(getUltrasonico('A') != 0)
-                faltante_CM = 0;
-        }
-        else if(abs(primeraLectura_C - segundaLectura_C) > (30-(faltanteVariable+1)) &&
-        abs(primeraLectura_C - segundaLectura_C) < (30+(faltanteVariable+1))) {
+        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) > (30-(faltanteVariable+1)) &&
+        abs(primeraLectura_C - segundaLectura_C) < (30+(faltanteVariable+1)))) {
             faltante_CM = 0;
         } else {
             faltante_CM = 30 - abs(primeraLectura_C - segundaLectura_C);
