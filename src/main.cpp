@@ -202,7 +202,6 @@ int faltante_CM;
 int faltanteVariable = 3;
 char faltanteChar;
 
-
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
 NewPing ULTRA_C(TRIG_C, ECHO_C, MAX_DISTANCE);
