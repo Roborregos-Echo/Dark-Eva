@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.3.5 --------------------------------
-//--------------------------- 20 / MARZO / 2017 -----------------------------
+//--------------------------- 21 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -209,9 +209,23 @@ NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
 NewPing ULTRA_C(TRIG_C, ECHO_C, MAX_DISTANCE);
 NewPing ULTRA_D(TRIG_D, ECHO_D, MAX_DISTANCE);
 
+int getUltrasonico(char cSentido) {
+    switch(cSentido) {
+        case 'A':
+            return ULTRA_A.convert_cm(ULTRA_A.ping_median(1));
 
+        case 'B':
+            return ULTRA_B.convert_cm(ULTRA_B.ping_median(1));
+
+        case 'C':
+            return ULTRA_C.convert_cm(ULTRA_C.ping_median(1));
+
+        case 'D':
+            return ULTRA_D.convert_cm(ULTRA_D.ping_median(1));
+    }
+}
 // Siempre meter el delay manualmente, tiene que ser de 50!!!!
-unsigned int getUltrasonico(char cSentido) {
+unsigned int getUltrasonicoVIEJO(char cSentido) {
     switch(cSentido) {
         case 'A':
             return ULTRA_A.ping() / US_ROUNDTRIP_CM;
@@ -794,7 +808,6 @@ void alinear() {
             detener();
         }
     } else if(bravo) {
-        delay(50);
         while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_B1) < 6.5) {
@@ -1643,12 +1656,6 @@ void alinearIMU() {
                     lcd.clear();
                     lcd.print(steps);
                 }
-            } else if (delta) {
-                while (steps <= 1200) {
-                    horizontalIzquierda();
-                    lcd.clear();
-                    lcd.print(steps);
-                }
             } else
                 return;
             detener();
@@ -1665,7 +1672,6 @@ void alinearIMU() {
             vueltasDadas = 0;
             cuadrosVisitados = 0;
         }
-        alinear();
     }
 }
 
@@ -1935,6 +1941,7 @@ void moverCuadro() {
         checarLimit();
     }
     detener();
+    delay(100);
     comprobarAvance();
     if(!rampaCambio && faltante_CM != 0) {
         if (faltanteChar == 'A') {
@@ -1942,7 +1949,6 @@ void moverCuadro() {
             int posActual = posInicial;
             if(posActual > posInicial - faltante_CM) {
                 while (posActual > posInicial - faltante_CM) {
-                    delay(50);
                     movimientoDerecho(MOV_FRENTE_ALINEAR);
                     checarInterr();
                     checarLimit();
@@ -1952,7 +1958,6 @@ void moverCuadro() {
                 }
             else if(posActual < posInicial - faltante_CM) {
                 while (posActual < posInicial - faltante_CM) {
-                    delay(50);
                     movimientoDerecho(MOV_REVERSA_ALINEAR);
                     posActual = getUltrasonico('A');
                 }
@@ -1963,7 +1968,6 @@ void moverCuadro() {
             int posActual = posInicial;
             if(posActual < posInicial + faltante_CM) {
                 while (posActual < posInicial + faltante_CM) {
-                    delay(50);
                     movimientoDerecho(MOV_FRENTE_ALINEAR);
                     checarInterr();
                     checarLimit();
@@ -1973,7 +1977,6 @@ void moverCuadro() {
                 }
             else if(posActual > posInicial + faltante_CM) {
                 while (posActual > posInicial + faltante_CM) {
-                    delay(50);
                     movimientoDerecho(MOV_REVERSA_ALINEAR);
                     posActual = getUltrasonico('C');
                 }
@@ -2292,10 +2295,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 lcd.backlight();
                 delay(75);
             }
-            /*lcd.print(" T E O R I A ES");
+            lcd.print(" T E O R I A ES");
             lcd.setCursor(0, 1);
             lcd.print("P R A C T I C A");
-            delay(40000);*/
+            delay(40000);
         }
 
         for (int i = 0; i<4; i++)
