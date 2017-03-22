@@ -204,6 +204,12 @@ int faltante_CM;
 int faltanteVariable = 3;
 char faltanteChar;
 bool bumper = false;
+int lecturasUltra[30];
+int lecturasComparador[30];
+int contador_ultra = 0;
+int lecturasDiferentes = 0;
+bool boolUltra = false;
+bool boolAvanzo = false;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -240,6 +246,50 @@ int getUltrasonicoPared(char cSentido) {
         case 'D':
             return ULTRA_D.ping_cm();
     }
+}
+
+void agregarLecturas(char cSentido){
+    lecturasUltra[contador_ultra] = getUltrasonico(cSentido);
+    Serial.println(lecturasUltra[contador_ultra]);
+    contador_ultra++;
+}
+
+void checarAvance(){
+    for(int i=0; i<30; i++)
+    {
+        lecturasComparador[i] = lecturasUltra[i];
+    }
+
+    for(int i=0; i<30; i++)
+    {
+        for(int j=0; j<30; j++)
+        {
+            if(lecturasComparador[j] == lecturasUltra[i])
+            {
+                lecturasComparador[j] = 0;
+                boolUltra = true;
+            }
+        }
+        if(boolUltra)
+        {
+            lecturasDiferentes++;
+            boolUltra = false;
+        }
+    }
+
+    if(lecturasDiferentes > 10)
+        boolAvanzo = true;
+    else
+        boolAvanzo = false;
+
+
+    for(int i=0; i<30; i++)
+    {
+        lecturasUltra[i] = 0;
+    }
+    contador_ultra = 0;
+    boolUltra = false;
+    lecturasDiferentes = 0;
 }
 
 
