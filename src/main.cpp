@@ -1696,6 +1696,14 @@ void movimientoDerecho(int fuente) {
             vecm = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             if(vecm.y() < -4)
                 bumper = true;
+
+            if(setIzq - inIzq > 10) {
+                detener();
+                delay(5000);
+            } else if(- setIzq + inIzq > 10) {
+                detener();
+                delay(5000);
+            }
             break;
 
         case MOV_RAMPA_SUBIR:
