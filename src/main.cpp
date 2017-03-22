@@ -96,7 +96,7 @@ byte iOrientacion = A_NORTE;
 // Coordenadas maximas
 const byte X_MAX = 15;
 const byte Y_MAX = 15;
-const byte Z_MAX = 3;
+const byte Z_MAX = 2;
 
 // Coordeanas actuales
 int    x_actual = 0;
@@ -1302,7 +1302,7 @@ void checarRampa2() {
 
         if(x_last2 != 255)
         {
-            if(cuadros[x_last][y_last][z_actual].getEstado() != RECORRIDO)
+            if(cuadros[x_last2][y_last2][z_actual].getEstado() != RECORRIDO)
                 cuadros[x_last2][y_last2][z_actual].setEstado(SIN_RECORRER);
 
             Last2 = false;
@@ -2292,10 +2292,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 lcd.backlight();
                 delay(75);
             }
-            lcd.print(" T E O R I A ES");
+            /*lcd.print(" T E O R I A ES");
             lcd.setCursor(0, 1);
             lcd.print("P R A C T I C A");
-            delay(40000);
+            delay(40000);*/
         }
 
         for (int i = 0; i<4; i++)
@@ -2416,7 +2416,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 }
             }
         }
-
         ////lcd.println("Paths: " + String(x_path) + "," + String(y_path) + " = " + String(pathway(x_path, y_path, x_destino, y_destino)));
         //delay(1000);
         ////lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
@@ -2518,7 +2517,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 ////lcd.println(y_back);
                 delay(3000);*/
                 back_index--;
-                //-----------
+                //------------
                 if(x_back == x_actual && y_back == y_actual) {
                     backList[back_index+1] = 999;
                     ////lcd.println("Entre al final");
@@ -2529,7 +2528,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                     if(ref == 255) {
                         //x_actual = x_destino;
                         //y_actual = y_destino;
-
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
                                 if(gridActual-backList[i] == X_MAX) {
@@ -2556,9 +2554,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                     gridActual -= 1;
                                 }
                             }
-                            lcd.setCursor(0, 1);
-                            lcd.print("          ");
-                            lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
                         }
                     } else {
                         for(int i = 0; i<GRID_MAX; i++) {
@@ -3286,6 +3281,8 @@ void resolverLaberinto() {
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
                 // GOTO RAMPA
+                lcd.clear();
+                lcd.print("GOTO RAMPA");
                 verificarRampa();
                 if (rampaid)
                 {
@@ -3295,7 +3292,7 @@ void resolverLaberinto() {
                 else{
                 ////lcd.println("GOTO-INICIO");
                 lcd.clear();
-
+                lcd.print("GOTO INICIO");
                 for(int y=0; y < Y_MAX; y++)
                 {
                     for (int x=0; x < X_MAX; x++)
@@ -3309,6 +3306,7 @@ void resolverLaberinto() {
                 }
 
                 gotoInicio(x_inicio, y_inicio);
+                delay(50000);
             }
             //gotoSR
             }
