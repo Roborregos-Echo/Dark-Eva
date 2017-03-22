@@ -129,7 +129,7 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   220;
+const int VEL_MOTOR                 =   230;
 
 const int VEL_MOTOR_RAMPA           =   245;
 const int VEL_MOTOR_RAMPA_ENCODER   =   245;
@@ -203,6 +203,7 @@ int segundaLectura_A, segundaLectura_C;
 int faltante_CM;
 int faltanteVariable = 3;
 char faltanteChar;
+bool bumper = false;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -212,34 +213,35 @@ NewPing ULTRA_D(TRIG_D, ECHO_D, MAX_DISTANCE);
 int getUltrasonico(char cSentido) {
     switch(cSentido) {
         case 'A':
-            return ULTRA_A.convert_cm(ULTRA_A.ping_median(1));
+            return ULTRA_A.convert_cm(ULTRA_A.ping_median(3));
 
         case 'B':
-            return ULTRA_B.convert_cm(ULTRA_B.ping_median(1));
+            return ULTRA_B.convert_cm(ULTRA_B.ping_median(3));
 
         case 'C':
-            return ULTRA_C.convert_cm(ULTRA_C.ping_median(1));
+            return ULTRA_C.convert_cm(ULTRA_C.ping_median(3));
 
         case 'D':
-            return ULTRA_D.convert_cm(ULTRA_D.ping_median(1));
+            return ULTRA_D.convert_cm(ULTRA_D.ping_median(3));
     }
 }
-// Siempre meter el delay manualmente, tiene que ser de 50!!!!
-unsigned int getUltrasonicoVIEJO(char cSentido) {
+
+int getUltrasonicoPared(char cSentido) {
     switch(cSentido) {
         case 'A':
-            return ULTRA_A.ping() / US_ROUNDTRIP_CM;
+            return ULTRA_A.ping_cm();
 
         case 'B':
-            return ULTRA_B.ping() / US_ROUNDTRIP_CM;
+            return ULTRA_B.ping_cm();
 
         case 'C':
-            return ULTRA_C.ping() / US_ROUNDTRIP_CM;
+            return ULTRA_C.ping_cm();
 
         case 'D':
-            return ULTRA_D.ping() / US_ROUNDTRIP_CM;
+            return ULTRA_D.ping_cm();
     }
 }
+
 
 void primeraLectura() {
     primeraLectura_A = getUltrasonico('A');
@@ -761,22 +763,22 @@ void alinear() {
 
     velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
-    lecturaUltra = getUltrasonico('A');
+    lecturaUltra = getUltrasonicoPared('A');
     lecturaSharp = getSharpCorta(SHARP_A);
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         alfa = true;
 
-    lecturaUltra = getUltrasonico('B');
+    lecturaUltra = getUltrasonicoPared('B');
     lecturaSharp = getSharpCorta(SHARP_B1);
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         bravo = true;
 
-    lecturaUltra = getUltrasonico('C');
+    lecturaUltra = getUltrasonicoPared('C');
     lecturaSharp = getSharpCorta(SHARP_A);
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         charlie = true;
 
-    lecturaUltra = getUltrasonico('D1');
+    lecturaUltra = getUltrasonicoPared('D');
     lecturaSharp = getSharpCorta(SHARP_A);
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         delta = true;
@@ -1533,22 +1535,22 @@ void alinearIMU() {
         velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
 
-        lecturaUltra = getUltrasonico('A');
+        lecturaUltra = getUltrasonicoPared('A');
         lecturaSharp = getSharpCorta(SHARP_A);
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             alfa = true;
 
-        lecturaUltra = getUltrasonico('B');
+        lecturaUltra = getUltrasonicoPared('B');
         lecturaSharp = getSharpCorta(SHARP_B1);
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             bravo = true;
 
-        lecturaUltra = getUltrasonico('C');
+        lecturaUltra = getUltrasonicoPared('C');
         lecturaSharp = getSharpCorta(SHARP_A);
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             charlie = true;
 
-        lecturaUltra = getUltrasonico('D1');
+        lecturaUltra = getUltrasonicoPared('D1');
         lecturaSharp = getSharpCorta(SHARP_A);
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             delta = true;
@@ -1676,6 +1678,7 @@ void alinearIMU() {
 }
 
 void movimientoDerecho(int fuente) {
+    imu::Vector<3> vecm = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     switch (fuente) {
         case MOV_FRENTE:
             avanzar();
@@ -1690,6 +1693,9 @@ void movimientoDerecho(int fuente) {
             izqPID.Compute();
             derPID.Compute();
             velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
+            vecm = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+            if(vecm.y() < -4)
+                bumper = true;
             break;
 
         case MOV_RAMPA_SUBIR:
@@ -1769,6 +1775,7 @@ void movimientoDerecho(int fuente) {
 }
 
 void moverCuadro() {
+    delay(100);
     primeraLectura();
     cuadrosVisitados++;
     steps = 0;
@@ -1779,7 +1786,7 @@ void moverCuadro() {
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    if(vec.y() < -6.5) {
+    if(vec.y() < -10) {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
@@ -1850,7 +1857,7 @@ void moverCuadro() {
                 vueltaDer();
                 break;*/
         }
-    } else if(vec.y() > 6.5) {
+    } else if(vec.y() > 10) {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
@@ -1926,7 +1933,7 @@ void moverCuadro() {
     } else {
         steps = 0;
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-        while (steps <= 975) {
+        while (steps <= 960) {
             movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
@@ -1935,7 +1942,7 @@ void moverCuadro() {
 
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
-    while (steps <= 975) {
+    while (steps <= 960) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
@@ -1943,46 +1950,62 @@ void moverCuadro() {
     detener();
     delay(100);
     comprobarAvance();
-    if(!rampaCambio && faltante_CM != 0) {
+    if(bumper && !rampaCambio && faltante_CM != 0) {
+        lcd.clear();
+        lcd.print("faltante ");
+        lcd.print(faltante_CM);
         if (faltanteChar == 'A') {
-            int posInicial = getUltrasonico('A');
+            lcd.print("   A");
+            int posInicial = segundaLectura_A;
             int posActual = posInicial;
+            lcd.setCursor(0, 1);
+            lcd.print(primeraLectura_A);
+            lcd.print(" ");
+            lcd.print(posInicial);
+            lcd.print(" ");
+            delay(1000);
             if(posActual > posInicial - faltante_CM) {
                 while (posActual > posInicial - faltante_CM) {
                     movimientoDerecho(MOV_FRENTE_ALINEAR);
                     checarInterr();
                     checarLimit();
-                    posActual = getUltrasonico('A');
+                    posActual = getUltrasonicoPared('A');
                 }
                 detener();
                 }
             else if(posActual < posInicial - faltante_CM) {
                 while (posActual < posInicial - faltante_CM) {
                     movimientoDerecho(MOV_REVERSA_ALINEAR);
-                    posActual = getUltrasonico('A');
+                    posActual = getUltrasonicoPared('A');
                 }
                 detener();
                 }
         } else {
-            int posInicial = getUltrasonico('C');
+            int posInicial = segundaLectura_C;
+            lcd.print("   C");
             int posActual = posInicial;
+            lcd.setCursor(0, 1);
+            lcd.print(posInicial);
+            lcd.print(" ");
+            delay(1000);
             if(posActual < posInicial + faltante_CM) {
                 while (posActual < posInicial + faltante_CM) {
                     movimientoDerecho(MOV_FRENTE_ALINEAR);
                     checarInterr();
                     checarLimit();
-                    posActual = getUltrasonico('C');
+                    posActual = getUltrasonicoPared('C');
                 }
                 detener();
                 }
             else if(posActual > posInicial + faltante_CM) {
                 while (posActual > posInicial + faltante_CM) {
                     movimientoDerecho(MOV_REVERSA_ALINEAR);
-                    posActual = getUltrasonico('C');
+                    posActual = getUltrasonicoPared('C');
                 }
                 detener();
                 }
         }
+        bumper = false;
     }
     alinearIMU();
     alinear();
@@ -2288,17 +2311,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if(x_destino == x_actual && y_destino == y_actual) {
             pathFinished = true;
-            lcd.clear();
-            for (int i = 0; i < 8; i++) {
-                lcd.noBacklight();
-                delay(75);
-                lcd.backlight();
-                delay(75);
-            }
-            lcd.print(" T E O R I A ES");
-            lcd.setCursor(0, 1);
-            lcd.print("P R A C T I C A");
-            delay(40000);
         }
 
         for (int i = 0; i<4; i++)
@@ -2615,7 +2627,7 @@ void checarParedes() {
     switch(iOrientacion) {
         case A_NORTE:
         if(y_actual > 0) {
-            lectura = getUltrasonico('C');
+            lectura = getUltrasonicoPared('C');
             if((lectura == 0 || lectura > 15 ) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2630,7 +2642,7 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        lectura = getUltrasonico('B');
+        lectura = getUltrasonicoPared('B');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
@@ -2641,7 +2653,7 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        lectura = getUltrasonico('A');
+        lectura = getUltrasonicoPared('A');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
@@ -2654,7 +2666,7 @@ void checarParedes() {
 
         if(x_actual > 0)
         {
-            lectura = getUltrasonico('D');
+            lectura = getUltrasonicoPared('D');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2673,7 +2685,7 @@ void checarParedes() {
         break;
         //--------------------------------------------------------------------
         case B_NORTE:
-        lectura = getUltrasonico('C');
+        lectura = getUltrasonicoPared('C');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
@@ -2684,7 +2696,7 @@ void checarParedes() {
         if((lectura != 0 && lectura < 15))
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        lectura = getUltrasonico('B');
+        lectura = getUltrasonicoPared('B');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
@@ -2698,7 +2710,7 @@ void checarParedes() {
 
         if(x_actual > 0)
         {
-            lectura = getUltrasonico('A');
+            lectura = getUltrasonicoPared('A');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2715,7 +2727,7 @@ void checarParedes() {
 
         if(y_actual > 0)
         {
-            lectura = getUltrasonico('D');
+            lectura = getUltrasonicoPared('D');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2734,7 +2746,7 @@ void checarParedes() {
         break;
         //--------------------------------------------------------------------
         case C_NORTE:
-        lectura = getUltrasonico('C');
+        lectura = getUltrasonicoPared('C');
         if((lectura == 0 || lectura > 15)&& (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
@@ -2747,7 +2759,7 @@ void checarParedes() {
 
         if(x_actual > 0)
         {
-            lectura = getUltrasonico('B');
+            lectura = getUltrasonicoPared('B');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2764,7 +2776,7 @@ void checarParedes() {
 
         if(y_actual > 0)
         {
-            lectura = getUltrasonico('A');
+            lectura = getUltrasonicoPared('A');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2779,7 +2791,7 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        lectura = getUltrasonico('D');
+        lectura = getUltrasonicoPared('D');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
@@ -2795,7 +2807,7 @@ void checarParedes() {
         case D_NORTE:
         if(x_actual > 0)
         {
-            lectura = getUltrasonico('C');
+            lectura = getUltrasonicoPared('C');
             if((lectura == 0 || lectura > 15) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2814,7 +2826,7 @@ void checarParedes() {
 
         if(y_actual > 0)
         {
-            lectura = getUltrasonico('B');
+            lectura = getUltrasonicoPared('B');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2831,7 +2843,7 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        lectura = getUltrasonico('A');
+        lectura = getUltrasonicoPared('A');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
@@ -2843,7 +2855,7 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
-        lectura = getUltrasonico('D');
+        lectura = getUltrasonicoPared('D');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
@@ -3309,7 +3321,18 @@ void resolverLaberinto() {
                 }
 
                 gotoInicio(x_inicio, y_inicio);
-                delay(50000);
+
+                lcd.clear();
+                for (int i = 0; i < 8; i++) {
+                    lcd.noBacklight();
+                    delay(75);
+                    lcd.backlight();
+                    delay(75);
+                }
+                lcd.print(" T E O R I A ES");
+                lcd.setCursor(0, 1);
+                lcd.print("P R A C T I C A");
+                delay(60000);
             }
             //gotoSR
             }
@@ -3896,7 +3919,7 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(150);
-    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
 void loop() {
