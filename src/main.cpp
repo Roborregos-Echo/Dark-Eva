@@ -255,14 +255,14 @@ void agregarLecturas(char cSentido){
 }
 
 void checarAvance(){
-    for(int i=0; i<30; i++)
+    for(int i=0; i<20; i++)
     {
         lecturasComparador[i] = lecturasUltra[i];
     }
 
-    for(int i=0; i<30; i++)
+    for(int i=0; i<20; i++)
     {
-        for(int j=0; j<30; j++)
+        for(int j=0; j<20; j++)
         {
             if(lecturasComparador[j] == lecturasUltra[i])
             {
@@ -283,7 +283,7 @@ void checarAvance(){
         boolAvanzo = false;
 
 
-    for(int i=0; i<30; i++)
+    for(int i=0; i<20; i++)
     {
         lecturasUltra[i] = 0;
     }
