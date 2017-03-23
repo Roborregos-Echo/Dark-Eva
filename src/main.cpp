@@ -204,8 +204,8 @@ int faltante_CM;
 int faltanteVariable = 3;
 char faltanteChar;
 bool bumper = false;
-int lecturasUltra[30];
-int lecturasComparador[30];
+int lecturasUltra[20];
+int lecturasComparador[20];
 int contador_ultra = 0;
 int lecturasDiferentes = 0;
 bool boolUltra = false;
@@ -289,7 +289,6 @@ void checarAvance(){
     }
     contador_ultra = 0;
     boolUltra = false;
-    lecturasDiferentes = 0;
 }
 
 
@@ -322,6 +321,9 @@ void comprobarAvance() {
     }
 }
 
+void checarFaltante(){
+    faltante_CM = map(lecturasDiferentes, 1, 20, 0, 30);
+}
 
 //******************************************
 //------------- PATHFINDING ----------------
