@@ -171,6 +171,7 @@ int vueltasDadas = 0;
 bool rampaCambio = false;
 
 
+
 //******************************************
 //----------- SHARP GP2Y0A21YK -------------
 const int SHARP_A   = 12;
@@ -210,6 +211,7 @@ int contador_ultra = 0;
 int lecturasDiferentes = 0;
 bool boolUltra = false;
 bool boolAvanzo = false;
+long tiempo;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -1754,6 +1756,24 @@ void movimientoDerecho(int fuente) {
                 detener();
                 delay(5000);
             }
+
+            if(millis() - tiempo > 48 && millis()-tiempo < 52) {
+                tiempo = millis();
+                agregarLecturas('A');
+            }
+
+            if(contador_ultra == 20) {
+                checarAvance();
+                if(boolAvanzo) {
+                Serial.println("Si avanzo");
+                boolAvanzo = false;
+                } else
+                Serial.println("NO avanzo");
+
+                delay(1000);
+                tiempo = millis();
+                lecturasDiferentes = 0;
+            }
             break;
 
         case MOV_RAMPA_SUBIR:
@@ -1837,6 +1857,7 @@ void moverCuadro() {
     primeraLectura();
     cuadrosVisitados++;
     steps = 0;
+    tiempo = millis();
     while (steps <= 3500) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
@@ -3977,7 +3998,7 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(150);
-    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
 void loop() {
