@@ -1253,6 +1253,8 @@ void checarRampa() {
             }
         }
     }
+    subirRampa = false;
+    bajarRampa = false;
 }
 
 
@@ -1423,7 +1425,7 @@ void movimientoDerecho(int fuente) {
                     else
                         inIzq = getAngulo();
 
-                    vueltaIzquierda();
+                    vueltaDerecha();
                 } while(setIzq - inIzq  > 3);
                 detener();
                 steps = pos * 0.80;
@@ -1452,10 +1454,10 @@ void movimientoDerecho(int fuente) {
             }
 
 
-            if(contador_ultra < 20 && millis() - millisPasado > 48 && millis() - millisPasado < 52) {
+            /*if(contador_ultra < 20 && millis() - millisPasado > 48 && millis() - millisPasado < 52) {
                 millisPasado = millis();
                 agregarLecturas('A');
-            }
+            }*/
             break;
 
         case MOV_RAMPA_SUBIR:
@@ -1535,8 +1537,8 @@ void movimientoDerecho(int fuente) {
 }
 
 void moverCuadro() {
-    delay(100);
-    primeraLectura();
+    //delay(100);
+    //primeraLectura();
     cuadrosVisitados++;
     steps = 0;
     while (steps <= 3500) {
@@ -1558,7 +1560,9 @@ void moverCuadro() {
             case BAJAR_SUBIR:
             case BAJAR:
                 lcd.clear();
+                lcd.print(permisoRampa);
                 lcd.print("ERROR");
+                delay(50000);
                 break;
 
             case SUBIR:
@@ -1709,7 +1713,7 @@ void moverCuadro() {
     }
     detener();
     delay(100);
-    if(contador_ultra == 20) {
+    /*if(contador_ultra == 20) {
         checarAvance();
         if(boolAvanzo) {
             lcd.clear();
@@ -1724,7 +1728,7 @@ void moverCuadro() {
         delay(1000);
         millisPasado = millis();
         lecturasDiferentes = 0;
-    }
+    }*/
     alinearIMU();
     alinear();
     checarColor();
@@ -3217,30 +3221,6 @@ void calibrarColor() {
     }
 
     lcd.clear();
-    lcd.print("  Checkpoint...");
-    while(EstadoColor == ESTADO_CHECKPOINT) {
-        ////lcd.println("Calibrar Checkpoint");
-        BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 0) {
-            setFiltro('N');
-            iN_CHECKPOINT = getColor();
-
-            setFiltro('R');
-            iR_CHECKPOINT = getColor();
-
-            setFiltro('G');
-            iV_CHECKPOINT = getColor();
-
-            setFiltro('B');
-            iA_CHECKPOINT = getColor();
-
-            //*Limpia la pantalla
-            EstadoColor = ESTADO_LISTO;
-            delay(500);
-        }
-    }
-
-    lcd.clear();
     lcd.print("   LISTO... ");
     delay(4000);
     EstadoColor++;
@@ -3294,9 +3274,10 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 
 void checarColor() {
-    if(checarCuadroColor(COLOR_NEGRO, 80)) {
+    if(checarCuadroColor(COLOR_NEGRO, 150)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
+        delay(1000);
         cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
         cuadros[x_actual-1][y_actual][z_actual].setPared('E', true);
         cuadros[x_actual][y_actual+1][z_actual].setPared('S', true);
@@ -3481,7 +3462,7 @@ void setup() {
     //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
-    setFrecuencia(20);           //Establece la frecuencia del TCS3200
+    setFrecuencia(2);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
     pinMode(S0, OUTPUT);         //Establece  pin de Salida
     pinMode(S1, OUTPUT);         //Establece  pin de Salida
@@ -3501,9 +3482,21 @@ void setup() {
     pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
     pinMode(interruptDefiner, INPUT);
     pinMode(BOTON_COLOR, INPUT);
-
     lcd.begin();
     lcd.backlight();
+
+    if (digitalRead(BOTON_COLOR) == 0) {
+         lcd.clear();
+         lcd.print("SUELTE EL BOTON");
+         delay(800);
+         calibrarColor();
+     } else {
+         leerValores();
+         lcd.clear();
+         lcd.print("VALORES ANADIDOS");
+     }
+
+    lcd.clear();
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
     lcd.print("   T E O R I A");
