@@ -44,7 +44,7 @@ void vueltaDer();
 void vueltaIzq();
 
 
-
+    
 //********************************************
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
@@ -3024,13 +3024,14 @@ void resolverLaberinto() {
                 Pathfinding(x_recorrer[iCSR], y_recorrer[iCSR], var);
             } else {
                 // GOTO RAMPA
-                lcd.clear();
-                lcd.print("GOTO RAMPA");
                 verificarRampa();
                 if (rampaid)
                 {
+                    lcd.clear();
+                    lcd.print("GOTO RAMPA");
                     byte var = 255;
                     Pathfinding(x_rampa, y_rampa, var);
+                    rampaid = false;
                 }
                 else{
                 ////lcd.println("GOTO-INICIO");
