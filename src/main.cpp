@@ -44,7 +44,7 @@ void vueltaDer();
 void vueltaIzq();
 
 
-    
+
 //********************************************
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
@@ -3186,7 +3186,7 @@ void calibrarColor() {
     while(EstadoColor == ESTADO_OFF) {
         ////lcd.println("Calibrar...");
         lcd.setCursor(0, 0);
-        lcd.print("   Calibrar...");
+        lcd.print("   Calibrar... ");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 0) {
             //*Limpia la pantalla
@@ -3251,26 +3251,11 @@ bool checarCuadroColor(byte cuadro, byte margen) {
     setFiltro('B');
     iAzul = getColor();
 
-    switch (cuadro) {
-        case COLOR_NEGRO:
-        if(iNone <= iN_NEGRO+margen && iNone >= iN_NEGRO-margen && iRojo <= iR_NEGRO+margen && iRojo >= iR_NEGRO-margen
-        && iVerde <= iV_NEGRO+margen && iVerde >= iV_NEGRO-margen && iAzul <= iA_NEGRO+margen && iAzul >= iA_NEGRO-margen)
-            return true;
-        else
-            return false;
-        break;
-
-        case COLOR_CHECKPOINT:
-        if(iNone <= iN_CHECKPOINT+margen && iNone >= iN_CHECKPOINT-margen && iRojo <= iR_CHECKPOINT+margen && iRojo >= iR_CHECKPOINT-margen
-        && iVerde <= iV_CHECKPOINT+margen && iVerde >= iV_CHECKPOINT-margen && iAzul <= iA_CHECKPOINT+margen && iAzul >= iA_CHECKPOINT-margen)
-            return true;
-        else
-            return false;
-        break;
-
-        default:
+    if(iNone <= iN_NEGRO+margen && iNone >= iN_NEGRO-margen && iRojo <= iR_NEGRO+margen && iRojo >= iR_NEGRO-margen
+    && iVerde <= iV_NEGRO+margen && iVerde >= iV_NEGRO-margen && iAzul <= iA_NEGRO+margen && iAzul >= iA_NEGRO-margen)
+        return true;
+    else
         return false;
-    }
 }
 
 
@@ -3485,6 +3470,34 @@ void setup() {
     pinMode(BOTON_COLOR, INPUT);
     lcd.begin();
     lcd.backlight();
+
+    /*while(true)
+    {
+        lcd.clear();
+        lcd.print("      None");
+        setFiltro('N');
+        lcd.setCursor(0, 1);
+        lcd.print(getColor());
+        delay(1000);
+        lcd.clear();
+        lcd.print("      Red");
+        setFiltro('R');
+        lcd.setCursor(0, 1);
+        lcd.print(getColor());
+        delay(1000);
+        lcd.clear();
+        lcd.print("     Green");
+        setFiltro('G');
+        lcd.setCursor(0, 1);
+        lcd.print(getColor());
+        delay(1000);
+        lcd.clear();
+        lcd.print("      Blue");
+        setFiltro('B');
+        lcd.setCursor(0, 1);
+        lcd.print(getColor());
+        delay(1000);
+    }*/
 
     if (digitalRead(BOTON_COLOR) == 0) {
          lcd.clear();
