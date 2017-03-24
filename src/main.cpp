@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.3.6 --------------------------------
-//--------------------------- 23 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.3.7 --------------------------------
+//--------------------------- 24 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -130,8 +130,8 @@ byte y_recorrer[50];
 
 const int VEL_MOTOR                 =   230;
 
-const int VEL_MOTOR_RAMPA           =   245;
-const int VEL_MOTOR_RAMPA_ENCODER   =   245;
+const int VEL_MOTOR_RAMPA           =   244;
+const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
 const int VEL_MOTOR_VUELTA          =   140;
 
@@ -802,12 +802,12 @@ void alinear() {
         bravo = true;
 
     lecturaUltra = getUltrasonicoUno('C');
-    lecturaSharp = getSharpCorta(SHARP_A);
+    lecturaSharp = getSharpCorta(SHARP_C);
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         charlie = true;
 
     lecturaUltra = getUltrasonicoUno('D');
-    lecturaSharp = getSharpCorta(SHARP_A);
+    lecturaSharp = getSharpCorta(SHARP_D1);
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         delta = true;
 
@@ -1277,7 +1277,7 @@ void checarRampa() {
 
 
 void alinearIMU() {
-    if (rampaCambio || cuadrosVisitados > 25 || vueltasDadas > 15) {
+    if (rampaCambio || cuadrosVisitados > 20 || vueltasDadas > 15) {
         int lecturaUltra, lecturaSharp;
         bool alfa       =   false;
         bool bravo      =   false;
@@ -1307,36 +1307,62 @@ void alinearIMU() {
             delta = true;
 
         if(rampaCambio) {
+            bool temp;
             byte ultimaOrientacion = iOrientacion;
             switch (iOrientacion) {
                 case B_norte:
                     vueltaDer();
+                    temp = alfa;
+                    alfa = bravo;
+                    bravo = charlie;
+                    charlie = delta;
+                    delta = temp;
+
                     break;
 
                 case C_norte:
                     vueltaDer();
                     vueltaDer();
+                    temp = alfa;
+                    alfa = charlie;
+                    charlie = temp;
+                    temp = bravo;
+                    bravo = charlie;
+                    charlie = temp;
                     break;
 
                 case D_norte:
                     vueltaIzq();
+                    temp = alfa;
+                    alfa = delta;
+                    delta = charlie;
+                    charlie = bravo;
+                    bravo = temp;
                     break;
             }
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
-            if (alfa)
-                while (steps <= 1200)
-                    avanzar();
-            else if (bravo)
-                while (steps <= 1200)
-                    horizontalDerecha();
-            else if (delta)
-                while (steps <= 1200)
-                    horizontalIzquierda();
-            else if (charlie)
-                while (steps <= 1200)
-                    reversa();
+            if (alfa) {
+                lecturaSharp = getSharpCorta(SHARP_A);
+                avanzar();
+                while(steps <= lecturaSharp * 210);
+
+            } else if (charlie) {
+                lecturaSharp = getSharpCorta(SHARP_C);
+                reversa();
+                while(steps <= lecturaSharp * 210);
+
+            } else if (bravo) {
+                lecturaSharp = getSharpCorta(SHARP_B1);
+                horizontalDerecha();
+                while(steps <= lecturaSharp * 210);
+
+            } else if (delta) {
+                lecturaSharp = getSharpCorta(SHARP_D1);
+                horizontalIzquierda();
+                while(steps <= lecturaSharp * 210);
+            }
 
             detener();
             lcd.clear();
@@ -1364,23 +1390,30 @@ void alinearIMU() {
             vueltasDadas = 0;
             cuadrosVisitados = 0;
             rampaCambio = false;
-        } else if ((cuadrosVisitados > 20 || vueltasDadas > 10) && iOrientacion == A_norte) {
+        } else if ((cuadrosVisitados > 20 || vueltasDadas > 15) && iOrientacion == A_norte) {
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
-            if (alfa)
-                while (steps <= 1200)
-                    avanzar();
-            else if (bravo)
-                while (steps <= 1200)
-                    horizontalDerecha();
-            else if (delta)
-                while (steps <= 1200)
-                    horizontalIzquierda();
-            else if (charlie)
-                while (steps <= 1200)
-                    reversa();
-            else
+            if (alfa) {
+                lecturaSharp = getSharpCorta(SHARP_A);
+                avanzar();
+                while(steps <= lecturaSharp * 210);
+
+            } else if (charlie) {
+                lecturaSharp = getSharpCorta(SHARP_C);
+                reversa();
+                while(steps <= lecturaSharp * 210);
+
+            } else if (bravo) {
+                lecturaSharp = getSharpCorta(SHARP_B1);
+                horizontalDerecha();
+                while(steps <= lecturaSharp * 210);
+
+            } else if (delta) {
+                lecturaSharp = getSharpCorta(SHARP_D1);
+                horizontalIzquierda();
+                while(steps <= lecturaSharp * 210);
+            } else
                 return;
             detener();
 
@@ -1419,7 +1452,7 @@ void movimientoDerecho(int fuente) {
             if(vecm.y() < -4)
                 bumper = true;
 
-            if(setIzq - inIzq > 7) {
+            if(setIzq - inIzq > 9) {
                 detener();
                 int pos = steps;
                 steps = 0;
@@ -1441,7 +1474,7 @@ void movimientoDerecho(int fuente) {
                 } while(setIzq - inIzq  > 3);
                 detener();
                 steps = pos * 0.80;
-            } else if(inIzq - setIzq > 7) {
+            } else if(inIzq - setIzq > 9) {
                 detener();
                 int pos = steps;
                 steps = 0;
@@ -1484,7 +1517,7 @@ void movimientoDerecho(int fuente) {
 
             izqPID.Compute();
             derPID.Compute();
-            velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA + outDer);
+            velocidad(VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer, VEL_MOTOR_RAMPA + outIzq, VEL_MOTOR_RAMPA_ENCODER + outDer);
             break;
 
         case MOV_RAMPA_BAJAR:
@@ -1557,7 +1590,7 @@ void moverCuadro() {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
-        lcd.print("Aaaaaaa");
+        //lcd.print("Aaaaaaa");
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1582,6 +1615,11 @@ void moverCuadro() {
                 while (vec.y() < -4) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                }
+                steps = 0;
+
+                while (steps <= 1000) {
+                    movimientoDerecho(MOV_FRENTE);
                 }
                 steps = 0;
                 break;
@@ -1656,6 +1694,11 @@ void moverCuadro() {
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 steps = 0;
+
+                while (steps <= 1000) {
+                    movimientoDerecho(MOV_FRENTE);
+                }
+                steps = 0;
                 break;
 
             /*case BAJAR_SUBIR:
@@ -1714,7 +1757,7 @@ void moverCuadro() {
             movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
-            lcd.print("Bbbbbb");
+            //lcd.print("Bbbbbb");
         }
     }
 
@@ -1724,7 +1767,7 @@ void moverCuadro() {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
-        lcd.print("Cccccc");
+        //lcd.print("Cccccc");
     }
     detener();
     delay(100);
@@ -1744,9 +1787,9 @@ void moverCuadro() {
         millisPasado = millis();
         lecturasDiferentes = 0;
     }*/
+    checarColor();
     alinearIMU();
     alinear();
-    checarColor();
 }
 
 
@@ -3579,7 +3622,7 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(150);
-    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
 void loop() {
