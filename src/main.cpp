@@ -815,6 +815,8 @@ void alinear() {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
             unsigned long inicio = millis();
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 1.5) {
+                lcd.clear();
+                lcd.print(111111);
                 horizontalDerecha();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -825,6 +827,8 @@ void alinear() {
 
             inicio = millis();
             while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 1.5) {
+                lcd.clear();
+                lcd.print(222222);
                 horizontalIzquierda();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -837,6 +841,8 @@ void alinear() {
         while (!(getSharpCorta(SHARP_B1) > 6.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_B1) < 6.5) {
+                lcd.clear();
+                lcd.print(333333);
                 horizontalIzquierda();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -846,6 +852,8 @@ void alinear() {
             detener();
             inicio = millis();
             while (getSharpCorta(SHARP_B1) > 8.5) {
+                lcd.clear();
+                lcd.print(444444);
                 horizontalDerecha();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -869,6 +877,8 @@ void alinear() {
         while (!(getSharpCorta(SHARP_D1) > 6.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_D1) < 6.5) {
+                lcd.clear();
+                lcd.print(555555);
                 horizontalDerecha();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -878,6 +888,8 @@ void alinear() {
             detener();
             inicio = millis();
             while (getSharpCorta(SHARP_D1) >  8.5) {
+                lcd.clear();
+                lcd.print(666666);
                 horizontalIzquierda();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -903,6 +915,8 @@ void alinear() {
         while (!(getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 9)) {
             inicio = millis();
             while (getSharpCorta(SHARP_A) < 7) {
+                lcd.clear();
+                lcd.print(777777);
                 reversa();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -912,6 +926,8 @@ void alinear() {
             detener();
             inicio = millis();
             while (getSharpCorta(SHARP_A) > 9) {
+                lcd.clear();
+                lcd.print(888888);
                 avanzar();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -920,13 +936,13 @@ void alinear() {
             }
             detener();
         }
-    }
-
-    if (charlie) {
+    } else if (charlie) {
         unsigned long inicio;
-        while (!(getSharpCorta(SHARP_C) > 8 && getSharpCorta(SHARP_C) < 10)) {
+        while (!(getSharpCorta(SHARP_C) > 7 && getSharpCorta(SHARP_C) < 9)) {
             inicio = millis();
-            while (getSharpCorta(SHARP_C) < 8.5) {
+            while (getSharpCorta(SHARP_C) < 7) {
+                lcd.clear();
+                lcd.print(999999);
                 avanzar();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -936,7 +952,9 @@ void alinear() {
             detener();
 
             inicio = millis();
-            while (getSharpCorta(SHARP_C) > 9.5) {
+            while (getSharpCorta(SHARP_C) > 9) {
+                lcd.clear();
+                lcd.print(123456);
                 reversa();
                 if (millis() >= inicio + 800) {
                     detener();
@@ -1308,29 +1326,26 @@ void alinearIMU() {
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
             if (alfa)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     avanzar();
             else if (bravo)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     horizontalDerecha();
             else if (delta)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     horizontalIzquierda();
             else if (charlie)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     reversa();
-            else if (delta)
-                while (steps <= 1000)
-                    horizontalIzquierda();
 
             detener();
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1500);
+            delay(1400);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(150);
+            delay(50);
 
             switch (ultimaOrientacion) {
                 case B_norte:
@@ -1354,20 +1369,17 @@ void alinearIMU() {
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
             if (alfa)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     avanzar();
             else if (bravo)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     horizontalDerecha();
             else if (delta)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     horizontalIzquierda();
             else if (charlie)
-                while (steps <= 1000)
+                while (steps <= 1200)
                     reversa();
-            else if (delta)
-                while (steps <= 1000)
-                    horizontalIzquierda();
             else
                 return;
             detener();
@@ -1375,11 +1387,11 @@ void alinearIMU() {
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1500);
+            delay(1400);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(150);
+            delay(50);
 
             vueltasDadas = 0;
             cuadrosVisitados = 0;
@@ -1566,7 +1578,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR:
-                while (vec.y() < -6.5) {
+                while (vec.y() < -5) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1638,7 +1650,7 @@ void moverCuadro() {
                 break;
 
             case BAJAR:
-                while (vec.y() > 6.5) {
+                while (vec.y() > 5) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
