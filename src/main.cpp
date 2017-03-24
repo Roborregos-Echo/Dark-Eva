@@ -1,4 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////                                         ///////////////////
 ///////////////////              T E O R Í A                ///////////////////
@@ -44,7 +44,7 @@ void vueltaDer();
 void vueltaIzq();
 
 
-    
+
 //********************************************
 //********************************************
 //---------- DECLARACIÓN VARIABLES -----------
@@ -1277,7 +1277,7 @@ void checarRampa() {
 
 
 void alinearIMU() {
-    if (rampaCambio || cuadrosVisitados > 20 || vueltasDadas > 10) {
+    if (rampaCambio || cuadrosVisitados > 25 || vueltasDadas > 15) {
         int lecturaUltra, lecturaSharp;
         bool alfa       =   false;
         bool bravo      =   false;
@@ -1297,12 +1297,12 @@ void alinearIMU() {
             bravo = true;
 
         lecturaUltra = getUltrasonicoUno('C');
-        lecturaSharp = getSharpCorta(SHARP_A);
+        lecturaSharp = getSharpCorta(SHARP_C);
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             charlie = true;
 
         lecturaUltra = getUltrasonicoUno('D');
-        lecturaSharp = getSharpCorta(SHARP_A);
+        lecturaSharp = getSharpCorta(SHARP_D1);
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             delta = true;
 
@@ -1553,14 +1553,15 @@ void moverCuadro() {
     //primeraLectura();
     cuadrosVisitados++;
     steps = 0;
-    while (steps <= 3500) {
+    while (steps <= 3700) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
+        lcd.print("Aaaaaaa");
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    if(vec.y() < -10) {
+    if(vec.y() < -9) {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
@@ -1578,7 +1579,7 @@ void moverCuadro() {
                 break;
 
             case SUBIR:
-                while (vec.y() < -5) {
+                while (vec.y() < -4) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1633,7 +1634,7 @@ void moverCuadro() {
                 vueltaDer();
                 break;*/
         }
-    } else if(vec.y() > 10) {
+    } else if(vec.y() > 9) {
         lcd.home();
         lcd.print("BAJAR RAMPA");
         bajarRampa = true;
@@ -1650,7 +1651,7 @@ void moverCuadro() {
                 break;
 
             case BAJAR:
-                while (vec.y() > 5) {
+                while (vec.y() > 4) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
@@ -1709,19 +1710,21 @@ void moverCuadro() {
     } else {
         steps = 0;
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-        while (steps <= 960) {
+        while (steps <= 950) {
             movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
+            lcd.print("Bbbbbb");
         }
     }
 
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
-    while (steps <= 960) {
+    while (steps <= 750) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
+        lcd.print("Cccccc");
     }
     detener();
     delay(100);
@@ -3548,6 +3551,8 @@ void setup() {
 
     delay(1000);
     hacerPruebas();
+
+    getUltrasonicoUno('D');
 
     if(digitalRead(switch_preferencia) == 0)
         preferencia = DERECHA;
