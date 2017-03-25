@@ -135,8 +135,8 @@ const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
 const int VEL_MOTOR_VUELTA          =   150;
 
-const int VEL_MOTOR_ALINEAR          =   100;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   100;
+const int VEL_MOTOR_ALINEAR          =   120;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   120;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -195,7 +195,7 @@ const int SHARP_D2  = 1;
 #define ECHO_D 30
 
 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
-#define MAX_DISTANCE 100
+#define MAX_DISTANCE 400
 
 int MARGEN_FALTANTE = 3;
 bool bumper     = false;
@@ -538,16 +538,16 @@ float getSharpCorta(int iSharp) {
 int getUltrasonicoMediana(char cSentido) {
     switch(cSentido) {
         case 'A':
-            return ULTRA_A.convert_cm(ULTRA_A.ping_median(3));
+            return NewPing::convert_cm(ULTRA_A.ping_median(3));
 
         case 'B':
-            return ULTRA_B.convert_cm(ULTRA_B.ping_median(3));
+            return NewPing::convert_cm(ULTRA_B.ping_median(3));
 
         case 'C':
-            return ULTRA_C.convert_cm(ULTRA_C.ping_median(3));
+            return NewPing::convert_cm(ULTRA_C.ping_median(3));
 
         case 'D':
-            return ULTRA_D.convert_cm(ULTRA_D.ping_median(3));
+            return NewPing::convert_cm(ULTRA_D.ping_median(3));
     }
 }
 
@@ -1342,27 +1342,38 @@ void alinearIMU() {
             }
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+            unsigned long inicio = millis();
 
-            if (alfa) {
-                lecturaSharp = getSharpCorta(SHARP_A);
-                avanzar();
-                while(steps <= lecturaSharp * 210);
-
-            } else if (charlie) {
-                lecturaSharp = getSharpCorta(SHARP_C);
-                reversa();
-                while(steps <= lecturaSharp * 210);
-
-            } else if (bravo) {
+            if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                horizontalDerecha();
-                while(steps <= lecturaSharp * 210);
-
+                while(steps <= lecturaSharp * 210) {
+                    horizontalDerecha();
+                    if (millis() >= inicio + 1500)
+                        steps = 9999;
+                }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                horizontalIzquierda();
-                while(steps <= lecturaSharp * 210);
+                while(steps <= lecturaSharp * 210) {
+                    horizontalIzquierda();
+                    if (millis() >= inicio + 1500)
+                        steps = 9999;
+                }
+            } else if (charlie) {
+                lecturaSharp = getSharpCorta(SHARP_C);
+                while(steps <= lecturaSharp * 210) {
+                    reversa();
+                    if (millis() >= inicio + 1500)
+                        steps = 9999;
+                }
+            } else if (alfa) {
+                lecturaSharp = getSharpCorta(SHARP_A);
+                while(steps <= lecturaSharp * 210) {
+                    avanzar();
+                    if (millis() >= inicio + 1500)
+                        steps = 9999;
+                }
             }
+
 
             detener();
             lcd.clear();
@@ -1390,29 +1401,51 @@ void alinearIMU() {
             vueltasDadas = 0;
             cuadrosVisitados = 0;
             rampaCambio = false;
+
         } else if ((cuadrosVisitados > 20 || vueltasDadas > 15) && iOrientacion == A_norte) {
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+            unsigned long inicio = millis();
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                avanzar();
-                while(steps <= lecturaSharp * 210);
+                while(steps <= lecturaSharp * 210) {
+                    avanzar();
+                    if (millis() >= inicio + 1500) {
+                        detener();
+                        return;
+                    }
+                }
 
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                reversa();
-                while(steps <= lecturaSharp * 210);
+                while(steps <= lecturaSharp * 210) {
+                    reversa();
+                    if (millis() >= inicio + 1500) {
+                        detener();
+                        return;
+                    }
+                }
 
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                horizontalDerecha();
-                while(steps <= lecturaSharp * 210);
+                while(steps <= lecturaSharp * 210) {
+                    horizontalDerecha();
+                    if (millis() >= inicio + 1500) {
+                        detener();
+                        return;
+                    }
+                }
 
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                horizontalIzquierda();
-                while(steps <= lecturaSharp * 210);
+                while(steps <= lecturaSharp * 210) {
+                    horizontalIzquierda();
+                    if (millis() >= inicio + 1500) {
+                        detener();
+                        return;
+                    }
+                }
             } else
                 return;
             detener();
@@ -1432,17 +1465,20 @@ void alinearIMU() {
     }
 }
 
+
 void movimientoDerecho(int fuente) {
+    float angle;
     imu::Vector<3> vecm = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     switch (fuente) {
         case MOV_FRENTE:
             avanzar();
-            if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
+            angle = getAngulo();
+            if(angle > 320) {
+                inIzq = - (360 - angle);
+                inDer = - (360 - angle);
             } else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
+                inIzq = angle;
+                inDer = angle;
             }
 
             izqPID.Compute();
@@ -1454,8 +1490,6 @@ void movimientoDerecho(int fuente) {
 
             if(setIzq - inIzq > 9) {
                 detener();
-                lcd.clear();
-                lcd.print("aaaaaaaa");
                 int pos = steps;
                 steps = 0;
                 while (steps <= 800)
@@ -1467,19 +1501,18 @@ void movimientoDerecho(int fuente) {
                 detener();
                 velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
                 do {
-                    if(getAngulo() > 320)
-                        inIzq = - (360 - getAngulo());
+                    angle = getAngulo();
+                    if(angle > 320)
+                        inIzq = - (360 - angle);
                     else
-                        inIzq = getAngulo();
-
+                        inIzq = angle;
                     vueltaDerecha();
                 } while(setIzq - inIzq  > 3);
                 detener();
                 steps = pos * 0.80;
             } else if(inIzq - setIzq > 9) {
                 detener();
-                lcd.clear();
-                lcd.print("bbbbbbbbb");
+                delay(1000);
                 int pos = steps;
                 steps = 0;
                 while (steps <= 800)
@@ -1491,10 +1524,11 @@ void movimientoDerecho(int fuente) {
                 detener();
                 velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
                 do {
-                    if(getAngulo() > 320)
-                        inIzq = - (360 - getAngulo());
+                    angle = getAngulo();
+                    if(angle > 320)
+                        inIzq = - (360 - angle);
                     else
-                        inIzq = getAngulo();
+                        inIzq = angle;
 
                     vueltaIzquierda();
                 } while(inIzq - setIzq  > 3);
@@ -1511,12 +1545,13 @@ void movimientoDerecho(int fuente) {
 
         case MOV_RAMPA_SUBIR:
             avanzar();
-            if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
+            angle = getAngulo();
+            if(angle > 320) {
+                inIzq = - (360 - angle);
+                inDer = - (360 - angle);
             } else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
+                inIzq = angle;
+                inDer = angle;
             }
 
             izqPID.Compute();
@@ -1526,13 +1561,13 @@ void movimientoDerecho(int fuente) {
 
         case MOV_RAMPA_BAJAR:
             avanzar();
-            if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
-            }
-            else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
+            angle = getAngulo();
+            if(angle > 320) {
+                inIzq = - (360 - angle);
+                inDer = - (360 - angle);
+            } else {
+                inIzq = angle;
+                inDer = angle;
             }
 
             izqPID.Compute();
@@ -1547,13 +1582,13 @@ void movimientoDerecho(int fuente) {
 
         case MOV_RAMPA_NO_BAJAR:
             reversa();
-            if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
-            }
-            else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
+            angle = getAngulo();
+            if(angle > 320) {
+                inIzq = - (360 - angle);
+                inDer = - (360 - angle);
+            } else {
+                inIzq = angle;
+                inDer = angle;
             }
             izqPID.Compute();
             derPID.Compute();
@@ -1566,12 +1601,13 @@ void movimientoDerecho(int fuente) {
             break;
         case MOV_FRENTE_ALINEAR:
             avanzar();
-            if(getAngulo() > 320) {
-                inIzq = - (360 - getAngulo());
-                inDer = - (360 - getAngulo());
+            angle = getAngulo();
+            if(angle > 320) {
+                inIzq = - (360 - angle);
+                inDer = - (360 - angle);
             } else {
-                inIzq = getAngulo();
-                inDer = getAngulo();
+                inIzq = angle;
+                inDer = angle;
             }
 
             izqPID.Compute();
@@ -3484,7 +3520,7 @@ void imprimirValores3() {
         }
     delay(500);
 }
-    
+
 void hacerPruebas() {
     lcd.clear();
     lcd.print(" Quieres hacer");
@@ -3589,12 +3625,13 @@ void setup() {
     setIzq = 0;
     setDer = 0;
 
-    if(getAngulo() > 320) {
-        inIzq = - (360 - getAngulo());
-        inDer = - (360 - getAngulo());
+    float angle = getAngulo();
+    if(angle > 320) {
+        inIzq = - (360 - angle);
+        inDer = - (360 - angle);
     } else {
-        inIzq = getAngulo();
-        inDer = getAngulo();
+        inIzq = angle;
+        inDer = angle;
     }
 
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
