@@ -128,12 +128,12 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   230;
+const int VEL_MOTOR                 =   245;
 
-const int VEL_MOTOR_RAMPA           =   244;
+const int VEL_MOTOR_RAMPA           =   240;
 const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
-const int VEL_MOTOR_VUELTA          =   140;
+const int VEL_MOTOR_VUELTA          =   150;
 
 const int VEL_MOTOR_ALINEAR          =   100;
 const int VEL_MOTOR_ALINEAR_ENCODER  =   100;
@@ -1454,6 +1454,8 @@ void movimientoDerecho(int fuente) {
 
             if(setIzq - inIzq > 9) {
                 detener();
+                lcd.clear();
+                lcd.print("aaaaaaaa");
                 int pos = steps;
                 steps = 0;
                 while (steps <= 800)
@@ -1476,6 +1478,8 @@ void movimientoDerecho(int fuente) {
                 steps = pos * 0.80;
             } else if(inIzq - setIzq > 9) {
                 detener();
+                lcd.clear();
+                lcd.print("bbbbbbbbb");
                 int pos = steps;
                 steps = 0;
                 while (steps <= 800)
@@ -3621,7 +3625,7 @@ void setup() {
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(150);
+    delay(50);
     //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 }
 
