@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.3.7 --------------------------------
-//--------------------------- 24 / MARZO / 2017 -----------------------------
+//------------------------------ VERSIÓN 1.3.8 --------------------------------
+//--------------------------- 25 / MARZO / 2017 -----------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -135,8 +135,8 @@ const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
 const int VEL_MOTOR_VUELTA          =   150;
 
-const int VEL_MOTOR_ALINEAR          =   120;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   120;
+const int VEL_MOTOR_ALINEAR          =   125;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   125;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -247,7 +247,6 @@ bool rampaid    = false;
 byte firstFloor     = 0;
 byte rampaDiff      = 4;
 byte lastMove;            // 0,1,0
-byte rampaLastMove;
 byte permisoRampa;
 byte x_rampa, y_rampa;
 
@@ -1630,7 +1629,6 @@ void moverCuadro() {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
-        //lcd.print("Aaaaaaa");
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
@@ -1797,7 +1795,6 @@ void moverCuadro() {
             movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
-            //lcd.print("Bbbbbb");
         }
     }
 
@@ -1807,26 +1804,8 @@ void moverCuadro() {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
-        //lcd.print("Cccccc");
     }
     detener();
-    delay(100);
-    /*if(contador_ultra == 20) {
-        checarAvance();
-        if(boolAvanzo) {
-            lcd.clear();
-            lcd.print("SI AVANZO");
-            boolAvanzo = false;
-            checarFaltante();
-        } else {
-            lcd.clear();
-            lcd.print("NO AVANZO");
-        }
-
-        delay(1000);
-        millisPasado = millis();
-        lecturasDiferentes = 0;
-    }*/
     checarColor();
     alinearIMU();
     alinear();
@@ -2078,9 +2057,9 @@ byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
 //******************************************
 //------------- PATHFINDING ----------------
 void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
-    ////lcd.println("Estoy en PathFinding");
-    ////lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
-    ////lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
+    //lcd.println("Estoy en PathFinding");
+    //lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
+    //lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
     lcd.print("                ");
     lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
@@ -2118,11 +2097,11 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
 
     while (!pathFinished) {
-        ////lcd.println("Entre al while");
+        //lcd.println("Entre al while");
         neighborsortValue = 999;
         openSortValue = 999;
         LastPathValue = pathway(x_path, y_path, x_destino, y_destino);
-        ////lcd.println("LastPathValue =" + String(LastPathValue));
+        //lcd.println("LastPathValue =" + String(LastPathValue));
 
         if(x_destino == x_actual && y_destino == y_actual) {
             pathFinished = true;
@@ -2139,7 +2118,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('S')) {
             if(y_path > 0) {
-                if (cuadros[x_path][y_path-1][z_actual].getEstado() == INICIO || cuadros[x_path][y_path-1][z_actual].getEstado() == CHECKPOINT or
+                if (cuadros[x_path][y_path-1][z_actual].getEstado() == INICIO || cuadros[x_path][y_path-1][z_actual].getEstado() == CHECKPOINT ||
                 cuadros[x_path][y_path-1][z_actual].getEstado() == RECORRIDO || (x_path == x_destino && y_path-1 == y_destino)) {
                     Grid = coordToGrid(x_path, y_path-1);
                     if(closedList[Grid] == 999) {
@@ -2152,7 +2131,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('E')) {
             if(x_path < X_MAX -1) {
-                if (cuadros[x_path+1][y_path][z_actual].getEstado() == INICIO || cuadros[x_path+1][y_path][z_actual].getEstado() == CHECKPOINT or
+                if (cuadros[x_path+1][y_path][z_actual].getEstado() == INICIO || cuadros[x_path+1][y_path][z_actual].getEstado() == CHECKPOINT ||
                 cuadros[x_path+1][y_path][z_actual].getEstado() == RECORRIDO || (x_path+1 == x_destino && y_path == y_destino)) {
                     Grid = coordToGrid(x_path+1, y_path);
                     if(closedList[Grid] == 999) {
@@ -2165,7 +2144,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('N')) {
             if(y_path < Y_MAX -1) {
-                if (cuadros[x_path][y_path+1][z_actual].getEstado() == INICIO || cuadros[x_path][y_path+1][z_actual].getEstado() == CHECKPOINT or
+                if (cuadros[x_path][y_path+1][z_actual].getEstado() == INICIO || cuadros[x_path][y_path+1][z_actual].getEstado() == CHECKPOINT ||
                 cuadros[x_path][y_path+1][z_actual].getEstado() == RECORRIDO || (x_path == x_destino && y_path+1 == y_destino)) {
                     Grid = coordToGrid(x_path, y_path+1);
                     if(closedList[Grid] == 999) {
@@ -2178,7 +2157,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if (!cuadros[x_path][y_path][z_actual].getPared('O')) {
             if(x_path > 0) {
-                if (cuadros[x_path-1][y_path][z_actual].getEstado() == INICIO || cuadros[x_path-1][y_path][z_actual].getEstado() == CHECKPOINT or
+                if (cuadros[x_path-1][y_path][z_actual].getEstado() == INICIO || cuadros[x_path-1][y_path][z_actual].getEstado() == CHECKPOINT ||
                 cuadros[x_path-1][y_path][z_actual].getEstado() == RECORRIDO || (x_path-1 == x_destino && y_path == y_destino)) {
                     Grid = coordToGrid(x_path-1, y_path);
                     if(closedList[Grid] == 999) {
@@ -2246,25 +2225,25 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 }
             }
         }
-        ////lcd.println("Paths: " + String(x_path) + "," + String(y_path) + " = " + String(pathway(x_path, y_path, x_destino, y_destino)));
+        //lcd.println("Paths: " + String(x_path) + "," + String(y_path) + " = " + String(pathway(x_path, y_path, x_destino, y_destino)));
         //delay(1000);
-        ////lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
+        //lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino && y_path == y_destino) {
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
-                    ////lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
+                    //lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
                 }
                 for(int i = 0; i<GRID_MAX; i++)
                 {
-                ////lcd.println("Closed[" + String(i) + "] = " + String (closedList[i]));
+                //lcd.println("Closed[" + String(i) + "] = " + String (closedList[i]));
             }*/
 
             //Encontrar camino de regreso
             x_back = x_path;
             y_back = y_path;
-            /*////lcd.println(x_back);
-            ////lcd.println(y_back);*/
+            //lcd.println(x_back);
+            //lcd.println(y_back);
 
             while(!backFinished) {
                 for (int i = 0; i<4; i++)
@@ -2340,19 +2319,19 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 backList[back_index] = newGrid;
                 lastBackGrid = back_index;
 
-                //////lcd.println("BackList = " + String(backList[back_index]));
+                ////lcd.println("BackList = " + String(backList[back_index]));
 
                 /*//lcd.print(x_back);
                 //lcd.print(" ");
-                ////lcd.println(y_back);
+                //lcd.println(y_back);
                 delay(3000);*/
                 back_index--;
                 //------------
                 if(x_back == x_actual && y_back == y_actual) {
                     backList[back_index+1] = 999;
-                    ////lcd.println("Entre al final");
+                    //lcd.println("Entre al final");
                     //delay(500);
-                    //Dar ordenes de movimiento para llegar
+                    //Dar ||denes de movimiento para llegar
                     backFinished = true;
 
                     if(ref == 255) {
@@ -2361,25 +2340,25 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                         for(int i = 0; i<GRID_MAX; i++) {
                             if(backList[i] != 999) {
                                 if(gridActual-backList[i] == X_MAX) {
-                                    ////lcd.println("Abajo");
+                                    //lcd.println("Abajo");
                                     absoluteMove('S');
                                     gridActual -= X_MAX;
                                 }
 
                                 if(gridActual-backList[i] == -1) {
-                                    ////lcd.println("Derecha");
+                                    //lcd.println("Derecha");
                                     absoluteMove('E');
                                     gridActual += 1;
                                 }
 
                                 if(gridActual-backList[i] == -X_MAX) {
-                                    ////lcd.println("Arriba");
+                                    //lcd.println("Arriba");
                                     absoluteMove('N');
                                     gridActual += X_MAX;
                                 }
 
                                 if(gridActual-backList[i] == 1) {
-                                    ////lcd.println("Izquierda");
+                                    //lcd.println("Izquierda");
                                     absoluteMove('O');
                                     gridActual -= 1;
                                 }
@@ -2443,7 +2422,7 @@ void checarParedes() {
         case A_norte:
         if(y_actual > 0) {
             lectura = getUltrasonicoUno('C');
-            if((lectura == 0 || lectura > 15 ) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15 ) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2458,7 +2437,7 @@ void checarParedes() {
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         lectura = getUltrasonicoUno('B');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2469,7 +2448,7 @@ void checarParedes() {
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         lectura = getUltrasonicoUno('A');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2482,7 +2461,7 @@ void checarParedes() {
         if(x_actual > 0)
         {
             lectura = getUltrasonicoUno('D');
-            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2501,7 +2480,7 @@ void checarParedes() {
         //--------------------------------------------------------------------
         case B_norte:
         lectura = getUltrasonicoUno('C');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2512,7 +2491,7 @@ void checarParedes() {
         cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         lectura = getUltrasonicoUno('B');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2526,7 +2505,7 @@ void checarParedes() {
         if(x_actual > 0)
         {
             lectura = getUltrasonicoUno('A');
-            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2543,7 +2522,7 @@ void checarParedes() {
         if(y_actual > 0)
         {
             lectura = getUltrasonicoUno('D');
-            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
             agregarLast('S');
@@ -2562,7 +2541,7 @@ void checarParedes() {
         //--------------------------------------------------------------------
         case C_norte:
         lectura = getUltrasonicoUno('C');
-        if((lectura == 0 || lectura > 15)&& (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15)&& (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2575,7 +2554,7 @@ void checarParedes() {
         if(x_actual > 0)
         {
             lectura = getUltrasonicoUno('B');
-            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2592,7 +2571,7 @@ void checarParedes() {
         if(y_actual > 0)
         {
             lectura = getUltrasonicoUno('A');
-            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2607,7 +2586,7 @@ void checarParedes() {
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         lectura = getUltrasonicoUno('D');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2623,7 +2602,7 @@ void checarParedes() {
         if(x_actual > 0)
         {
             lectura = getUltrasonicoUno('C');
-            if((lectura == 0 || lectura > 15) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('O');
@@ -2642,7 +2621,7 @@ void checarParedes() {
         if(y_actual > 0)
         {
             lectura = getUltrasonicoUno('B');
-            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  or
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
                 agregarLast('S');
@@ -2659,7 +2638,7 @@ void checarParedes() {
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
         lectura = getUltrasonicoUno('A');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('E');
             shortMove = true;
@@ -2671,7 +2650,7 @@ void checarParedes() {
             cuadros[x_actual][y_actual][z_actual].setPared('E', true);
 
         lectura = getUltrasonicoUno('D');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  or
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  ||
         cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
             agregarLast('N');
             shortMove = true;
@@ -2708,7 +2687,7 @@ void checarLasts() {
 
 //Verificar si en el for i es i>1 o i>0 (probar)
 void recorrerX() {
-    ////lcd.println("Recorrer X");
+    //lcd.println("Recorrer X");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<Y_MAX; j++) {
             for(int i=X_MAX-1; i>0; i--) {
@@ -2744,7 +2723,7 @@ void recorrerX() {
 }
 
 void recorrerY() {
-    ////lcd.println("Recorrer Y");
+    //lcd.println("Recorrer Y");
     for(int k=0; k<Z_MAX; k++){
         for(int j=0; j<X_MAX; j++) {
             for(int i=Y_MAX-1; i>0; i--){
@@ -2784,35 +2763,35 @@ void gotoInicio(byte x_final, byte y_final) {
     bool boolInicio = false;
 
     if(nearInicio == 1) {
-        ////lcd.println("Entre a nearInicio");
-        ////lcd.println("Inicio " + String(x_final) + "," + String(y_final));
-        ////lcd.println("Actual " + String(x_actual) + "," + String(y_actual));
+        //lcd.println("Entre a nearInicio");
+        //lcd.println("Inicio " + String(x_final) + "," + String(y_final));
+        //lcd.println("Actual " + String(x_actual) + "," + String(y_actual));
         int xInicio = x_final - x_actual;
         int yInicio = y_final - y_actual;
 
         if(xInicio == 1) {
-            ////lcd.println("Inicio E");
+            //lcd.println("Inicio E");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('E')) {
                 absoluteMove('E');
                 boolInicio = true;
             }
         }
         else if(xInicio == -1) {
-            ////lcd.println("Inicio O");
+            //lcd.println("Inicio O");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('O')) {
                 absoluteMove('O');
                 boolInicio = true;
             }
         }
         else if(yInicio == 1) {
-            ////lcd.println("Inicio N");
+            //lcd.println("Inicio N");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('N')) {
                 absoluteMove('N');
                 boolInicio = true;
             }
         }
         else if(yInicio == -1) {
-            ////lcd.println("Inicio S");
+            //lcd.println("Inicio S");
             if(!cuadros[x_actual][y_actual][z_actual].getPared('S')) {
                 absoluteMove('S');
                 boolInicio = true;
@@ -2826,33 +2805,13 @@ void gotoInicio(byte x_final, byte y_final) {
     }
 }
 
-/*void RampaMoveX() {
-    switch(rampaLastMove) {
-        case TO_NORTH:
-            y_actual++;
-            break;
-
-        case TO_EAST:
-            x_actual++;
-            break;
-
-        case TO_SOUTH:
-            y_actual--;
-            break;
-
-        case TO_WEST:
-            x_actual--;
-            break;
-    }
-}*/
-
 void resolverLaberinto() {
     if(shortMove) {
-        ////lcd.println("ENTRE AL SHORTMOVE");
+        //lcd.println("ENTRE AL SHORTMOVE");
 
         if(preferencia == IZQUIERDA) {
             if(!D_wall) {
-                ////lcd.println("Short Izquierda");
+                //lcd.println("Short Izquierda");
                 switch(iOrientacion) {
                     case A_norte:
                     x_actual--;
@@ -2879,7 +2838,7 @@ void resolverLaberinto() {
                 moverCuadro();
                 checarLasts();
             } else if(!A_wall) {
-                ////lcd.println("Short Frente");
+                //lcd.println("Short Frente");
                 switch(iOrientacion) {
                     case A_norte:
                     y_actual++;
@@ -2904,7 +2863,7 @@ void resolverLaberinto() {
                 moverCuadro();
                 checarLasts();
             } else if(!B_wall) {
-                ////lcd.println("Short Derecha");
+                //lcd.println("Short Derecha");
                 switch(iOrientacion) {
                     case A_norte:
                     x_actual++;
@@ -2930,7 +2889,7 @@ void resolverLaberinto() {
                 moverCuadro();
                 checarLasts();
             } else {
-                ////lcd.println("Short Atras");
+                //lcd.println("Short Atras");
                 switch(iOrientacion) {
                     case A_norte:
                     y_actual--;
@@ -2966,7 +2925,7 @@ void resolverLaberinto() {
         if(preferencia == DERECHA)
         {
             if(!B_wall) {
-                ////lcd.println("Short Derecha");
+                //lcd.println("Short Derecha");
                 switch(iOrientacion) {
                     case A_norte:
                     x_actual++;
@@ -2992,7 +2951,7 @@ void resolverLaberinto() {
                 moverCuadro();
                 checarLasts();
             }else if(!A_wall) {
-                ////lcd.println("Short Frente");
+                //lcd.println("Short Frente");
                 switch(iOrientacion) {
                     case A_norte:
                     y_actual++;
@@ -3018,7 +2977,7 @@ void resolverLaberinto() {
                 checarLasts();
             }
             else if(!D_wall) {
-                ////lcd.println("Short Izquierda");
+                //lcd.println("Short Izquierda");
                 switch(iOrientacion) {
                     case A_norte:
                     x_actual--;
@@ -3080,7 +3039,7 @@ void resolverLaberinto() {
 
     } else {
         if(Last) {
-            ////lcd.println("LAST");
+            //lcd.println("LAST");
             lcd.clear();
             lcd.print("GOTO LAST");
             byte var = 255;
@@ -3090,7 +3049,7 @@ void resolverLaberinto() {
             y_last = 255;
             Last = false;
         } else {
-            ////lcd.println("GOTO-SR");
+            //lcd.println("GOTO-SR");
             lcd.clear();
             lcd.print("GOTO SR");
             int LowestCSR = 999;
@@ -3120,7 +3079,7 @@ void resolverLaberinto() {
                     rampaid = false;
                 }
                 else{
-                ////lcd.println("GOTO-INICIO");
+                //lcd.println("GOTO-INICIO");
                 lcd.clear();
                 lcd.print("GOTO INICIO");
                 for(int y=0; y < Y_MAX; y++)
@@ -3194,18 +3153,12 @@ int EEPROMReadInt(int p_address) {
 
 //-------------- ESCRIBIR EN LA EEPROM ----------------
 void escribirValores() {
-    EEPROMWriteInt(0, iR_NEGRO);
     EEPROMWriteInt(2, iN_NEGRO);
-    EEPROMWriteInt(4, iA_NEGRO);
-    EEPROMWriteInt(6, iV_NEGRO);
 }
 
 //-------------- LEER DE LA EEPROM ----------------
 void leerValores() {
-    iR_NEGRO = EEPROMReadInt(0);
     iN_NEGRO = EEPROMReadInt(2);
-    iA_NEGRO = EEPROMReadInt(4);
-    iV_NEGRO = EEPROMReadInt(6);
 }
 
 
@@ -3282,7 +3235,7 @@ int getColor() {
 // Funcion para calibrar los colores que se usaran
 void calibrarColor() {
     while(EstadoColor == ESTADO_OFF) {
-        ////lcd.println("Calibrar...");
+        //lcd.println("Calibrar...");
         lcd.setCursor(0, 0);
         lcd.print("   Calibrar... ");
         BotonColor = digitalRead(BOTON_COLOR);
@@ -3296,20 +3249,11 @@ void calibrarColor() {
     lcd.clear();
     lcd.print("    Negro...");
     while(EstadoColor == ESTADO_NEGRO) {
-        ////lcd.println("Calibrar Negro");
+        //lcd.println("Calibrar Negro");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 0) {
             setFiltro('N');
             iN_NEGRO = getColor();
-
-            setFiltro('R');
-            iR_NEGRO = getColor();
-
-            setFiltro('G');
-            iV_NEGRO = getColor();
-
-            setFiltro('B');
-            iA_NEGRO = getColor();
 
             //*Limpia la pantalla
             delay(500);
@@ -3324,7 +3268,7 @@ void calibrarColor() {
     delay(4000);
     EstadoColor++;
     /*while(EstadoColor == ESTADO_LISTO) {
-        ////lcd.println("Listo...");
+        //lcd.println("Listo...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //Limpia la pantalla
@@ -3340,17 +3284,7 @@ bool checarCuadroColor(byte cuadro, byte margen) {
     setFiltro('N');
     iNone = getColor();
 
-    setFiltro('R');
-    iRojo = getColor();
-
-    setFiltro('G');
-    iVerde = getColor();
-
-    setFiltro('B');
-    iAzul = getColor();
-
-    if(iNone <= iN_NEGRO+margen && iNone >= iN_NEGRO-margen && iRojo <= iR_NEGRO+margen && iRojo >= iR_NEGRO-margen
-    && iVerde <= iV_NEGRO+margen && iVerde >= iV_NEGRO-margen && iAzul <= iA_NEGRO+margen && iAzul >= iA_NEGRO-margen)
+    if(iNone <= iN_NEGRO+margen && iNone >= iN_NEGRO-margen)
         return true;
     else
         return false;
@@ -3358,7 +3292,7 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 
 void checarColor() {
-    if(checarCuadroColor(COLOR_NEGRO, 150)) {
+    if(checarCuadroColor(COLOR_NEGRO, 50)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
         delay(1000);
@@ -3546,7 +3480,7 @@ void setup() {
     //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
-    setFrecuencia(2);           //Establece la frecuencia del TCS3200
+    setFrecuencia(100);           //Establece la frecuencia del TCS3200
     pinMode(sensorOut, INPUT);   //Inicializa el pin que recibira la informacion del TCS3200
     pinMode(S0, OUTPUT);         //Establece  pin de Salida
     pinMode(S1, OUTPUT);         //Establece  pin de Salida
@@ -3568,34 +3502,6 @@ void setup() {
     pinMode(BOTON_COLOR, INPUT);
     lcd.begin();
     lcd.backlight();
-
-    /*while(true)
-    {
-        lcd.clear();
-        lcd.print("      None");
-        setFiltro('N');
-        lcd.setCursor(0, 1);
-        lcd.print(getColor());
-        delay(1000);
-        lcd.clear();
-        lcd.print("      Red");
-        setFiltro('R');
-        lcd.setCursor(0, 1);
-        lcd.print(getColor());
-        delay(1000);
-        lcd.clear();
-        lcd.print("     Green");
-        setFiltro('G');
-        lcd.setCursor(0, 1);
-        lcd.print(getColor());
-        delay(1000);
-        lcd.clear();
-        lcd.print("      Blue");
-        setFiltro('B');
-        lcd.setCursor(0, 1);
-        lcd.print(getColor());
-        delay(1000);
-    }*/
 
     if (digitalRead(BOTON_COLOR) == 0) {
          lcd.clear();
@@ -3664,6 +3570,7 @@ void setup() {
     lcd.print("CALIBRADO");
     delay(50);
     //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+
 }
 
 void loop() {
