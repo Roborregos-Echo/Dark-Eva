@@ -3484,7 +3484,7 @@ void imprimirValores3() {
         }
     delay(500);
 }
-
+    
 void hacerPruebas() {
     lcd.clear();
     lcd.print(" Quieres hacer");
