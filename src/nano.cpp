@@ -1,7 +1,7 @@
 #include <PixyUART.h>
 #include <Arduino.h>
 #include <i2cmaster.h>
-  
+
 
 PixyUART pixy;
 uint16_t blocks;
