@@ -663,7 +663,7 @@ void checarInterr() {
         int pos = steps;
         steps = 0;
 
-        if(digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
+        if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
             if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15) {
                 detener();
                 lcd.clear();
@@ -685,7 +685,7 @@ void checarInterr() {
                 vueltaDer();
             }
 
-        } else if (digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
+        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
                 detener();
                 lcd.clear();
@@ -2182,8 +2182,13 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     for (int i = 0; i<GRID_MAX; i++)
         backList[i] = 999;
 
-
+    unsigned int tiempo = millis();
     while (!pathFinished) {
+
+        if(tiempo - millis() > 5000)
+        {
+
+        }
         //lcd.println("Entre al while");
         neighborsortValue = 999;
         openSortValue = 999;
@@ -3639,7 +3644,7 @@ void setup() {
         preferencia = DERECHA;
     else
         preferencia = IZQUIERDA;
-    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 
 }
 
