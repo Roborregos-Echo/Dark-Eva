@@ -753,6 +753,7 @@ void checarInterr() {
 }
 
 
+
 void checarLimit() {
     bool izq = false;
     bool der = false;
@@ -1726,13 +1727,11 @@ void moverCuadro() {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 2000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 detener();
                 delay(200);
                 alinearIMU();
@@ -1740,13 +1739,11 @@ void moverCuadro() {
                 delay(200);
                 vueltaDer();
                 delay(200);
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 2000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 while (vec.y() > 10.0) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
@@ -1755,7 +1752,6 @@ void moverCuadro() {
                 detener();
                 alinearIMU();
                 break;
-
             case REGRESA_ABAJO:
                 detener();
                 while (vec.y() < -10.0) {
@@ -1803,13 +1799,11 @@ void moverCuadro() {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 3000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 detener();
                 alinearIMU();
                 delay(200);
@@ -1817,13 +1811,11 @@ void moverCuadro() {
                 delay(200);
                 vueltaDer();
                 delay(200);
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 3000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 while (vec.y() < -10.0) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
@@ -1832,14 +1824,12 @@ void moverCuadro() {
                 detener();
                 alinearIMU();
                 break;
-
             case REGRESA_ARRIBA:
                 detener();
                 while (vec.y() > 10.0) {
                     movimientoDerecho(MOV_RAMPA_NO_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
-
                 detener();
                 delay(200);
                 vueltaDer();
@@ -3392,52 +3382,39 @@ void checarColor() {
           for(int x = 0; x < X_MAX; x++)
           {
             TotalGrid = totalCoordToGrid(x, y, z);
-
             if(cuadros[x][y][z].getmlx())
             checkList1[TotalGrid] += 16;
-
             if(cuadros[x][y][z].getPared('S'))
             checkList1[TotalGrid] += 8;
-
             if(cuadros[x][y][z].getPared('E'))
             checkList1[TotalGrid] += 4;
-
             if(cuadros[x][y][z].getPared('N'))
             checkList1[TotalGrid] += 2;
-
             if(cuadros[x][y][z].getPared('O'))
             checkList1[TotalGrid] += 1;
-
             switch(cuadros[x][y][z].getEstado()){
                 case NO_EXISTE:
                 checkList2[TotalGrid] = 0;
                 break;
-
                 case SIN_RECORRER:
                 checkList2[TotalGrid] = 1;
                 break;
-
                 case RECORRIDO:
                 checkList2[TotalGrid] = 2;
                 break;
-
                 case CHECKPOINT:
                 checkList2[TotalGrid] = 3;
                 break;
-
                 case NEGRO:
                 checkList2[TotalGrid] = 4;
                 break;
-
                 case RAMPA:
                 checkList2[TotalGrid] = 5;
                 break;
-
                 case INICIO:
                 checkList2[TotalGrid] = 6;
                 break;
             }
-
           }
         }
       }
