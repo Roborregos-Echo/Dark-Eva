@@ -280,8 +280,8 @@ Servo servo;
 
 //******************************************
 //---------------- LIMIT -----------------
-const int LIMIT_IZQUIERDO = 31;
-const int LIMIT_DERECHO = 32;
+const int LIMIT_IZQUIERDO = 32;
+const int LIMIT_DERECHO = 31;
 
 
 //******************************************
@@ -1624,7 +1624,7 @@ void movimientoDerecho(int fuente) {
 
             izqPID.Compute();
             derPID.Compute();
-            velocidad(100 + outIzq, 100 + outDer, 100 + outIzq, 100 + outDer);
+            velocidad(85 + outIzq, 85 + outDer, 85 + outIzq, 85 + outDer);
             break;
 
         case MOV_RAMPA_NO_SUBIR:
