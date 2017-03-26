@@ -55,10 +55,11 @@ void vueltaIzq();
 //******************************************
 //--------------- LABERINTO ----------------
 #define switch_preferencia 33
+#define timeoutPin 35
 const byte DERECHA      =   0;
 const byte IZQUIERDA    =   1;
 
-byte preferencia;
+byte preferencia = IZQUIERDA;
 
 
 //******************************************
@@ -2187,7 +2188,46 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
         if(tiempo - millis() > 5000)
         {
+            if(bumper)
+            {
+                int lecturaA = getUltrasonicoUno('A');
+                int lecturaB = getUltrasonicoUno('B');
+                int lecturaC = getUltrasonicoUno('C');
+                int lecturaD = getUltrasonicoUno('D');
 
+                if(lecturaA == 0 || lecturaA > 15)
+                {
+                    do {
+                        moverCuadro();
+                    } while(bumper);
+                }
+                else if (lecturaB == 0 || lecturaB > 15)
+                {
+                    vueltaDer();
+                    do{
+                        moverCuadro();
+                    } while(bumper);
+                }
+                else if (lecturaC == 0 || lecturaC > 15)
+                {
+                    vueltaDer();
+                    vueltaDer();
+                    do{
+                        moverCuadro();
+                    }while(bumper);
+                }
+                else if (lecturaD == 0 || lecturaD > 15)
+                {
+                    vueltaIzq();
+                    do{
+                        moverCuadro();
+                    }while(bumper);
+                }
+            }
+            alinear();
+            digitalWrite(timeoutPin, HIGH);
+            delay(200);
+            digitalWrite(timeoutPin, LOW);
         }
         //lcd.println("Entre al while");
         neighborsortValue = 999;
