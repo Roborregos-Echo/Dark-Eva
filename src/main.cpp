@@ -263,7 +263,8 @@ byte checkList2[GRID_MAX];
 
 // Interupcion del nano;
 #define interruptNano 2
-const int interruptDefiner = 3;
+const int heatDefiner = 3;
+const int visualDefiner = 14;
 
 
 //******************************************
@@ -653,43 +654,101 @@ void victim_Detected() {
      inFire = true;
 }
 
+
+
 void checarInterr() {
     if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
-        detener();
-        lcd.clear();
-        for (int i = 0; i < 8; i++) {
-            lcd.noBacklight();
-            delay(100);
-            lcd.backlight();
-            delay(100);
-        }
-        int pos = steps;
-        steps = 0;
+        int lecturaB = getUltrasonicoUno('B');
+        int lecturaD = getUltrasonicoUno('D');
 
-        if(digitalRead(interruptDefiner) == 0) {
-            lcd.print("VICTIMA DERECHA");
-            vueltaIzq();
-            servoMotor();
-            if(first_victim) {
-                delay(500);
+        if(digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
+            if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15)
+            {
+                detener();
+                lcd.clear();
+                for (int i = 0; i < 8; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                int pos = steps;
+                steps = 0;
+
+                lcd.print("VICTIMA DERECHA");
+                vueltaIzq();
                 servoMotor();
-                first_victim = false;
+                if(first_victim) {
+                    delay(500);
+                    servoMotor();
+                    first_victim = false;
+                }
+                vueltaDer();
+
+                cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                inFire = false;
+                steps = pos;
             }
-            vueltaDer();
-        } else if (digitalRead(interruptDefiner) == 1){
-            lcd.print("VICTIMA IZQUIERDA");
-            vueltaDer();
-            servoMotor();
-            if(first_victim) {
-                delay(500);
+
+        } else if (digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0){
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15)
+            {
+                detener();
+                lcd.clear();
+                for (int i = 0; i < 8; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                int pos = steps;
+                steps = 0;
+
+                lcd.print("VICTIMA IZQUIERDA");
+                vueltaDer();
                 servoMotor();
-                first_victim = false;
+                if(first_victim) {
+                    delay(500);
+                    servoMotor();
+                    first_victim = false;
+                  }
+                  vueltaIzq();
+
+                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                  inFire = false;
+                  steps = pos;
             }
-            vueltaIzq();
+        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1){
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15)
+            {
+                detener();
+                lcd.clear();
+                for (int i = 0; i < 8; i++) {
+                    lcd.noBacklight();
+                    delay(100);
+                    lcd.backlight();
+                    delay(100);
+                }
+                int pos = steps;
+                steps = 0;
+
+                lcd.print("VICTIMA VISUAL");
+                vueltaDer();
+                servoMotor();
+                if(first_victim) {
+                    delay(500);
+                    servoMotor();
+                    first_victim = false;
+                  }
+                  vueltaIzq();
+
+                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                  inFire = false;
+                  steps = pos;
+            }
+
         }
-        cuadros[x_actual][y_actual][z_actual].setmlx(true);
-        inFire = false;
-        steps = pos;
+
     }
 }
 
@@ -1667,13 +1726,11 @@ void moverCuadro() {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 2000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 detener();
                 delay(200);
                 alinearIMU();
@@ -1681,13 +1738,11 @@ void moverCuadro() {
                 delay(200);
                 vueltaDer();
                 delay(200);
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 2000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 while (vec.y() > 10.0) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
@@ -1696,7 +1751,6 @@ void moverCuadro() {
                 detener();
                 alinearIMU();
                 break;
-
             case REGRESA_ABAJO:
                 detener();
                 while (vec.y() < -10.0) {
@@ -1744,13 +1798,11 @@ void moverCuadro() {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 3000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 detener();
                 alinearIMU();
                 delay(200);
@@ -1758,13 +1810,11 @@ void moverCuadro() {
                 delay(200);
                 vueltaDer();
                 delay(200);
-
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
                 steps = 0;
                 while (steps <= 3000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
-
                 vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 while (vec.y() < -10.0) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
@@ -1773,14 +1823,12 @@ void moverCuadro() {
                 detener();
                 alinearIMU();
                 break;
-
             case REGRESA_ARRIBA:
                 detener();
                 while (vec.y() > 10.0) {
                     movimientoDerecho(MOV_RAMPA_NO_BAJAR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
-
                 detener();
                 delay(200);
                 vueltaDer();
@@ -3333,52 +3381,39 @@ void checarColor() {
           for(int x = 0; x < X_MAX; x++)
           {
             TotalGrid = totalCoordToGrid(x, y, z);
-
             if(cuadros[x][y][z].getmlx())
             checkList1[TotalGrid] += 16;
-
             if(cuadros[x][y][z].getPared('S'))
             checkList1[TotalGrid] += 8;
-
             if(cuadros[x][y][z].getPared('E'))
             checkList1[TotalGrid] += 4;
-
             if(cuadros[x][y][z].getPared('N'))
             checkList1[TotalGrid] += 2;
-
             if(cuadros[x][y][z].getPared('O'))
             checkList1[TotalGrid] += 1;
-
             switch(cuadros[x][y][z].getEstado()){
                 case NO_EXISTE:
                 checkList2[TotalGrid] = 0;
                 break;
-
                 case SIN_RECORRER:
                 checkList2[TotalGrid] = 1;
                 break;
-
                 case RECORRIDO:
                 checkList2[TotalGrid] = 2;
                 break;
-
                 case CHECKPOINT:
                 checkList2[TotalGrid] = 3;
                 break;
-
                 case NEGRO:
                 checkList2[TotalGrid] = 4;
                 break;
-
                 case RAMPA:
                 checkList2[TotalGrid] = 5;
                 break;
-
                 case INICIO:
                 checkList2[TotalGrid] = 6;
                 break;
             }
-
           }
         }
       }
@@ -3476,7 +3511,7 @@ void hacerPruebas() {
 void setup() {
     Serial.begin(9600);
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    //pinMode(interruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    pinMode(interruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
@@ -3498,7 +3533,8 @@ void setup() {
     pinMode(ENABLE_IZQUIERDA_ADELANTE, OUTPUT);
     pinMode(ENABLE_DERECHA_ATRAS, OUTPUT);
     pinMode(ENABLE_IZQUIERDA_ATRAS, OUTPUT);
-    pinMode(interruptDefiner, INPUT);
+    pinMode(heatDefiner, INPUT);
+    pinMode(visualDefiner, INPUT);
     pinMode(BOTON_COLOR, INPUT);
     lcd.begin();
     lcd.backlight();
@@ -3569,7 +3605,7 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(50);
-    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 
 }
 
