@@ -131,7 +131,7 @@ byte y_recorrer[50];
 
 const int VEL_MOTOR                 =   245;
 
-const int VEL_MOTOR_RAMPA           =   240;
+const int VEL_MOTOR_RAMPA           =   245;
 const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
 const int VEL_MOTOR_VUELTA          =   150;
@@ -1379,7 +1379,6 @@ void alinearIMU() {
                     bravo = charlie;
                     charlie = delta;
                     delta = temp;
-
                     break;
 
                 case C_norte:
@@ -1435,16 +1434,15 @@ void alinearIMU() {
                         steps = 9999;
                 }
             }
-
-
             detener();
+
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1400);
+            delay(1200);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(50);
+            delay(25);
 
             switch (ultimaOrientacion) {
                 case B_norte:
@@ -1463,7 +1461,6 @@ void alinearIMU() {
             vueltasDadas = 0;
             cuadrosVisitados = 0;
             rampaCambio = false;
-
         } else if ((cuadrosVisitados > 20 || vueltasDadas > 15) && iOrientacion == A_norte) {
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
@@ -1478,7 +1475,6 @@ void alinearIMU() {
                         return;
                     }
                 }
-
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
                 while(steps <= lecturaSharp * 210) {
@@ -1488,7 +1484,6 @@ void alinearIMU() {
                         return;
                     }
                 }
-
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
                 while(steps <= lecturaSharp * 210) {
@@ -1498,7 +1493,6 @@ void alinearIMU() {
                         return;
                     }
                 }
-
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
                 while(steps <= lecturaSharp * 210) {
@@ -1512,14 +1506,13 @@ void alinearIMU() {
                 return;
             detener();
 
-
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1400);
+            delay(1200);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(50);
+            delay(25);
 
             vueltasDadas = 0;
             cuadrosVisitados = 0;
@@ -1530,7 +1523,7 @@ void alinearIMU() {
 
 void movimientoDerecho(int fuente) {
     float angle;
-    imu::Vector<3> vecm = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+    imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
     switch (fuente) {
         case MOV_FRENTE:
             avanzar();
@@ -1546,8 +1539,8 @@ void movimientoDerecho(int fuente) {
             izqPID.Compute();
             derPID.Compute();
             velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
-            vecm = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-            if(vecm.y() < -4)
+            vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+            if(vec.y() < -4)
                 bumper = true;
 
             if(setIzq - inIzq > 9) {
@@ -3537,7 +3530,7 @@ void setup() {
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(50);
+    delay(25);
 
     if(digitalRead(switch_preferencia) == 0)
         preferencia = DERECHA;
@@ -3555,7 +3548,7 @@ void loop() {
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-    delay(50);
+    delay(25);
 
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
