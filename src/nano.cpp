@@ -1,16 +1,16 @@
 #include <PixyUART.h>
 #include <Arduino.h>
 #include <i2cmaster.h>
-
+  
 
 PixyUART pixy;
-uint16_t blocks; 
+uint16_t blocks;
 
 #define pinReset 13
 #define pinListener 9
 
 #define visualLed 11
-#define heatLed 10 
+#define heatLed 10
 #define visualDefiner 12
 #define Pin_Interrupt 2
 #define heatDefiner 3
@@ -52,7 +52,7 @@ float temperature(int address) {
   pec = i2c_readNak();
   i2c_stop();
 
-  
+
   // Esto convierte los bytes altos y bajos juntos y procesa la temperatura.
   double tempFactor = 0.02;       // 0.02 grados por LSB (medida de
                                   // resolución del MLX90614).
@@ -72,7 +72,7 @@ float temperature(int address) {
 
 // Regresa el valor del mlx izquierdo(D) o derecho(B)
 float getTemperature(char cLado){
-  
+
   switch (cLado)
   {
     case 'B':
@@ -92,7 +92,7 @@ float getTemperature(char cLado){
 // Guarda la temperatura ambiente de cada mlx
 void guardarAmbiente(){
   temp_ambienteB = getTemperature('B');
-  
+
   //temp_ambienteD = getTemperature('D');
 }
 
@@ -158,7 +158,7 @@ void identificarLetra(){
     if(blocks != 0)
     {
       for(int i=0; i<blocks; i++)
-      { 
+      {
        x_block[contador + i] = pixy.blocks[i].x;
        y_block[contador + i] = pixy.blocks[i].y;
        width_block[contador + i] = pixy.blocks[i].width;
@@ -167,7 +167,7 @@ void identificarLetra(){
       contador += 3;
       lecturas[(contador-1)/3] = blocks;
     }
-    
+
   }
 // Elige la lectura con mayor numero de bloques detectados
   byte goodReads = 0;
@@ -204,7 +204,7 @@ void leerBlocks(){
   int x_media[3];
 
   tomarLecturas = false;
-  
+
   if(blocks)
   {
     for(int i = 0; i<blocks; i++)
@@ -213,16 +213,16 @@ void leerBlocks(){
     }
 
     tomarLecturas = true;
-    
+
     for(int i = 0; i<blocks; i++)
     {
       if(x_media[i] > x_max || x_media[i] < x_min)
         tomarLecturas = false;
     }
-    
+
   }
 
-  
+
 }
 
 void checarVision(){
@@ -254,7 +254,7 @@ void setup() {
   pinMode(pinReset, OUTPUT);
   digitalWrite(pinReset, HIGH);
   pinMode(pinListener, INPUT);
-  
+
 // Visual
   pinMode(visualLed, OUTPUT);
   pinMode(visualDefiner, OUTPUT);
@@ -268,7 +268,7 @@ void setup() {
   pinMode(heatLed, OUTPUT);
   digitalWrite(Pin_Interrupt, HIGH);
   delay(500);
-  
+
   guardarAmbiente();
 }
 
@@ -284,8 +284,8 @@ void loop() {
     delay(100);
     digitalWrite(pinReset, LOW);
   }
-  
+
   checarTemperatura(2);
-  checarVision(); 
+  checarVision();
   iCounter = 0;
 }
