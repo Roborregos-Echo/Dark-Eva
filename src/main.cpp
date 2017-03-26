@@ -199,6 +199,7 @@ const int SHARP_D2  = 1;
 
 int MARGEN_FALTANTE = 3;
 bool bumper     = false;
+bool malaPared  = false;
 bool boolUltra  = false;
 bool boolAvanzo = false;
 int lecturasUltra[20];
@@ -268,7 +269,7 @@ const int visualDefiner = 14;
 bool inFire = false;
 bool first_victim = true;
 int contadorLimit = 0;
-unsigned long inicioLimit;
+unsigned long inicioLimit = 0;
 
 
 //******************************************
@@ -754,6 +755,7 @@ void checarLimit() {
                 reversa();
             detener();
             steps = 9999;
+            malaPared = true;
             switch(lastMove) {
                 case TO_NORTH:
                     y_actual--;
@@ -775,10 +777,11 @@ void checarLimit() {
                     cuadros[x_actual][y_actual][z_actual].setPared('O', true);
                     break;
             }
+            contadorLimit = 0;
             return;
-        } else if (millis() < inicioLimit + 5000) {
-            contadorLimit = 1;
+        } else if (millis() > inicioLimit + 5000) {
             inicioLimit = millis();
+            contadorLimit = 1;
         }
 
         if(izq && der) {
@@ -1672,9 +1675,10 @@ void movimientoDerecho(int fuente) {
 
 void moverCuadro() {
     bumper = false;
+    malaPared = false;
     cuadrosVisitados++;
     steps = 0;
-    while (steps <= 3700) {
+    while (steps <= 3700 && !malaPared) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
@@ -1743,7 +1747,7 @@ void moverCuadro() {
     } else {
         steps = 0;
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-        while (steps <= 950) {
+        while (steps <= 950 && !malaPared) {
             movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
@@ -1752,7 +1756,7 @@ void moverCuadro() {
 
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     steps = 0;
-    while (steps <= 750) {
+    while (steps <= 750 && !malaPared) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
@@ -3254,10 +3258,8 @@ void calibrarColor() {
     delay(500);
     while(EstadoColor == ESTADO_LISTO) {
         BotonColor = digitalRead(BOTON_COLOR);
-        if(BotonColor == 1) {
-            //Limpia la pantalla
+        if(BotonColor == 0) {
             EstadoColor++;
-            //Pasa al siguiente estado
         }
     }
     delay(500);
