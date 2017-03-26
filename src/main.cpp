@@ -753,6 +753,7 @@ void checarInterr() {
 }
 
 
+
 void checarLimit() {
     bool izq = false;
     bool der = false;
