@@ -660,10 +660,11 @@ void checarInterr() {
     if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
         int lecturaB = getUltrasonicoUno('B');
         int lecturaD = getUltrasonicoUno('D');
+        int pos = steps;
+        steps = 0;
 
         if(digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
-            if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15)
-            {
+            if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15) {
                 detener();
                 lcd.clear();
                 for (int i = 0; i < 8; i++) {
@@ -672,8 +673,6 @@ void checarInterr() {
                     lcd.backlight();
                     delay(100);
                 }
-                int pos = steps;
-                steps = 0;
 
                 lcd.print("VICTIMA DERECHA");
                 vueltaIzq();
@@ -684,15 +683,10 @@ void checarInterr() {
                     first_victim = false;
                 }
                 vueltaDer();
-
-                cuadros[x_actual][y_actual][z_actual].setmlx(true);
-                inFire = false;
-                steps = pos;
             }
 
-        } else if (digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0){
-            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15)
-            {
+        } else if (digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
                 detener();
                 lcd.clear();
                 for (int i = 0; i < 8; i++) {
@@ -701,8 +695,6 @@ void checarInterr() {
                     lcd.backlight();
                     delay(100);
                 }
-                int pos = steps;
-                steps = 0;
 
                 lcd.print("VICTIMA IZQUIERDA");
                 vueltaDer();
@@ -713,14 +705,9 @@ void checarInterr() {
                     first_victim = false;
                   }
                   vueltaIzq();
-
-                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
-                  inFire = false;
-                  steps = pos;
             }
-        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1){
-            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15)
-            {
+        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
                 detener();
                 lcd.clear();
                 for (int i = 0; i < 8; i++) {
@@ -729,8 +716,6 @@ void checarInterr() {
                     lcd.backlight();
                     delay(100);
                 }
-                int pos = steps;
-                steps = 0;
 
                 lcd.print("VICTIMA VISUAL");
                 vueltaDer();
@@ -741,18 +726,16 @@ void checarInterr() {
                     first_victim = false;
                   }
                   vueltaIzq();
-
-                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
-                  inFire = false;
-                  steps = pos;
             }
-
         }
-
+        cuadros[x_actual][y_actual][z_actual].setmlx(true);
+        inFire = false;
+        steps = pos;
     }
 }
 
-
+int contadorLimit = 0;
+long inicioLimit;
 
 void checarLimit() {
     bool izq = false;
@@ -765,6 +748,7 @@ void checarLimit() {
         der = true;
 
     if(izq || der) {
+        contadorLimit++;
         detener();
         lcd.clear();
         lcd.print("  LIMIT  ");
@@ -777,6 +761,40 @@ void checarLimit() {
             delay(50);
         }
 
+        if(contadorLimit >= 3 && millis() < inicioLimit + 5000) {
+            detener();
+            while (steps <= 700) {
+                reversa();
+            }
+            detener();
+            steps = 9999;
+            switch(lastMove) {
+                case TO_NORTH:
+                y_actual--;
+                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                break;
+
+                case TO_EAST:
+                x_actual--;
+                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                break;
+
+                case TO_SOUTH:
+                y_actual++;
+                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                break;
+
+                case TO_WEST:
+                x_actual++;
+                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                break;
+            }
+            return;
+        } else if (millis() > inicioLimit + 5000) {
+            contadorLimit = 1;
+            inicioLimit = millis();
+        }
+
         if(izq && der) {
             lcd.setCursor(1, 0);
             lcd.print("  IZQ     DER ");
@@ -784,8 +802,28 @@ void checarLimit() {
                 reversa();
             }
             detener();
-            //TODO: PONER PARED
             steps = 9999;
+            switch(lastMove) {
+                case TO_NORTH:
+                y_actual--;
+                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                break;
+
+                case TO_EAST:
+                x_actual--;
+                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                break;
+
+                case TO_SOUTH:
+                y_actual++;
+                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                break;
+
+                case TO_WEST:
+                x_actual++;
+                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                break;
+            }
         } else if (izq){
             lcd.setCursor(1, 0);
             lcd.print("  IZQ");
@@ -1262,7 +1300,7 @@ void setRampa() {
         break;
 
         case TO_SOUTH:
-        cuadros[x_actual][y_actual-1][z_actual].setEstado(RAMPA);
+        cuadros[x_actual][y_actual+1][z_actual].setEstado(RAMPA);
         break;
 
         case TO_WEST:
@@ -3284,12 +3322,10 @@ int getColor() {
 // Funcion para calibrar los colores que se usaran
 void calibrarColor() {
     while(EstadoColor == ESTADO_OFF) {
-        //lcd.println("Calibrar...");
         lcd.setCursor(0, 0);
-        lcd.print("   Calibrar... ");
+        lcd.print("   Calibrar...");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 0) {
-            //*Limpia la pantalla
             EstadoColor = ESTADO_NEGRO;
             delay(500);
         }
@@ -3298,33 +3334,29 @@ void calibrarColor() {
     lcd.clear();
     lcd.print("    Negro...");
     while(EstadoColor == ESTADO_NEGRO) {
-        //lcd.println("Calibrar Negro");
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 0) {
             setFiltro('N');
             iN_NEGRO = getColor();
 
-            //*Limpia la pantalla
             delay(500);
             escribirValores();
-            //EstadoColor = ESTADO_CHECKPOINT;
             EstadoColor = ESTADO_LISTO;
         }
     }
 
     lcd.clear();
     lcd.print("   LISTO... ");
-    delay(4000);
-    EstadoColor++;
-    /*while(EstadoColor == ESTADO_LISTO) {
-        //lcd.println("Listo...");
+    delay(500);
+    while(EstadoColor == ESTADO_LISTO) {
         BotonColor = digitalRead(BOTON_COLOR);
         if(BotonColor == 1) {
             //Limpia la pantalla
             EstadoColor++;
             //Pasa al siguiente estado
         }
-    }*/
+    }
+    delay(500);
 }
 
 // Regresa true si el sensor detecta el color que declares en el parametro
