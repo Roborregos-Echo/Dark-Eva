@@ -2050,8 +2050,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     unsigned int tiempo = millis();
     while (!pathFinished) {
 
-        if(tiempo - millis() > 5000)
+        if(millis() - tiempo > 5000)
         {
+            lcd.clear();
+            lcd.print("RESEEET");
             if(bumper)
             {
                 int lecturaA = getUltrasonicoUno('A');
