@@ -54,7 +54,7 @@ void vueltaIzq();
 
 //******************************************
 //--------------- LABERINTO ----------------
-#define switch_preferencia 20
+#define switch_preferencia 33
 const byte DERECHA      =   0;
 const byte IZQUIERDA    =   1;
 
@@ -3544,7 +3544,7 @@ void hacerPruebas() {
 void setup() {
     Serial.begin(9600);
     //PORTC = (1 << PORTC4) | (1 << PORTC5);    // Habilita ‘pullups’.
-    pinMode(interruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
+    //pinMode(interruptNano, INPUT_PULLUP);  //Pone el pin de interrupcion a la escucha
     //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW); //Declara la funcion a ejecutar en interruptB
     attachInterrupt(digitalPinToInterrupt(ENC1), addStep, CHANGE);
     attachInterrupt(digitalPinToInterrupt(ENC2), addStep, CHANGE);
@@ -3626,10 +3626,6 @@ void setup() {
 
     getUltrasonicoUno('D');
 
-    if(digitalRead(switch_preferencia) == 0)
-        preferencia = DERECHA;
-    else
-        preferencia = IZQUIERDA;
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
     delay(1500);
@@ -3638,7 +3634,12 @@ void setup() {
     lcd.clear();
     lcd.print("CALIBRADO");
     delay(50);
-    attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
+
+    if(digitalRead(switch_preferencia) == 0)
+        preferencia = DERECHA;
+    else
+        preferencia = IZQUIERDA;
+    //attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
 
 }
 
