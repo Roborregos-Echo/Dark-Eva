@@ -1790,6 +1790,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1812,6 +1813,7 @@ void absoluteMove(char cLado) {
                 x_actual--;
                 lastMove = TO_WEST;
                 vueltaIzq();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1824,6 +1826,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1846,6 +1849,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaIzq();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1878,6 +1882,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaIzq();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1892,6 +1897,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1904,6 +1910,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaIzq();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
@@ -1918,6 +1925,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
+                checarInterr();
                 alinear();
                 moverCuadro();
                 break;
