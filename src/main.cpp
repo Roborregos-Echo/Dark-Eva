@@ -2446,29 +2446,20 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
 
-        lectura = getUltrasonicoUno('B');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
-        cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('E');
-            shortMove = true;
-        } else {
-            B_wall = true;
+        if(preferencia == IZQUIERDA)
+        {
+            lectura = getUltrasonicoUno('B');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
+            cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
+                agregarLast('E');
+                shortMove = true;
+            } else {
+                B_wall = true;
+            }
+            if(lectura != 0 && lectura < 15)
+                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
         }
-        if(lectura != 0 && lectura < 15)
-            cuadros[x_actual][y_actual][z_actual].setPared('E', true);
-
-        lectura = getUltrasonicoUno('A');
-        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  ||
-        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
-            agregarLast('N');
-            shortMove = true;
-        } else {
-            A_wall = true;
-        }
-        if(lectura != 0 && lectura < 15)
-            cuadros[x_actual][y_actual][z_actual].setPared('N', true);
-
-        if(x_actual > 0)
+        else
         {
             lectura = getUltrasonicoUno('D');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
@@ -2485,6 +2476,53 @@ void checarParedes() {
 
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+        }
+
+
+        lectura = getUltrasonicoUno('A');
+        if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual+1][z_actual].getEstado()==NO_EXISTE  ||
+        cuadros[x_actual][y_actual+1][z_actual].getEstado()==SIN_RECORRER)) {
+            agregarLast('N');
+            shortMove = true;
+        } else {
+            A_wall = true;
+        }
+        if(lectura != 0 && lectura < 15)
+            cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+
+        if(preferencia == IZQUIERDA)
+        {
+            if(x_actual > 0)
+            {
+                lectura = getUltrasonicoUno('D');
+                if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
+                cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
+                {
+                    agregarLast('O');
+                    shortMove = true;
+                }
+                else
+                {
+                    D_wall = true;
+                }
+            }
+
+            if(lectura != 0 && lectura < 15)
+                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+        }
+        else
+        {
+            lectura = getUltrasonicoUno('B');
+            if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
+            cuadros[x_actual+1][y_actual][z_actual].getEstado()==SIN_RECORRER)) {
+                agregarLast('E');
+                shortMove = true;
+            } else {
+                B_wall = true;
+            }
+            if(lectura != 0 && lectura < 15)
+                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+        }
 
         break;
         //--------------------------------------------------------------------
