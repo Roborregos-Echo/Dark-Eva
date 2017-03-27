@@ -134,10 +134,10 @@ const int VEL_MOTOR                 =   220;
 const int VEL_MOTOR_RAMPA           =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
-const int VEL_MOTOR_VUELTA          =   150;
+const int VEL_MOTOR_VUELTA          =   140;
 
-const int VEL_MOTOR_ALINEAR          =   130;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   130;
+const int VEL_MOTOR_ALINEAR          =   120;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   120;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -690,6 +690,8 @@ void checarInterr() {
                 while (steps <= 600)
                     reversa();
                 detener();
+                cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                inFire = false;
             }
 
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
@@ -711,6 +713,8 @@ void checarInterr() {
                   while (steps <= 600)
                       reversa();
                   detener();
+                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                  inFire = false;
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
@@ -731,10 +735,10 @@ void checarInterr() {
                   while (steps <= 600)
                       reversa();
                   detener();
+                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                  inFire = false;
             }
         }
-        cuadros[x_actual][y_actual][z_actual].setmlx(true);
-        inFire = false;
         steps = pos;
     }
 }
