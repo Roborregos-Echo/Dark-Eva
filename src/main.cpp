@@ -129,9 +129,9 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   245;
+const int VEL_MOTOR                 =   220;
 
-const int VEL_MOTOR_RAMPA           =   250;
+const int VEL_MOTOR_RAMPA           =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
 const int VEL_MOTOR_VUELTA          =   150;
@@ -686,6 +686,10 @@ void checarInterr() {
                     first_victim = false;
                 }
                 vueltaDer();
+                steps = 0;
+                while (steps <= 600)
+                    reversa();
+                detener();
             }
 
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
@@ -703,6 +707,10 @@ void checarInterr() {
                     first_victim = false;
                   }
                   vueltaIzq();
+                  steps = 0;
+                  while (steps <= 600)
+                      reversa();
+                  detener();
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
@@ -719,14 +727,14 @@ void checarInterr() {
                     first_victim = false;
                   }
                   vueltaIzq();
+                  steps = 0;
+                  while (steps <= 600)
+                      reversa();
+                  detener();
             }
         }
         cuadros[x_actual][y_actual][z_actual].setmlx(true);
         inFire = false;
-        steps = 0;
-        while (steps <= 500)
-            reversa();
-        detener();
         steps = pos;
     }
 }
@@ -865,7 +873,7 @@ void checarLimit() {
             while (steps <= 500)
                 reversa();
             detener();
-            while (steps <= 1000)
+            while (steps <= 1300)
                 horizontalDerecha();
             detener();
             steps = pos - 500;
@@ -876,7 +884,7 @@ void checarLimit() {
                 reversa();
             }
             detener();
-            while (steps <= 1000)
+            while (steps <= 1300)
                 horizontalIzquierda();
             detener();
             steps = pos - 500;
@@ -3582,6 +3590,9 @@ void setup() {
     delay(800);
     hacerPruebas();
 
+    getUltrasonicoUno('A');
+    getUltrasonicoUno('B');
+    getUltrasonicoUno('C');
     getUltrasonicoUno('D');
 
     lcd.clear();
