@@ -29,7 +29,7 @@
 #include <NewPing.h>
 
 
-    
+
 //********************************************
 //********************************************
 //------------------ HEADERS -----------------
@@ -2288,6 +2288,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         //lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino && y_path == y_destino) {
+
+            tiempo = millis();
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     //lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
