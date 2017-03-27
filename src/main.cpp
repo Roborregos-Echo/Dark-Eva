@@ -132,7 +132,7 @@ byte y_recorrer[50];
 const int VEL_MOTOR                 =   220;
 
 const int VEL_MOTOR_RAMPA           =   255;
-const int VEL_MOTOR_RAMPA_ENCODER   =   255;
+const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
 const int VEL_MOTOR_VUELTA          =   140;
 
@@ -739,6 +739,7 @@ void checarInterr() {
                   inFire = false;
             }
         }
+        inFire = false;
         steps = pos;
     }
 }
@@ -746,26 +747,30 @@ void checarInterr() {
 
 void checarInterrSinVuelta() {
     if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
+        detener();
         int lecturaB = getUltrasonicoUno('B');
         int lecturaD = getUltrasonicoUno('D');
-        detener();
-        lcd.clear();
-        parpadear(8, 100);
         bool correcto = false;
 
         if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
             if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15) {
+                lcd.clear();
+                parpadear(8, 100);
                 lcd.print("VICTIMA DERECHA");
                 correcto = true;
             }
 
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
+                lcd.clear();
+                parpadear(8, 100);
                 lcd.print("VICTIMA IZQUIERDA");
                 correcto = true;
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
+                lcd.clear();
+                parpadear(8, 100);
                 lcd.print("VICTIMA VISUAL");
                 correcto = true;
             }
@@ -779,8 +784,8 @@ void checarInterrSinVuelta() {
                 first_victim = false;
             }
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
-            inFire = false;
         }
+        inFire = false;
     }
 }
 
@@ -2122,7 +2127,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     unsigned int tiempo = millis();
     while (!pathFinished) {
 
-        if(millis() - tiempo > 12000)
+        if(millis() - tiempo > 8000)
         {
             lcd.clear();
             lcd.print("RESEEET");
