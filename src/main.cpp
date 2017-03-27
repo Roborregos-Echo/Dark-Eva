@@ -131,13 +131,13 @@ byte y_recorrer[50];
 
 const int VEL_MOTOR                 =   245;
 
-const int VEL_MOTOR_RAMPA           =   245;
+const int VEL_MOTOR_RAMPA           =   250;
 const int VEL_MOTOR_RAMPA_ENCODER   =   255;
 
 const int VEL_MOTOR_VUELTA          =   150;
 
-const int VEL_MOTOR_ALINEAR          =   125;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   125;
+const int VEL_MOTOR_ALINEAR          =   130;
+const int VEL_MOTOR_ALINEAR_ENCODER  =   130;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
