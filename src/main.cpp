@@ -28,7 +28,7 @@
 #include <EEPROM.h>
 #include <NewPing.h>
 
-
+    
 
 //********************************************
 //********************************************
@@ -2300,8 +2300,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         //lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino && y_path == y_destino) {
-
-            tiempo = millis();
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     //lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
@@ -2318,6 +2316,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             //lcd.println(y_back);
 
             while(!backFinished) {
+                tiempo = millis();
                 for (int i = 0; i<4; i++)
                 neighbors[i] = 999;
                 neighborsortValue = 999;
@@ -2400,6 +2399,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 back_index--;
                 //------------
                 if(x_back == x_actual && y_back == y_actual) {
+                    tiempo = millis();
                     backList[back_index+1] = 999;
                     //lcd.println("Entre al final");
                     //delay(500);
