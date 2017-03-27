@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.3.9 --------------------------------
-//--------------------------- 26 / MARZO / 2017 -----------------------------
+//--------------------------- 26 / MARZO / 2017 -------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -440,7 +440,7 @@ void detener() {
     digitalWrite(Pin2_IZQUIERDA_ADELANTE, HIGH);
     digitalWrite(Pin2_IZQUIERDA_ATRAS, HIGH);
 
-    delay(100);
+    delay(80);
 
     digitalWrite(Pin1_DERECHA_ADELANTE, LOW);
     digitalWrite(Pin1_DERECHA_ATRAS, LOW);
@@ -681,7 +681,7 @@ void checarInterr() {
                 vueltaIzq();
                 servoMotor();
                 if(first_victim) {
-                    delay(500);
+                    delay(200);
                     servoMotor();
                     first_victim = false;
                 }
@@ -698,7 +698,7 @@ void checarInterr() {
                 vueltaDer();
                 servoMotor();
                 if(first_victim) {
-                    delay(500);
+                    delay(200);
                     servoMotor();
                     first_victim = false;
                   }
@@ -714,7 +714,7 @@ void checarInterr() {
                 vueltaDer();
                 servoMotor();
                 if(first_victim) {
-                    delay(500);
+                    delay(200);
                     servoMotor();
                     first_victim = false;
                   }
@@ -723,7 +723,52 @@ void checarInterr() {
         }
         cuadros[x_actual][y_actual][z_actual].setmlx(true);
         inFire = false;
+        steps = 0;
+        while (steps <= 500)
+            reversa();
+        detener();
         steps = pos;
+    }
+}
+
+
+void checarInterrSinVuelta() {
+    if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
+        int lecturaB = getUltrasonicoUno('B');
+        int lecturaD = getUltrasonicoUno('D');
+        detener();
+        lcd.clear();
+        parpadear(8, 100);
+        bool correcto = false;
+
+        if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
+            if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15) {
+                lcd.print("VICTIMA DERECHA");
+                correcto = true;
+            }
+
+        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
+                lcd.print("VICTIMA IZQUIERDA");
+                correcto = true;
+            }
+        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
+                lcd.print("VICTIMA VISUAL");
+                correcto = true;
+            }
+        }
+
+        if(correcto) {
+            servoMotor();
+            if(first_victim) {
+                delay(200);
+                servoMotor();
+                first_victim = false;
+            }
+            cuadros[x_actual][y_actual][z_actual].setmlx(true);
+            inFire = false;
+        }
     }
 }
 
@@ -746,8 +791,10 @@ void checarLimit() {
         int pos = steps;
         steps = 0;
         parpadear(4, 50);
+        velocidad(VEL_MOTOR + contadorLimit * 15, VEL_MOTOR + contadorLimit * 15, VEL_MOTOR + contadorLimit * 15, VEL_MOTOR + contadorLimit * 15);
 
-        if(contadorLimit >= 3 && millis() < inicioLimit + 5000) {
+        if(contadorLimit >= 4 && millis() < inicioLimit + 6000) {
+            velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             lcd.setCursor(1, 0);
             lcd.print("  YA PASO MUCHO ");
             detener();
@@ -779,7 +826,7 @@ void checarLimit() {
             }
             contadorLimit = 0;
             return;
-        } else if (millis() > inicioLimit + 5000) {
+        } else if (millis() > inicioLimit + 6000) {
             inicioLimit = millis();
             contadorLimit = 1;
         }
@@ -834,6 +881,7 @@ void checarLimit() {
             detener();
             steps = pos - 500;
         }
+        velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     }
 }
 
@@ -1441,7 +1489,7 @@ void alinearIMU() {
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1200);
+            delay(1000);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
@@ -1511,7 +1559,7 @@ void alinearIMU() {
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1200);
+            delay(1000);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
@@ -1699,7 +1747,7 @@ void moverCuadro() {
                 lcd.clear();
                 lcd.print(permisoRampa);
                 lcd.print("ERROR");
-                delay(50000);
+                delay(5000);
                 break;
 
             case SUBIR:
@@ -1790,7 +1838,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1799,10 +1847,10 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 // Equivalente vuelta ATRAS
                 alinear();
@@ -1813,7 +1861,7 @@ void absoluteMove(char cLado) {
                 x_actual--;
                 lastMove = TO_WEST;
                 vueltaIzq();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1826,7 +1874,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1835,10 +1883,10 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 // Equivalente vuelta ATRAS
                 alinear();
@@ -1849,7 +1897,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaIzq();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1868,10 +1916,10 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 // Equivalente vuelta ATRAS
                 alinear();
@@ -1882,7 +1930,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaIzq();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1897,7 +1945,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1910,7 +1958,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaIzq();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1925,7 +1973,7 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 alinear();
                 moverCuadro();
                 break;
@@ -1934,10 +1982,10 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 // Equivalente vuelta ATRAS
                 alinear();
@@ -2923,10 +2971,10 @@ void resolverLaberinto() {
                         break;
                 }
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 vueltaDer();
-                checarInterr();
+                checarInterrSinVuelta();
                 checarLimit();
                 moverCuadro();
                 checarLasts();
@@ -3037,10 +3085,10 @@ void resolverLaberinto() {
                             break;
                     }
                     vueltaDer();
-                    checarInterr();
+                    checarInterrSinVuelta();
                     checarLimit();
                     vueltaDer();
-                    checarInterr();
+                    checarInterrSinVuelta();
                     checarLimit();
                     moverCuadro();
                     checarLasts();
@@ -3132,7 +3180,7 @@ void servoMotor() {
         servo.write(180);
     else
         servo.write(0);
-    delay(500);
+    delay(650);
 }
 
 void checarmlx() {
@@ -3257,10 +3305,9 @@ void calibrarColor() {
         if(BotonColor == 0) {
             setFiltro('N');
             iN_NEGRO = getColor();
-
-            delay(500);
             escribirValores();
             EstadoColor = ESTADO_LISTO;
+            delay(500);
         }
     }
 
@@ -3293,7 +3340,6 @@ void checarColor() {
     if(checarCuadroColor(COLOR_NEGRO, 50)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
-        delay(1000);
         cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
         cuadros[x_actual-1][y_actual][z_actual].setPared('E', true);
         cuadros[x_actual][y_actual+1][z_actual].setPared('S', true);
@@ -3385,7 +3431,7 @@ void checarArray() {
 void imprimirValores1() {
     lcd.clear();
     lcd.print("     SHARPS");
-    delay(1000);
+    delay(500);
     while (digitalRead(BOTON_COLOR) != 0) {
         lcd.clear();
         lcd.setCursor(5, 0);
@@ -3398,7 +3444,7 @@ void imprimirValores1() {
 }
 
 void imprimirValores2() {
-    delay(1000);
+    delay(500);
     while (digitalRead(BOTON_COLOR) != 0) {
         lcd.clear();
         lcd.setCursor(0, 0);
@@ -3417,7 +3463,7 @@ void imprimirValores2() {
 void imprimirValores3() {
     lcd.clear();
     lcd.print("  ULTRASONICOS");
-    delay(1000);
+    delay(500);
         while(digitalRead(BOTON_COLOR) != 0){
         lcd.clear();
         lcd.setCursor(0, 0);
@@ -3438,7 +3484,7 @@ void hacerPruebas() {
     lcd.print(" Quieres hacer");
     lcd.setCursor(0, 1);
     lcd.print("    pruebas?");
-    delay(800);
+    delay(500);
     if(digitalRead(BOTON_COLOR) == 0) {
         imprimirValores1();
         imprimirValores2();
@@ -3485,7 +3531,7 @@ void setup() {
     if (digitalRead(BOTON_COLOR) == 0) {
          lcd.clear();
          lcd.print("SUELTE EL BOTON");
-         delay(800);
+         delay(500);
          calibrarColor();
      } else {
          leerValores();
@@ -3531,14 +3577,14 @@ void setup() {
     z_actual = 0;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
-    delay(1000);
+    delay(800);
     hacerPruebas();
 
     getUltrasonicoUno('D');
 
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
-    delay(1500);
+    delay(1000);
     bno.begin();
     bno.setExtCrystalUse(true);
     lcd.clear();
