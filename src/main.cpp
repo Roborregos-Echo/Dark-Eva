@@ -2110,7 +2110,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     unsigned int tiempo = millis();
     while (!pathFinished) {
 
-        if(millis() - tiempo > 5000)
+        if(millis() - tiempo > 12000)
         {
             lcd.clear();
             lcd.print("RESEEET");
