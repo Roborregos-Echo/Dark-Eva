@@ -2118,7 +2118,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     unsigned int tiempo = millis();
     while (!pathFinished) {
 
-        if(millis() - tiempo > 5000)
+        if(millis() - tiempo > 12000)
         {
             lcd.clear();
             lcd.print("RESEEET");
@@ -2296,6 +2296,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         //lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino && y_path == y_destino) {
+
+            tiempo = millis();
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     //lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
@@ -2501,6 +2503,7 @@ void checarParedes() {
         }
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+
 
         lectura = getUltrasonicoUno('B');
         if((lectura == 0 || lectura > 15) && (cuadros[x_actual+1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
