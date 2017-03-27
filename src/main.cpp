@@ -2086,6 +2086,7 @@ byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
 //******************************************
 //------------- PATHFINDING ----------------
 void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
+    unsigned long tiempo = millis();
     //lcd.println("Estoy en PathFinding");
     //lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     //lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
@@ -2124,7 +2125,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     for (int i = 0; i<GRID_MAX; i++)
         backList[i] = 999;
 
-    unsigned int tiempo = millis();
     while (!pathFinished) {
 
         if(millis() - tiempo > 8000)
@@ -2305,6 +2305,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         //lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino && y_path == y_destino) {
+            tiempo = millis();
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     //lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
