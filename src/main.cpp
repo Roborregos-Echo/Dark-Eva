@@ -638,11 +638,13 @@ void checarInterr() {
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
-                
+
                 // Comprueba que si sea una victima real y no haya detectado basura por error
                 detener();
                 inFire = false;
-                delay(750);
+                delay(300);
+                inFire = false;
+                delay(300);
 
                 if(inFire) {
                     lcd.clear();
