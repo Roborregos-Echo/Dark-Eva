@@ -719,24 +719,37 @@ void checarInterr() {
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
                 detener();
-                lcd.clear();
-                parpadear(8, 100);
-                lcd.print("VICTIMA VISUAL");
+                unsigned long tiempo = millis();
+                bool victimaCorrecta = false;
 
-                vueltaDer();
-                servoMotor();
-                if(first_victim) {
-                    delay(200);
+                // Comprueba que si sea una victima real y no haya detectado basura por error
+                while(millis() - tiempo < 750)
+                {
+                    if(digitalRead(heatDefiner) == 0 && digitalRead(heatDefiner) == 1)
+                        victimaCorrecta = true;
+                }
+
+                if(victimaCorrecta)
+                {
+                    lcd.clear();
+                    parpadear(8, 100);
+                    lcd.print("VICTIMA VISUAL");
+
+                    vueltaDer();
                     servoMotor();
-                    first_victim = false;
-                  }
-                  vueltaIzq();
-                  steps = 0;
-                  while (steps <= 600)
-                      reversa();
-                  detener();
-                  cuadros[x_actual][y_actual][z_actual].setmlx(true);
-                  inFire = false;
+                    if(first_victim) {
+                        delay(200);
+                        servoMotor();
+                        first_victim = false;
+                      }
+                      vueltaIzq();
+                      steps = 0;
+                      while (steps <= 600)
+                          reversa();
+                      detener();
+                      cuadros[x_actual][y_actual][z_actual].setmlx(true);
+                      inFire = false;
+                }        
             }
         }
         inFire = false;
