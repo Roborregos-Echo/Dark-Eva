@@ -638,17 +638,14 @@ void checarInterr() {
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
-                detener();
-                unsigned long tiempo = millis();
-                bool victimaCorrecta = false;
-
                 // Comprueba que si sea una victima real y no haya detectado basura por error
-                while(millis() - tiempo < 750) {
-                    if(digitalRead(heatDefiner) == 0 && digitalRead(heatDefiner) == 1)
-                        victimaCorrecta = true;
-                }
+                detener();
+                inFire = false;
+                delay(300);
+                inFire = false;
+                delay(300);
 
-                if(victimaCorrecta) {
+                if(inFire) {
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
