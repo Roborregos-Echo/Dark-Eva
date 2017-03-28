@@ -136,8 +136,7 @@ const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
 const int VEL_MOTOR_VUELTA          =   140;
 
-const int VEL_MOTOR_ALINEAR          =   120;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   120;
+const int VEL_MOTOR_ALINEAR          =   90;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -197,20 +196,8 @@ const int SHARP_D2  = 1;
 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 #define MAX_DISTANCE 400
 
-int MARGEN_FALTANTE = 3;
 bool bumper     = false;
 bool malaPared  = false;
-bool boolUltra  = false;
-bool boolAvanzo = false;
-int lecturasUltra[20];
-int lecturasComparador[20];
-int contador_ultra = 0;
-int lecturasDiferentes = 0;
-int primeraLectura_A, primeraLectura_C;
-int segundaLectura_A, segundaLectura_C;
-long millisPasado;
-char faltanteChar;
-int faltante_CM;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -569,74 +556,6 @@ int getUltrasonicoUno(char cSentido) {
     }
 }
 
-void agregarLecturas(char cSentido) {
-    lecturasUltra[contador_ultra++] = getUltrasonicoUno(cSentido);
-}
-
-void checarAvance() {
-    for(int i = 0; i < 20; i++)
-        lecturasComparador[i] = lecturasUltra[i];
-
-    for(int i = 0; i < 20; i++) {
-        for(int j = 0; j < 20; j++) {
-            if(lecturasComparador[j] == lecturasUltra[i]) {
-                lecturasComparador[j] = 0;
-                boolUltra = true;
-            }
-        }
-        if(boolUltra) {
-            lecturasDiferentes++;
-            boolUltra = false;
-        }
-    }
-
-    if(lecturasDiferentes > 10)
-        boolAvanzo = true;
-    else
-        boolAvanzo = false;
-
-
-    for(int i=0; i < 20; i++)
-        lecturasUltra[i] = 0;
-
-    contador_ultra = 0;
-    boolUltra = false;
-}
-
-
-void primeraLectura() {
-    primeraLectura_A = getUltrasonicoMediana('A');
-    primeraLectura_C = getUltrasonicoMediana('C');
-}
-
-/*void comprobarAvance() {
-    if(primeraLectura_A != 0) {
-        faltanteChar = 'A';
-        segundaLectura_A = getUltrasonicoMediana('A');
-        if(segundaLectura_A == 0 || (abs(primeraLectura_A - segundaLectura_A) >= (30 - MARGEN_FALTANTE) &&
-        abs(primeraLectura_A - segundaLectura_A) <= (30 + MARGEN_FALTANTE))) {
-            faltante_CM = 0;
-        } else {
-            faltante_CM = 30 - abs(primeraLectura_A - segundaLectura_A);
-        }
-    } else if(primeraLectura_C != 0) {
-        faltanteChar = 'C';
-        segundaLectura_C = getUltrasonicoMediana('C');
-        if(segundaLectura_C == 0 || (abs(primeraLectura_C - segundaLectura_C) >= (30 - MARGEN_FALTANTE) &&
-        abs(primeraLectura_C - segundaLectura_C) <= (30 + MARGEN_FALTANTE))) {
-            faltante_CM = 0;
-        } else {
-            faltante_CM = 30 - abs(primeraLectura_C - segundaLectura_C);
-        }
-    } else {
-        faltante_CM = 0;
-    }
-}*/
-
-void checarFaltante() {
-    faltante_CM = map(lecturasDiferentes, 1, 20, 30, 0);
-}
-
 
 //******************************************
 //---------------- ENCODER -----------------
@@ -670,6 +589,7 @@ void checarInterr() {
         int lecturaD = getUltrasonicoUno('D');
         int pos = steps;
         steps = 0;
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
         if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
             if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15) {
@@ -723,14 +643,12 @@ void checarInterr() {
                 bool victimaCorrecta = false;
 
                 // Comprueba que si sea una victima real y no haya detectado basura por error
-                while(millis() - tiempo < 750)
-                {
+                while(millis() - tiempo < 750) {
                     if(digitalRead(heatDefiner) == 0 && digitalRead(heatDefiner) == 1)
                         victimaCorrecta = true;
                 }
 
-                if(victimaCorrecta)
-                {
+                if(victimaCorrecta) {
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
@@ -761,6 +679,7 @@ void checarInterr() {
 void checarInterrSinVuelta() {
     if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
         detener();
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
         int lecturaB = getUltrasonicoUno('B');
         int lecturaD = getUltrasonicoUno('D');
         bool correcto = false;
@@ -949,7 +868,7 @@ void alinear() {
     bool charlie    =   false;
     bool delta      =   false;
 
-    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
     lecturaUltra = getUltrasonicoUno('A');
     lecturaSharp = getSharpCorta(SHARP_A);
@@ -971,6 +890,7 @@ void alinear() {
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         delta = true;
 
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
     if(bravo && delta) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
             unsigned long inicio = millis();
@@ -1130,6 +1050,7 @@ void alinear() {
 void vueltaIzq() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
+    checarInterrSinVuelta();
     posInicial = getAngulo();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Izq");
@@ -1218,11 +1139,15 @@ void vueltaIzq() {
             iOrientacion = A_norte;
             break;
     }
+    checarInterrSinVuelta();
+    checarLimit();
+    alinear();
 }
 
 void vueltaDer() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
+    checarInterrSinVuelta();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Der");
     posInicial = getAngulo();
@@ -1311,6 +1236,9 @@ void vueltaDer() {
             iOrientacion = C_norte;
             break;
     }
+    checarInterrSinVuelta();
+    checarLimit();
+    alinear();
 }
 
 
@@ -1426,7 +1354,7 @@ void alinearIMU() {
         bool bravo      =   false;
         bool charlie    =   false;
         bool delta      =   false;
-        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
 
         lecturaUltra = getUltrasonicoUno('A');
@@ -1488,28 +1416,28 @@ void alinearIMU() {
 
             if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     horizontalDerecha();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     horizontalIzquierda();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     reversa();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     avanzar();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
@@ -1549,7 +1477,7 @@ void alinearIMU() {
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     avanzar();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1558,7 +1486,7 @@ void alinearIMU() {
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     reversa();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1567,7 +1495,7 @@ void alinearIMU() {
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     horizontalDerecha();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1576,7 +1504,7 @@ void alinearIMU() {
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 210) {
+                while(steps <= lecturaSharp * 300) {
                     horizontalIzquierda();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1868,8 +1796,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1877,13 +1803,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1891,8 +1812,6 @@ void absoluteMove(char cLado) {
                 x_actual--;
                 lastMove = TO_WEST;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
         }
@@ -1904,8 +1823,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1913,13 +1830,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1927,8 +1839,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1946,13 +1856,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1960,8 +1865,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1975,8 +1878,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
         }
@@ -1988,8 +1889,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -2003,8 +1902,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -2012,13 +1909,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
         }
@@ -3005,11 +2897,7 @@ void resolverLaberinto() {
                         break;
                 }
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 moverCuadro();
                 checarLasts();
             }
@@ -3119,11 +3007,7 @@ void resolverLaberinto() {
                             break;
                     }
                     vueltaDer();
-                    checarInterrSinVuelta();
-                    checarLimit();
                     vueltaDer();
-                    checarInterrSinVuelta();
-                    checarLimit();
                     moverCuadro();
                     checarLasts();
                 }
