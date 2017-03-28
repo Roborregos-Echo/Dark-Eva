@@ -129,14 +129,14 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   220;
+const int VEL_MOTOR                 =   215;
 
 const int VEL_MOTOR_RAMPA           =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
 const int VEL_MOTOR_VUELTA          =   140;
 
-const int VEL_MOTOR_ALINEAR          =   90;
+const int VEL_MOTOR_ALINEAR          =   80;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -607,7 +607,7 @@ void checarInterr() {
                 }
                 vueltaDer();
                 steps = 0;
-                while (steps <= 600)
+                while (steps <= 400)
                     reversa();
                 detener();
                 cuadros[x_actual][y_actual][z_actual].setmlx(true);
@@ -630,7 +630,7 @@ void checarInterr() {
                   }
                   vueltaIzq();
                   steps = 0;
-                  while (steps <= 600)
+                  while (steps <= 400)
                       reversa();
                   detener();
                   cuadros[x_actual][y_actual][z_actual].setmlx(true);
@@ -660,7 +660,7 @@ void checarInterr() {
                       }
                       vueltaIzq();
                       steps = 0;
-                      while (steps <= 600)
+                      while (steps <= 400)
                           reversa();
                       detener();
                       cuadros[x_actual][y_actual][z_actual].setmlx(true);
@@ -738,7 +738,7 @@ void checarLimit() {
         int pos = steps;
         steps = 0;
         parpadear(4, 50);
-        velocidad(VEL_MOTOR + contadorLimit * 15, VEL_MOTOR + contadorLimit * 15, VEL_MOTOR + contadorLimit * 15, VEL_MOTOR + contadorLimit * 15);
+        velocidad(VEL_MOTOR + contadorLimit * 10, VEL_MOTOR + contadorLimit * 10, VEL_MOTOR + contadorLimit * 10, VEL_MOTOR + contadorLimit * 10);
 
         if(contadorLimit >= 4 && millis() < inicioLimit + 6000) {
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
@@ -812,7 +812,7 @@ void checarLimit() {
             while (steps <= 500)
                 reversa();
             detener();
-            while (steps <= 1300)
+            while (steps <= 1100)
                 horizontalDerecha();
             detener();
             steps = pos - 500;
@@ -823,7 +823,7 @@ void checarLimit() {
                 reversa();
             }
             detener();
-            while (steps <= 1300)
+            while (steps <= 1100)
                 horizontalIzquierda();
             detener();
             steps = pos - 500;
@@ -1414,28 +1414,28 @@ void alinearIMU() {
 
             if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     horizontalDerecha();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     horizontalIzquierda();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     reversa();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     avanzar();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
@@ -1475,7 +1475,7 @@ void alinearIMU() {
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     avanzar();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1484,7 +1484,7 @@ void alinearIMU() {
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     reversa();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1493,7 +1493,7 @@ void alinearIMU() {
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     horizontalDerecha();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1502,7 +1502,7 @@ void alinearIMU() {
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 300) {
+                while(steps <= lecturaSharp * 270) {
                     horizontalIzquierda();
                     if (millis() >= inicio + 1500) {
                         detener();
