@@ -2073,6 +2073,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 }
             }
             alinear();
+            delay(500);
             digitalWrite(timeoutPin, HIGH);
             delay(200);
             digitalWrite(timeoutPin, LOW);
