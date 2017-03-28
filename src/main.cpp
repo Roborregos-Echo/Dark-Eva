@@ -129,12 +129,12 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   235;
+const int VEL_MOTOR                 =   220;
 
 const int VEL_MOTOR_RAMPA           =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
-const int VEL_MOTOR_VUELTA          =   150;
+const int VEL_MOTOR_VUELTA          =   145;
 
 const int VEL_MOTOR_ALINEAR         =   90;
 
@@ -509,7 +509,7 @@ float getSharpCorta(int iSharp) {
         promedio += sharpRead[i];
     promedio /= 10;
 
-    if (promedio >= 175 && promedio <= 550)
+    if (promedio >= 150 && promedio <= 580)
         return 2429 * (pow(promedio, -1.004));
     else
         return 30;
@@ -625,10 +625,10 @@ void checarInterr() {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
                 // Comprueba que si sea una victima real y no haya detectado basura por error
                 detener();
-                inFire = false;
+                /*inFire = false;
                 delay(300);
                 inFire = false;
-                delay(300);
+                delay(300);*/
 
                 if(inFire) {
                     lcd.clear();
@@ -791,7 +791,7 @@ void checarLimit() {
             while (steps <= 400)
                 reversa();
             detener();
-            while (steps <= 1100)
+            while (steps <= 1000)
                 horizontalDerecha();
             detener();
             steps = pos - 400;
@@ -802,7 +802,7 @@ void checarLimit() {
                 reversa();
             }
             detener();
-            while (steps <= 1100)
+            while (steps <= 1000)
                 horizontalIzquierda();
             detener();
             steps = pos - 400;
@@ -890,10 +890,10 @@ void alinear() {
             detener();
         }
     } else if(bravo) {
-        while (!(getSharpCorta(SHARP_B1) > 6.3 && getSharpCorta(SHARP_B1) < 8.7)) {
+        while (!(getSharpCorta(SHARP_B1) > 5.5 && getSharpCorta(SHARP_B1) < 8.5)) {
             lcd.clear();
             unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_B1) < 6.3) {
+            while (getSharpCorta(SHARP_B1) < 5.5) {
                 lcd.print(333333);
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
@@ -904,7 +904,7 @@ void alinear() {
             detener();
 
             inicio = millis();
-            while (getSharpCorta(SHARP_B1) > 8.7) {
+            while (getSharpCorta(SHARP_B1) > 8.5) {
                 lcd.print(444444);
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
@@ -926,10 +926,10 @@ void alinear() {
             detener();
         }*/
     } else if(delta) {
-        while (!(getSharpCorta(SHARP_D1) > 6.3 && getSharpCorta(SHARP_D1) < 8.7)) {
+        while (!(getSharpCorta(SHARP_D1) > 5.5 && getSharpCorta(SHARP_D1) < 8.5)) {
             lcd.clear();
             unsigned long inicio = millis();
-            while (getSharpCorta(SHARP_D1) < 6.3) {
+            while (getSharpCorta(SHARP_D1) < 5.5) {
                 lcd.print(555555);
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
@@ -940,7 +940,7 @@ void alinear() {
             detener();
 
             inicio = millis();
-            while (getSharpCorta(SHARP_D1) >  8.7) {
+            while (getSharpCorta(SHARP_D1) >  8.5) {
                 lcd.print(666666);
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
@@ -964,10 +964,10 @@ void alinear() {
 
     if (alfa) {
         unsigned long inicio;
-        while (!(getSharpCorta(SHARP_A) > 7 && getSharpCorta(SHARP_A) < 9)) {
+        while (!(getSharpCorta(SHARP_A) > 6 && getSharpCorta(SHARP_A) < 9)) {
             lcd.clear();
             inicio = millis();
-            while (getSharpCorta(SHARP_A) < 7) {
+            while (getSharpCorta(SHARP_A) < 6) {
                 lcd.print(777777);
                 reversa();
                 if (millis() >= inicio + 900) {
@@ -990,10 +990,10 @@ void alinear() {
         }
     } else if (charlie) {
         unsigned long inicio;
-        while (!(getSharpCorta(SHARP_C) > 7 && getSharpCorta(SHARP_C) < 9)) {
+        while (!(getSharpCorta(SHARP_C) > 6 && getSharpCorta(SHARP_C) < 9)) {
             inicio = millis();
             lcd.clear();
-            while (getSharpCorta(SHARP_C) < 7) {
+            while (getSharpCorta(SHARP_C) < 6) {
                 lcd.print(999999);
                 avanzar();
                 if (millis() >= inicio + 900) {
@@ -1110,6 +1110,8 @@ void vueltaIzq() {
             iOrientacion = A_norte;
             break;
     }
+    inFire = false;
+    delay(350);
     checarInterrSinVuelta();
     checarLimit();
     alinear();
@@ -1207,6 +1209,9 @@ void vueltaDer() {
             iOrientacion = C_norte;
             break;
     }
+
+    inFire = false;
+    delay(350);
     checarInterrSinVuelta();
     checarLimit();
     alinear();
@@ -1384,28 +1389,28 @@ void alinearIMU() {
 
             if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     horizontalDerecha();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     horizontalIzquierda();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     reversa();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
                 }
             } else if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     avanzar();
                     if (millis() >= inicio + 1500)
                         steps = 9999;
@@ -1445,7 +1450,7 @@ void alinearIMU() {
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     avanzar();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1454,7 +1459,7 @@ void alinearIMU() {
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     reversa();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1463,7 +1468,7 @@ void alinearIMU() {
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     horizontalDerecha();
                     if (millis() >= inicio + 1500) {
                         detener();
@@ -1472,7 +1477,7 @@ void alinearIMU() {
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 270) {
+                while(steps <= lecturaSharp * 310) {
                     horizontalIzquierda();
                     if (millis() >= inicio + 1500) {
                         detener();
