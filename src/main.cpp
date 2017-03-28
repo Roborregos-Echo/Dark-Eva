@@ -136,8 +136,7 @@ const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
 const int VEL_MOTOR_VUELTA          =   140;
 
-const int VEL_MOTOR_ALINEAR          =   120;
-const int VEL_MOTOR_ALINEAR_ENCODER  =   120;
+const int VEL_MOTOR_ALINEAR          =   90;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -670,6 +669,7 @@ void checarInterr() {
         int lecturaD = getUltrasonicoUno('D');
         int pos = steps;
         steps = 0;
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
         if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
             if(lecturaB != 0 && lecturaB < 15 && getSharpCorta(SHARP_B1) < 15 && getSharpCorta(SHARP_B2) < 15) {
@@ -748,6 +748,7 @@ void checarInterr() {
 void checarInterrSinVuelta() {
     if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
         detener();
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
         int lecturaB = getUltrasonicoUno('B');
         int lecturaD = getUltrasonicoUno('D');
         bool correcto = false;
@@ -936,7 +937,7 @@ void alinear() {
     bool charlie    =   false;
     bool delta      =   false;
 
-    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
     lecturaUltra = getUltrasonicoUno('A');
     lecturaSharp = getSharpCorta(SHARP_A);
@@ -958,6 +959,7 @@ void alinear() {
     if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
         delta = true;
 
+    velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
     if(bravo && delta) {
         while (abs(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1)) > 1.5) {
             unsigned long inicio = millis();
@@ -1117,6 +1119,7 @@ void alinear() {
 void vueltaIzq() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
+    checarInterrSinVuelta();
     posInicial = getAngulo();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Izq");
@@ -1205,11 +1208,15 @@ void vueltaIzq() {
             iOrientacion = A_norte;
             break;
     }
+    checarInterrSinVuelta();
+    checarLimit();
+    alinear();
 }
 
 void vueltaDer() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
+    checarInterrSinVuelta();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Der");
     posInicial = getAngulo();
@@ -1298,6 +1305,9 @@ void vueltaDer() {
             iOrientacion = C_norte;
             break;
     }
+    checarInterrSinVuelta();
+    checarLimit();
+    alinear();
 }
 
 
@@ -1413,7 +1423,7 @@ void alinearIMU() {
         bool bravo      =   false;
         bool charlie    =   false;
         bool delta      =   false;
-        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR_ENCODER, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
 
         lecturaUltra = getUltrasonicoUno('A');
@@ -1855,8 +1865,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1864,13 +1872,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1878,8 +1881,6 @@ void absoluteMove(char cLado) {
                 x_actual--;
                 lastMove = TO_WEST;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
         }
@@ -1891,8 +1892,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1900,13 +1899,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1914,8 +1908,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1933,13 +1925,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1947,8 +1934,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_EAST;
                 x_actual++;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1962,8 +1947,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
         }
@@ -1975,8 +1958,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_NORTH;
                 y_actual++;
                 vueltaIzq();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1990,8 +1971,6 @@ void absoluteMove(char cLado) {
                 lastMove = TO_SOUTH;
                 y_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                alinear();
                 moverCuadro();
                 break;
 
@@ -1999,13 +1978,8 @@ void absoluteMove(char cLado) {
                 lastMove = TO_WEST;
                 x_actual--;
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 // Equivalente vuelta ATRAS
-                alinear();
                 moverCuadro();
                 break;
         }
@@ -2991,11 +2965,7 @@ void resolverLaberinto() {
                         break;
                 }
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 vueltaDer();
-                checarInterrSinVuelta();
-                checarLimit();
                 moverCuadro();
                 checarLasts();
             }
@@ -3105,11 +3075,7 @@ void resolverLaberinto() {
                             break;
                     }
                     vueltaDer();
-                    checarInterrSinVuelta();
-                    checarLimit();
                     vueltaDer();
-                    checarInterrSinVuelta();
-                    checarLimit();
                     moverCuadro();
                     checarLasts();
                 }
