@@ -749,7 +749,7 @@ void checarInterr() {
                       detener();
                       cuadros[x_actual][y_actual][z_actual].setmlx(true);
                       inFire = false;
-                }        
+                }
             }
         }
         inFire = false;
@@ -2181,6 +2181,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 }
             }
             alinear();
+            delay(500);
             digitalWrite(timeoutPin, HIGH);
             delay(200);
             digitalWrite(timeoutPin, LOW);
