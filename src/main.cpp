@@ -2191,7 +2191,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         openSortValue = 999;
         LastPathValue = pathway(x_path, y_path, x_destino, y_destino);
         //lcd.println("LastPathValue =" + String(LastPathValue));
-
+        
         if(x_destino == x_actual && y_destino == y_actual) {
             pathFinished = true;
         }
