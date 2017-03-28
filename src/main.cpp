@@ -638,17 +638,13 @@ void checarInterr() {
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
-                detener();
-                unsigned long tiempo = millis();
-                bool victimaCorrecta = false;
 
                 // Comprueba que si sea una victima real y no haya detectado basura por error
-                while(millis() - tiempo < 750) {
-                    if(digitalRead(heatDefiner) == 0 && digitalRead(heatDefiner) == 1)
-                        victimaCorrecta = true;
-                }
+                detener();
+                inFire = false;
+                delay(750);
 
-                if(victimaCorrecta) {
+                if(inFire) {
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
@@ -2083,7 +2079,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         openSortValue = 999;
         LastPathValue = pathway(x_path, y_path, x_destino, y_destino);
         //lcd.println("LastPathValue =" + String(LastPathValue));
-        
+
         if(x_destino == x_actual && y_destino == y_actual) {
             pathFinished = true;
         }
