@@ -5,8 +5,8 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.4.0 --------------------------------
-//--------------------------- 27 / MARZO / 2017 -------------------------------
+//------------------------------ VERSIÓN 1.4.1 --------------------------------
+//--------------------------- 28 / MARZO / 2017 -------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -129,14 +129,14 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   215;
+const int VEL_MOTOR                 =   230;
 
 const int VEL_MOTOR_RAMPA           =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
-const int VEL_MOTOR_VUELTA          =   140;
+const int VEL_MOTOR_VUELTA          =   150;
 
-const int VEL_MOTOR_ALINEAR          =   80;
+const int VEL_MOTOR_ALINEAR         =   90;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -638,13 +638,17 @@ void checarInterr() {
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
-                
-                // Comprueba que si sea una victima real y no haya detectado basura por error
                 detener();
-                inFire = false;
-                delay(750);
+                unsigned long tiempo = millis();
+                bool victimaCorrecta = false;
 
-                if(inFire) {
+                // Comprueba que si sea una victima real y no haya detectado basura por error
+                while(millis() - tiempo < 750) {
+                    if(digitalRead(heatDefiner) == 0 && digitalRead(heatDefiner) == 1)
+                        victimaCorrecta = true;
+                }
+
+                if(victimaCorrecta) {
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
@@ -743,7 +747,7 @@ void checarLimit() {
             lcd.setCursor(1, 0);
             lcd.print("  YA PASO MUCHO ");
             detener();
-            while (steps <= 700)
+            while (steps <= 600)
                 reversa();
             detener();
             steps = 9999;
@@ -779,7 +783,7 @@ void checarLimit() {
         if(izq && der) {
             lcd.setCursor(1, 0);
             lcd.print("  IZQ     DER ");
-            while (steps <= 700)
+            while (steps <= 500)
                 reversa();
             detener();
             steps = 9999;
@@ -807,24 +811,24 @@ void checarLimit() {
         } else if (izq){
             lcd.setCursor(1, 0);
             lcd.print("  IZQ");
-            while (steps <= 500)
+            while (steps <= 400)
                 reversa();
             detener();
             while (steps <= 1100)
                 horizontalDerecha();
             detener();
-            steps = pos - 500;
+            steps = pos - 400;
         } else if (der){
             lcd.setCursor(1, 0);
             lcd.print("           DER");
-            while (steps <= 500) {
+            while (steps <= 400) {
                 reversa();
             }
             detener();
             while (steps <= 1100)
                 horizontalIzquierda();
             detener();
-            steps = pos - 500;
+            steps = pos - 400;
         }
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
     }
