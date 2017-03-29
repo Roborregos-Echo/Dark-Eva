@@ -136,7 +136,7 @@ const int VEL_MOTOR_RAMPA_ENCODER   =   250;
 
 const int VEL_MOTOR_VUELTA          =   145;
 
-const int VEL_MOTOR_ALINEAR         =   90;
+const int VEL_MOTOR_ALINEAR         =   100;
 
 const int ENC1   = 18;
 const int ENC2   = 19;
@@ -624,10 +624,7 @@ void checarInterr() {
               inFire = false;
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             int lecturaD = getUltrasonicoUno('D');
-            int lecturaD1 = getSharpCorta(SHARP_D1);
-            int lecturaD2 = getSharpCorta(SHARP_D2);
-            if(lecturaD != 0 && lecturaD < 15 && lecturaD1 < 15 && lecturaD1 > 4 && lecturaD2 < 15 &&  lecturaD2 > 4 &&
-                millis() - tiempoVisual > 4000 ) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15 && millis() - tiempoVisual > 4000) {
                 // Comprueba que si sea una victima real y no haya detectado basura por error
                 detener();
                 /*inFire = false;
@@ -1679,7 +1676,7 @@ void moverCuadro() {
                 while (vec.y() < -4) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-                    if (inicioRampa + 30000 < millis()) {
+                    if (inicioRampa + 27000 < millis()) {
                         detener();
                         lcd.home();
                         lcd.print(" NO SUBIR ");
@@ -3206,6 +3203,12 @@ int getColor() {
 
 // Funcion para calibrar los colores que se usaran
 void calibrarColor() {
+    servoMotor();
+    if(first_victim) {
+        delay(200);
+        servoMotor();
+        first_victim = false;
+    }
     while(EstadoColor == ESTADO_OFF) {
         lcd.setCursor(0, 0);
         lcd.print("   Calibrar...");
@@ -3518,6 +3521,7 @@ void setup() {
         preferencia = IZQUIERDA;
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
     tiempoVisual = millis();
+    alinear();
 }
 
 void loop() {
