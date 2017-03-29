@@ -231,6 +231,8 @@ byte lastMove;            // 0,1,0
 byte permisoRampa;
 byte x_rampa, y_rampa;
 
+byte x_regresoRampa, y_regresoRampa, z_regresoRampa;
+
 
 //******************************************
 //-------------- CHECKPOINT ----------------
@@ -1261,6 +1263,11 @@ void setRampa() {
 
 void checarRampa() {
     if(subirRampa || bajarRampa) {
+
+        x_regresoRampa = x_actual;
+        y_regresoRampa = y_actual;
+        z_regresoRampa = z_actual;
+
         lcd.clear();
 
         cuadros[x_actual][y_actual][z_actual].setEstado(RECORRIDO);
@@ -1677,6 +1684,10 @@ void moverCuadro() {
                         alinear();
                         alinearIMU();
 
+                        x_actual = x_regresoRampa;
+                        y_actual = y_regresoRampa;
+                        z_actual = z_regresoRampa;
+                        
                         switch(lastMove) {
                             case TO_NORTH:
                                 y_actual--;
