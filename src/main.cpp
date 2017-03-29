@@ -50,8 +50,8 @@ void vueltaIzq();
 //---------- DECLARACIÓN VARIABLES -----------
 //********************************************
 //********************************************
-
 unsigned long tiempoVisual;
+unsigned long inicioRampa;
 
 //******************************************
 //--------------- LABERINTO ----------------
@@ -219,8 +219,8 @@ int neighbors[4];
 const byte ABAJO    = 1;
 const byte ARRIBA   = 2;
 
-const byte SUBIR            = 0;
-const byte BAJAR            = 1;
+const byte SUBIR    = 0;
+const byte BAJAR    = 1;
 
 bool piso1      = false;
 bool piso2      = false;
@@ -651,7 +651,6 @@ void checarInterr() {
                       cuadros[x_actual][y_actual][z_actual].setmlx(true);
                       inFire = false;
                 }
-
                 tiempoVisual = millis();
             }
         }
@@ -1024,7 +1023,7 @@ void alinear() {
 void vueltaIzq() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
-    checarInterrSinVuelta();
+    checarInterr();
     posInicial = getAngulo();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Izq");
@@ -1115,7 +1114,7 @@ void vueltaIzq() {
     }
     inFire = false;
     delay(350);
-    checarInterrSinVuelta();
+    checarInterr();
     checarLimit();
     alinear();
 }
@@ -1123,7 +1122,7 @@ void vueltaIzq() {
 void vueltaDer() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
-    checarInterrSinVuelta();
+    checarInterr();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Der");
     posInicial = getAngulo();
@@ -1215,7 +1214,7 @@ void vueltaDer() {
 
     inFire = false;
     delay(350);
-    checarInterrSinVuelta();
+    checarInterr();
     checarLimit();
     alinear();
 }
@@ -1327,7 +1326,7 @@ void checarRampa() {
 
 
 void alinearIMU() {
-    if (rampaCambio || cuadrosVisitados > 20 || vueltasDadas > 15) {
+    if (rampaCambio || cuadrosVisitados > 20 || vueltasDadas > 20) {
         int lecturaUltra, lecturaSharp;
         bool alfa = false, bravo = false, charlie = false, delta = false;
 
@@ -1392,30 +1391,30 @@ void alinearIMU() {
 
             if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     horizontalDerecha();
-                    if (millis() >= inicio + 1500)
+                    if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     horizontalIzquierda();
-                    if (millis() >= inicio + 1500)
+                    if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     reversa();
-                    if (millis() >= inicio + 1500)
+                    if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
             } else if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     avanzar();
-                    if (millis() >= inicio + 1500)
+                    if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
             }
@@ -1423,11 +1422,11 @@ void alinearIMU() {
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1000);
+            delay(1500);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(25);
+            delay(100);
 
             switch (ultimaOrientacion) {
                 case B_norte:
@@ -1446,43 +1445,43 @@ void alinearIMU() {
             vueltasDadas = 0;
             cuadrosVisitados = 0;
             rampaCambio = false;
-        } else if ((cuadrosVisitados > 20 || vueltasDadas > 15) && iOrientacion == A_norte) {
+        } else if ((cuadrosVisitados > 20 || vueltasDadas > 20) && iOrientacion == A_norte && !bumper ) {
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
             unsigned long inicio = millis();
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     avanzar();
-                    if (millis() >= inicio + 1500) {
+                    if (millis() >= inicio + 2000) {
                         detener();
                         return;
                     }
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     reversa();
-                    if (millis() >= inicio + 1500) {
+                    if (millis() >= inicio + 2000) {
                         detener();
                         return;
                     }
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     horizontalDerecha();
-                    if (millis() >= inicio + 1500) {
+                    if (millis() >= inicio + 2000) {
                         detener();
                         return;
                     }
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 310) {
+                while(steps <= lecturaSharp * 350) {
                     horizontalIzquierda();
-                    if (millis() >= inicio + 1500) {
+                    if (millis() >= inicio + 2000) {
                         detener();
                         return;
                     }
@@ -1493,11 +1492,11 @@ void alinearIMU() {
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
-            delay(1000);
+            delay(1500);
             bno.begin();
             lcd.clear();
             lcd.print("CALIBRADO");
-            delay(25);
+            delay(100);
 
             vueltasDadas = 0;
             cuadrosVisitados = 0;
@@ -1634,6 +1633,13 @@ void movimientoDerecho(int fuente) {
     }
 }
 
+void reversaCuadro() {
+    steps = 0;
+    while (steps <= 4800)
+        movimientoDerecho(MOV_REVERSA);
+    detener();
+}
+
 void moverCuadro() {
     bumper = false;
     malaPared = false;
@@ -1662,9 +1668,19 @@ void moverCuadro() {
                 break;
 
             case SUBIR:
+            inicioRampa = millis();
                 while (vec.y() < -4) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                    if (inicioRampa + 30000 >= millis()) {
+                        detener();
+                        lcd.home();
+                        lcd.print(" NO SUBIR ");
+                        reversaCuadro();
+                        alinear();
+                        alinearIMU();
+                        break;
+                    }
                 }
                 steps = 0;
 
@@ -1722,14 +1738,6 @@ void moverCuadro() {
     checarColor();
     alinearIMU();
     alinear();
-}
-
-
-void reversaCuadro() {
-    steps = 0;
-    while (steps <= 4800)
-        movimientoDerecho(MOV_REVERSA);
-    detener();
 }
 
 
@@ -3464,12 +3472,12 @@ void setup() {
 
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
-    delay(1000);
+    delay(1500);
     bno.begin();
     bno.setExtCrystalUse(true);
     lcd.clear();
     lcd.print("CALIBRADO");
-    delay(25);
+    delay(100);
 
     if(digitalRead(switch_preferencia) == 0)
         preferencia = DERECHA;
