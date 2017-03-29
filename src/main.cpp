@@ -3068,7 +3068,7 @@ void resolverLaberinto() {
                             y_inicio = y;
                         }
                     }
-                }
+                }   
 
                 gotoInicio(x_inicio, y_inicio);
 
