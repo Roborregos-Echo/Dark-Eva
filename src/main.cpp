@@ -3072,8 +3072,10 @@ void resolverLaberinto() {
                 {
                     lcd.clear();
                     lcd.print("GOTO RAMPA");
-                    byte var = 255;
-                    Pathfinding(x_rampa, y_rampa, var);
+                    /*byte var = 255;
+                    Pathfinding(x_rampa, y_rampa, var);*/
+                    gotoInicio(x_rampa, y_rampa);
+
                     rampaid = false;
                 }
                 else{
