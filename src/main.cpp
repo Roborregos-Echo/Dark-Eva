@@ -29,7 +29,7 @@
 #include <NewPing.h>
 
 
-    
+
 //********************************************
 //********************************************
 //------------------ HEADERS -----------------
@@ -51,6 +51,7 @@ void vueltaIzq();
 //********************************************
 //********************************************
 
+unsigned long tiempoVisual;
 
 //******************************************
 //--------------- LABERINTO ----------------
@@ -637,14 +638,14 @@ void checarInterr() {
                   inFire = false;
             }
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
-            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15 && millis() - tiempoVisual > 2000) {
 
                 // Comprueba que si sea una victima real y no haya detectado basura por error
                 detener();
-                inFire = false;
+                /*inFire = false;
                 delay(300);
                 inFire = false;
-                delay(300);
+                delay(300);*/
 
                 if(inFire) {
                     lcd.clear();
@@ -666,6 +667,8 @@ void checarInterr() {
                       cuadros[x_actual][y_actual][z_actual].setmlx(true);
                       inFire = false;
                 }
+
+                tiempoVisual = millis();
             }
         }
         inFire = false;
@@ -1753,7 +1756,7 @@ void moverCuadro() {
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         while (steps <= 950 && !malaPared) {
             movimientoDerecho(MOV_FRENTE);
-            checarInterr();
+            //checarInterr();
             checarLimit();
         }
     }
@@ -1986,10 +1989,55 @@ byte pathway(byte x_inicial, byte y_inicial, byte x_final, byte y_final) {
     return fabs(x_final - x_inicial) + fabs(y_final - y_inicial);
 }
 
+void reset(){
+    lcd.clear();
+    lcd.print("RESEEET");
+    if(bumper)
+    {
+        int lecturaA = getUltrasonicoUno('A');
+        int lecturaB = getUltrasonicoUno('B');
+        int lecturaC = getUltrasonicoUno('C');
+        int lecturaD = getUltrasonicoUno('D');
+
+        if(lecturaA == 0 || lecturaA > 15)
+        {
+            do {
+                moverCuadro();
+            } while(bumper);
+        }
+        else if (lecturaB == 0 || lecturaB > 15)
+        {
+            vueltaDer();
+            do{
+                moverCuadro();
+            } while(bumper);
+        }
+        else if (lecturaC == 0 || lecturaC > 15)
+        {
+            vueltaDer();
+            vueltaDer();
+            do{
+                moverCuadro();
+            }while(bumper);
+        }
+        else if (lecturaD == 0 || lecturaD > 15)
+        {
+            vueltaIzq();
+            do{
+                moverCuadro();
+            }while(bumper);
+        }
+    }
+    alinear();
+    delay(500);
+    digitalWrite(timeoutPin, HIGH);
+    delay(200);
+    digitalWrite(timeoutPin, LOW);
+}
+
 //******************************************
 //------------- PATHFINDING ----------------
 void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
-    unsigned long tiempo = millis();
     //lcd.println("Estoy en PathFinding");
     //lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     //lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
@@ -2030,52 +2078,7 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
 
     while (!pathFinished) {
 
-        if(millis() - tiempo > 8000)
-        {
-            lcd.clear();
-            lcd.print("RESEEET");
-            if(bumper)
-            {
-                int lecturaA = getUltrasonicoUno('A');
-                int lecturaB = getUltrasonicoUno('B');
-                int lecturaC = getUltrasonicoUno('C');
-                int lecturaD = getUltrasonicoUno('D');
 
-                if(lecturaA == 0 || lecturaA > 15)
-                {
-                    do {
-                        moverCuadro();
-                    } while(bumper);
-                }
-                else if (lecturaB == 0 || lecturaB > 15)
-                {
-                    vueltaDer();
-                    do{
-                        moverCuadro();
-                    } while(bumper);
-                }
-                else if (lecturaC == 0 || lecturaC > 15)
-                {
-                    vueltaDer();
-                    vueltaDer();
-                    do{
-                        moverCuadro();
-                    }while(bumper);
-                }
-                else if (lecturaD == 0 || lecturaD > 15)
-                {
-                    vueltaIzq();
-                    do{
-                        moverCuadro();
-                    }while(bumper);
-                }
-            }
-            alinear();
-            delay(500);
-            digitalWrite(timeoutPin, HIGH);
-            delay(200);
-            digitalWrite(timeoutPin, LOW);
-        }
         //lcd.println("Entre al while");
         neighborsortValue = 999;
         openSortValue = 999;
@@ -2209,7 +2212,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
         //lcd.println("LastPath = " + String(x_lastPath) + "," + String(y_lastPath));
         //delay(1000);
         if(x_path == x_destino && y_path == y_destino) {
-            tiempo = millis();
                     /*for(int i = 0; i<GRID_MAX; i++)
                     {
                     //lcd.println("Open[" + String(i) + "] = " + String (openList[i]));
@@ -2226,7 +2228,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             //lcd.println(y_back);
 
             while(!backFinished) {
-                tiempo = millis();
                 for (int i = 0; i<4; i++)
                 neighbors[i] = 999;
                 neighborsortValue = 999;
@@ -2309,7 +2310,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                 back_index--;
                 //------------
                 if(x_back == x_actual && y_back == y_actual) {
-                    tiempo = millis();
                     backList[back_index+1] = 999;
                     //lcd.println("Entre al final");
                     //delay(500);
@@ -2356,12 +2356,23 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             }
             pathFinished = true;
         }
+
+        bool resetear = true;
+        for(int i = 0; i<GRID_MAX; i++) {
+            if(openList[i] != 999)
+                resetear = false;
+        }
+        if(resetear)
+            reset();
+
     x_lastPath = x_path;
     y_lastPath = y_path;
     newGrid = coordToGrid(x_path, y_path);
     closedList[newGrid] = openList[newGrid];
     openList[newGrid] = 999;
-    }
+
+
+  }
 }
 
 
@@ -3515,7 +3526,7 @@ void setup() {
     else
         preferencia = IZQUIERDA;
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
-
+    tiempoVisual = millis();
 }
 
 void loop() {
