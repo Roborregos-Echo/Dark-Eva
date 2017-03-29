@@ -512,7 +512,7 @@ float getSharpCorta(int iSharp) {
         promedio += sharpRead[i];
     promedio /= 10;
 
-    if (promedio >= 150 && promedio <= 580)
+    if (promedio >= 145 && promedio <= 585)
         return 2429 * (pow(promedio, -1.004));
     else
         return 30;
@@ -1394,17 +1394,17 @@ void alinearIMU() {
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
             unsigned long inicio = millis();
 
-            if (bravo) {
-                lecturaSharp = getSharpCorta(SHARP_B1);
+            if (alfa) {
+                lecturaSharp = getSharpCorta(SHARP_A);
                 while(steps <= lecturaSharp * 350) {
-                    horizontalDerecha();
+                    avanzar();
                     if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
-            } else if (delta) {
-                lecturaSharp = getSharpCorta(SHARP_D1);
+            } else if (bravo) {
+                lecturaSharp = getSharpCorta(SHARP_B1);
                 while(steps <= lecturaSharp * 350) {
-                    horizontalIzquierda();
+                    horizontalDerecha();
                     if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
@@ -1415,10 +1415,10 @@ void alinearIMU() {
                     if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
-            } else if (alfa) {
-                lecturaSharp = getSharpCorta(SHARP_A);
+            } else if (delta) {
+                lecturaSharp = getSharpCorta(SHARP_D1);
                 while(steps <= lecturaSharp * 350) {
-                    avanzar();
+                    horizontalIzquierda();
                     if (millis() >= inicio + 2000)
                         steps = 9999;
                 }
@@ -1459,37 +1459,29 @@ void alinearIMU() {
                 lecturaSharp = getSharpCorta(SHARP_A);
                 while(steps <= lecturaSharp * 350) {
                     avanzar();
-                    if (millis() >= inicio + 2000) {
-                        detener();
-                        return;
-                    }
-                }
-            } else if (charlie) {
-                lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 350) {
-                    reversa();
-                    if (millis() >= inicio + 2000) {
-                        detener();
-                        return;
-                    }
+                    if (millis() >= inicio + 2000)
+                        steps = 9999;
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
                 while(steps <= lecturaSharp * 350) {
                     horizontalDerecha();
-                    if (millis() >= inicio + 2000) {
-                        detener();
-                        return;
-                    }
+                    if (millis() >= inicio + 2000)
+                        steps = 9999;
+                }
+            } else if (charlie) {
+                lecturaSharp = getSharpCorta(SHARP_C);
+                while(steps <= lecturaSharp * 350) {
+                    reversa();
+                    if (millis() >= inicio + 2000)
+                        steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
                 while(steps <= lecturaSharp * 350) {
                     horizontalIzquierda();
-                    if (millis() >= inicio + 2000) {
-                        detener();
-                        return;
-                    }
+                    if (millis() >= inicio + 2000)
+                        steps = 9999;
                 }
             } else
                 return;
@@ -1531,7 +1523,6 @@ void movimientoDerecho(int fuente) {
             vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
             if(vec.y() < -4) {
                 bumper = true;
-                contadorBumper++;
             }
 
             if(setIzq - inIzq > 9) {
@@ -1773,18 +1764,28 @@ void moverCuadro() {
     detener();
     if(!bumper)
         contadorBumper = 0;
-    else if (bumper && contadorBumper > 3) {
+    else
+        contadorBumper++;
+    if (bumper && contadorBumper > 4) {
         lcd.clear();
         lcd.print("BUMPER ATORADO");
         steps = 0;
-        while (steps <= 500)
+        unsigned long inicioBumper = millis();
+        while (steps <= 500) {
             reversa();
+            if(millis() >= inicioBumper + 10000)
+                break;
+        }
         detener();
         velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
+        inicioBumper = millis();
+        steps = 0;
         while (steps <= 1500) {
             avanzar();
             checarInterr();
             checarLimit();
+            if(millis() >= inicioBumper + 10000)
+                break;
         }
         detener();
     }
@@ -3475,6 +3476,13 @@ void setup() {
     lcd.begin();
     lcd.backlight();
 
+    servo.attach(servoPin);
+    if(servo.read() < 90)
+        servo.write(0);
+
+    if(servo.read() >= 90)
+        servo.write(180);
+
     if (digitalRead(BOTON_COLOR) == 0) {
          lcd.clear();
          lcd.print("SUELTE EL BOTON");
@@ -3490,13 +3498,6 @@ void setup() {
     lcd.print("   ROBORREGOS");
     lcd.setCursor(0, 1);
     lcd.print("   T E O R I A");
-
-    servo.attach(servoPin);
-    if(servo.read() < 90)
-        servo.write(0);
-
-    if(servo.read() >= 90)
-        servo.write(180);
 
     izqPID.SetMode(AUTOMATIC);
     derPID.SetMode(AUTOMATIC);
