@@ -3043,7 +3043,7 @@ void resolverLaberinto() {
             lcd.print("GOTO LAST");
             byte var = 255;
             Pathfinding(x_last, y_last, var);
-
+            
             x_last = 255;
             y_last = 255;
             Last = false;
