@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 1.4.1 --------------------------------
-//--------------------------- 28 / MARZO / 2017 -------------------------------
+//--------------------------- 29 / MARZO / 2017 -------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -51,7 +51,6 @@ void vueltaIzq();
 //********************************************
 //********************************************
 unsigned long tiempoVisual;
-unsigned long inicioRampa;
 
 //******************************************
 //--------------- LABERINTO ----------------
@@ -583,6 +582,7 @@ void checarInterr() {
 
         if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
             detener();
+            cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
             parpadear(8, 100);
             lcd.print("VICTIMA DERECHA");
@@ -599,10 +599,10 @@ void checarInterr() {
             while (steps <= 400)
                 reversa();
             detener();
-            cuadros[x_actual][y_actual][z_actual].setmlx(true);
             inFire = false;
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
             detener();
+            cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
             parpadear(8, 100);
             lcd.print("VICTIMA IZQUIERDA");
@@ -619,7 +619,6 @@ void checarInterr() {
               while (steps <= 400)
                   reversa();
               detener();
-              cuadros[x_actual][y_actual][z_actual].setmlx(true);
               inFire = false;
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             int lecturaD = getUltrasonicoUno('D');
@@ -632,6 +631,7 @@ void checarInterr() {
                 delay(300);*/
 
                 if(inFire) {
+                    cuadros[x_actual][y_actual][z_actual].setmlx(true);
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
@@ -648,7 +648,6 @@ void checarInterr() {
                       while (steps <= 400)
                           reversa();
                       detener();
-                      cuadros[x_actual][y_actual][z_actual].setmlx(true);
                       inFire = false;
                 }
                 tiempoVisual = millis();
@@ -1023,7 +1022,6 @@ void alinear() {
 void vueltaIzq() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
-    checarInterr();
     posInicial = getAngulo();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Izq");
@@ -1122,7 +1120,6 @@ void vueltaIzq() {
 void vueltaDer() {
     vueltasDadas++;
     float posInicial, posFinal, limInf, limSup;
-    checarInterr();
     lcd.setCursor(8, 1);
     lcd.print("Vuel Der");
     posInicial = getAngulo();
@@ -1668,17 +1665,39 @@ void moverCuadro() {
                 break;
 
             case SUBIR:
-            inicioRampa = millis();
+            unsigned long inicioRampa = millis();
                 while (vec.y() < -4) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-                    if (inicioRampa + 30000 >= millis()) {
+                    if (inicioRampa + 30000 < millis()) {
                         detener();
                         lcd.home();
                         lcd.print(" NO SUBIR ");
                         reversaCuadro();
                         alinear();
                         alinearIMU();
+
+                        switch(lastMove) {
+                            case TO_NORTH:
+                                y_actual--;
+                                cuadros[x_actual][y_actual][z_actual].setPared('N', true);
+                                break;
+
+                            case TO_EAST:
+                                x_actual--;
+                                cuadros[x_actual][y_actual][z_actual].setPared('E', true);
+                                break;
+
+                            case TO_SOUTH:
+                                y_actual++;
+                                cuadros[x_actual][y_actual][z_actual].setPared('S', true);
+                                break;
+
+                            case TO_WEST:
+                                x_actual++;
+                                cuadros[x_actual][y_actual][z_actual].setPared('O', true);
+                                break;
+                        }
                         break;
                     }
                 }
