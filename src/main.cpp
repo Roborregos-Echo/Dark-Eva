@@ -624,7 +624,10 @@ void checarInterr() {
               inFire = false;
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             int lecturaD = getUltrasonicoUno('D');
-            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15 && millis() - tiempoVisual > 4000) {
+            int lecturaD1 = getSharpCorta(SHARP_D1);
+            int lecturaD2 = getSharpCorta(SHARP_D2);
+            if(lecturaD != 0 && lecturaD < 15 && lecturaD1 < 15 && lecturaD1 > 4 && lecturaD2 < 15 &&  lecturaD2 > 4 &&
+                millis() - tiempoVisual > 4000 ) {
                 // Comprueba que si sea una victima real y no haya detectado basura por error
                 detener();
                 /*inFire = false;
@@ -1687,7 +1690,7 @@ void moverCuadro() {
                         x_actual = x_regresoRampa;
                         y_actual = y_regresoRampa;
                         z_actual = z_regresoRampa;
-                        
+
                         switch(lastMove) {
                             case TO_NORTH:
                                 y_actual--;
@@ -1752,7 +1755,7 @@ void moverCuadro() {
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
         while (steps <= 950 && !malaPared) {
             movimientoDerecho(MOV_FRENTE);
-            //checarInterr();
+            checarInterr();
             checarLimit();
         }
     }
