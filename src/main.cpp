@@ -196,6 +196,7 @@ const int SHARP_D2  = 1;
 
 bool bumper     = false;
 bool malaPared  = false;
+int contadorBumper = 0;
 
 NewPing ULTRA_A(TRIG_A, ECHO_A, MAX_DISTANCE);
 NewPing ULTRA_B(TRIG_B, ECHO_B, MAX_DISTANCE);
@@ -872,7 +873,7 @@ void alinear() {
             lcd.clear();
             unsigned long inicio = millis();
             while(getSharpCorta(SHARP_B1) - getSharpCorta(SHARP_D1) > 2) {
-                lcd.print(111111);
+                lcd.print(111);
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -883,7 +884,7 @@ void alinear() {
 
             inicio = millis();
             while(getSharpCorta(SHARP_D1) - getSharpCorta(SHARP_B1) > 2) {
-                lcd.print(222222);
+                lcd.print(222);
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -897,7 +898,7 @@ void alinear() {
             lcd.clear();
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_B1) < 5.5) {
-                lcd.print(333333);
+                lcd.print(333);
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -908,7 +909,7 @@ void alinear() {
 
             inicio = millis();
             while (getSharpCorta(SHARP_B1) > 8.5) {
-                lcd.print(444444);
+                lcd.print(444);
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -933,7 +934,7 @@ void alinear() {
             lcd.clear();
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_D1) < 5.5) {
-                lcd.print(555555);
+                lcd.print(555);
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -944,7 +945,7 @@ void alinear() {
 
             inicio = millis();
             while (getSharpCorta(SHARP_D1) >  8.5) {
-                lcd.print(666666);
+                lcd.print(666);
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -971,7 +972,7 @@ void alinear() {
             lcd.clear();
             inicio = millis();
             while (getSharpCorta(SHARP_A) < 6) {
-                lcd.print(777777);
+                lcd.print(777);
                 reversa();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -982,7 +983,7 @@ void alinear() {
 
             inicio = millis();
             while (getSharpCorta(SHARP_A) > 9) {
-                lcd.print(888888);
+                lcd.print(888);
                 avanzar();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -997,7 +998,7 @@ void alinear() {
             inicio = millis();
             lcd.clear();
             while (getSharpCorta(SHARP_C) < 6) {
-                lcd.print(999999);
+                lcd.print(999);
                 avanzar();
                 if (millis() >= inicio + 900) {
                     detener();
@@ -1528,8 +1529,10 @@ void movimientoDerecho(int fuente) {
             derPID.Compute();
             velocidad(VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq, VEL_MOTOR + outIzq - outDer, VEL_MOTOR + outDer - outIzq);
             vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-            if(vec.y() < -4)
+            if(vec.y() < -4) {
                 bumper = true;
+                contadorBumper++;
+            }
 
             if(setIzq - inIzq > 9) {
                 detener();
@@ -1676,6 +1679,8 @@ void moverCuadro() {
                 while (vec.y() < -4) {
                     movimientoDerecho(MOV_RAMPA_SUBIR);
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+                    lcd.clear();
+                    lcd.print(vec.y());
                     if (inicioRampa + 27000 < millis()) {
                         detener();
                         lcd.home();
@@ -1730,13 +1735,14 @@ void moverCuadro() {
         switch (permisoRampa) {
             case SUBIR:
                 lcd.clear();
-                lcd.home();
                 lcd.print("ERROR");
                 break;
 
             case BAJAR:
                 while (vec.y() > 4) {
                     movimientoDerecho(MOV_RAMPA_BAJAR);
+                    lcd.clear();
+                    lcd.print(vec.y());
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 steps = 0;
@@ -1763,6 +1769,24 @@ void moverCuadro() {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
+    }
+    detener();
+    if(!bumper)
+        contadorBumper = 0;
+    else if (bumper && contadorBumper > 3) {
+        lcd.clear();
+        lcd.print("BUMPER ATORADO");
+        steps = 0;
+        while (steps <= 500)
+            reversa();
+        detener();
+        velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
+        while (steps <= 1500) {
+            avanzar();
+            checarInterr();
+            checarLimit();
+        }
+        detener();
     }
     detener();
     checarColor();
@@ -1982,10 +2006,10 @@ void reset(){
     lcd.print("RESEEET");
     if(bumper)
     {
-        int lecturaA = getUltrasonicoUno('A');
-        int lecturaB = getUltrasonicoUno('B');
-        int lecturaC = getUltrasonicoUno('C');
-        int lecturaD = getUltrasonicoUno('D');
+        int lecturaA = getUltrasonicoMediana('A');
+        int lecturaB = getUltrasonicoMediana('B');
+        int lecturaC = getUltrasonicoMediana('C');
+        int lecturaD = getUltrasonicoMediana('D');
 
         if(lecturaA == 0 || lecturaA > 15)
         {
@@ -3018,7 +3042,7 @@ void resolverLaberinto() {
             lcd.print("GOTO LAST");
             byte var = 255;
             Pathfinding(x_last, y_last, var);
-
+            
             x_last = 255;
             y_last = 255;
             Last = false;
@@ -3068,7 +3092,7 @@ void resolverLaberinto() {
                             y_inicio = y;
                         }
                     }
-                }   
+                }
 
                 gotoInicio(x_inicio, y_inicio);
 
@@ -3260,7 +3284,7 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 
 void checarColor() {
-    if(checarCuadroColor(COLOR_NEGRO, 50)) {
+    if(checarCuadroColor(COLOR_NEGRO, 30)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
         cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
@@ -3503,10 +3527,10 @@ void setup() {
     delay(800);
     hacerPruebas();
 
-    getUltrasonicoUno('A');
-    getUltrasonicoUno('B');
-    getUltrasonicoUno('C');
-    getUltrasonicoUno('D');
+    getUltrasonicoMediana('A');
+    getUltrasonicoMediana('B');
+    getUltrasonicoMediana('C');
+    getUltrasonicoMediana('D');
 
     lcd.clear();
     lcd.print("CALIBRANDO IMU");
