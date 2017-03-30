@@ -2056,7 +2056,7 @@ byte gridToCoord(byte grid, char eje) {
     else if(eje == 'y')
         return grid / X_MAX;
 }
-
+    
 byte totalGridToCoord(int grid, char eje) {
     byte z = grid/ (X_MAX*Y_MAX);
     byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
