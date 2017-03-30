@@ -51,6 +51,7 @@ void vueltaIzq();
 //********************************************
 //********************************************
 unsigned long tiempoVisual;
+bool primeraVisual = true;
 
 //******************************************
 //--------------- LABERINTO ----------------
@@ -589,6 +590,7 @@ void checarInterr() {
             lcd.clear();
             parpadear(8, 100);
             lcd.print("VICTIMA DERECHA");
+            delay(3000);
 
             vueltaIzq();
             servoMotor();
@@ -609,6 +611,7 @@ void checarInterr() {
             lcd.clear();
             parpadear(8, 100);
             lcd.print("VICTIMA IZQUIERDA");
+            delay(3000);
 
             vueltaDer();
             servoMotor();
@@ -624,9 +627,11 @@ void checarInterr() {
               detener();
               inFire = false;
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
+            delay(50);
             int lecturaD = getUltrasonicoUno('D');
-            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15 && millis() - tiempoVisual > 4000) {
+            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15 && (primeraVisual || millis() - tiempoVisual > 4000)) {
                 // Comprueba que si sea una victima real y no haya detectado basura por error
+                primeraVisual = false;
                 detener();
                 /*inFire = false;
                 delay(300);
@@ -638,6 +643,7 @@ void checarInterr() {
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
+                    delay(3000);
 
                     vueltaDer();
                     servoMotor();
@@ -3043,7 +3049,7 @@ void resolverLaberinto() {
             lcd.print("GOTO LAST");
             byte var = 255;
             Pathfinding(x_last, y_last, var);
-            
+
             x_last = 255;
             y_last = 255;
             Last = false;
@@ -3547,7 +3553,7 @@ void setup() {
     else
         preferencia = IZQUIERDA;
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
-    tiempoVisual = millis();
+    tiempoVisual = 0;
     alinear();
 }
 
