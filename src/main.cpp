@@ -590,6 +590,7 @@ void checarInterr() {
             lcd.clear();
             parpadear(8, 100);
             lcd.print("VICTIMA DERECHA");
+            delay(3000);
 
             vueltaIzq();
             servoMotor();
@@ -610,6 +611,7 @@ void checarInterr() {
             lcd.clear();
             parpadear(8, 100);
             lcd.print("VICTIMA IZQUIERDA");
+            delay(3000);
 
             vueltaDer();
             servoMotor();
@@ -641,6 +643,7 @@ void checarInterr() {
                     lcd.clear();
                     parpadear(8, 100);
                     lcd.print("VICTIMA VISUAL");
+                    delay(3000);
 
                     vueltaDer();
                     servoMotor();
