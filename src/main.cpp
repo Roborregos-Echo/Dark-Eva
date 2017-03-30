@@ -590,9 +590,8 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 300);
             lcd.print("VICTIMA DERECHA");
-            delay(3000);
 
             vueltaIzq();
             servoMotor();
@@ -611,9 +610,8 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 300);
             lcd.print("VICTIMA IZQUIERDA");
-            delay(3000);
 
             vueltaDer();
             servoMotor();
@@ -643,9 +641,8 @@ void checarInterr() {
                 if(inFire) {
                     cuadros[x_actual][y_actual][z_actual].setmlx(true);
                     lcd.clear();
-                    parpadear(8, 100);
+                    parpadear(8, 300);
                     lcd.print("VICTIMA VISUAL");
-                    delay(3000);
 
                     vueltaDer();
                     servoMotor();
@@ -2812,7 +2809,7 @@ void recorrerY() {
     //lcd.println("Recorrer Y");
     for(int k = 0; k < Z_MAX; k++){
         for(int j = 0; j < X_MAX; j++) {
-            for(int i = Y_MAX - 1; i > 0; i--){
+            for(int i = Y_MAX - 1; i > 1; i--){
                 cuadros[j][i][k].setEstado(cuadros[j][i-1][k].getEstado());
                 cuadros[j][i][k].setPared('N', cuadros[j][i-1][k].getPared('N'));
                 cuadros[j][i][k].setPared('E', cuadros[j][i-1][k].getPared('E'));
@@ -3162,7 +3159,7 @@ void resolverLaberinto() {
                 //lcd.println("GOTO-INICIO");
                 lcd.clear();
                 lcd.print("GOTO INICIO");
-                for(int y=0; y < Y_MAX; y++)
+                /*for(int y=0; y < Y_MAX; y++)
                 {
                     for (int x=0; x < X_MAX; x++)
                     {
@@ -3172,7 +3169,7 @@ void resolverLaberinto() {
                             y_inicio = y;
                         }
                     }
-                }
+                }*/
 
                 gotoInicio(x_inicio, y_inicio);
 
@@ -3364,7 +3361,7 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 
 void checarColor() {
-    if(checarCuadroColor(COLOR_NEGRO, 30)) {
+    if(checarCuadroColor(COLOR_NEGRO, 75)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
         cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
@@ -3602,6 +3599,8 @@ void setup() {
     x_actual = 1;
     y_actual = 1;
     z_actual = 0;
+    x_inicio = x_actual;
+    y_inicio = y_actual;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
     delay(800);
@@ -3628,6 +3627,7 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
     tiempoVisual = 0;
     alinear();
+
 }
 
 void loop() {
