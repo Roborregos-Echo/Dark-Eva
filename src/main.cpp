@@ -5,8 +5,10 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//------------------------------ VERSIÓN 1.4.1 --------------------------------
-//--------------------------- 29 / MARZO / 2017 -------------------------------
+//----------------------------- D Í A    U N O --------------------------------
+///////////////////////////////////////////////////////////////////////////////
+//------------------------------ VERSIÓN 2.0.0 --------------------------------
+//--------------------------- 30 / MARZO / 2017 -------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -883,6 +885,9 @@ void alinear() {
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -894,6 +899,9 @@ void alinear() {
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -908,6 +916,9 @@ void alinear() {
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -919,6 +930,9 @@ void alinear() {
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -944,6 +958,9 @@ void alinear() {
                 horizontalDerecha();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -955,6 +972,9 @@ void alinear() {
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -972,7 +992,38 @@ void alinear() {
         }*/
     }
 
-    if (alfa) {
+    if(alfa && charlie) {
+        while (abs(getSharpCorta(SHARP_A) - getSharpCorta(SHARP_C)) > 2) {
+            lcd.clear();
+            unsigned long inicio = millis();
+            while(getSharpCorta(SHARP_A) - getSharpCorta(SHARP_C) > 2) {
+                lcd.print(987);
+                avanzar();
+                if (millis() >= inicio + 900) {
+                    detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
+                    return;
+                }
+            }
+            detener();
+
+            inicio = millis();
+            while(getSharpCorta(SHARP_C) - getSharpCorta(SHARP_A) > 2) {
+                lcd.print(654);
+                reversa();
+                if (millis() >= inicio + 900) {
+                    detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
+                    return;
+                }
+            }
+            detener();
+        }
+    } else if (alfa) {
         unsigned long inicio;
         while (!(getSharpCorta(SHARP_A) > 6 && getSharpCorta(SHARP_A) < 9)) {
             lcd.clear();
@@ -982,6 +1033,9 @@ void alinear() {
                 reversa();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -993,6 +1047,9 @@ void alinear() {
                 avanzar();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -1008,6 +1065,9 @@ void alinear() {
                 avanzar();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -1019,6 +1079,9 @@ void alinear() {
                 reversa();
                 if (millis() >= inicio + 900) {
                     detener();
+                    lcd.clear();
+                    lcd.print("TERMINADO DEMASIADO");
+                    delay(100);
                     return;
                 }
             }
@@ -1337,7 +1400,7 @@ void checarRampa() {
 
 
 void alinearIMU() {
-    if (rampaCambio || cuadrosVisitados > 20 || vueltasDadas > 20) {
+    if (rampaCambio || cuadrosVisitados > 16 || vueltasDadas > 16) {
         int lecturaUltra, lecturaSharp;
         bool alfa = false, bravo = false, charlie = false, delta = false;
 
@@ -1402,34 +1465,39 @@ void alinearIMU() {
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     avanzar();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     horizontalDerecha();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     reversa();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     horizontalIzquierda();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             }
             detener();
+
+            if(steps == 9999) {
+                lcd.clear();
+                lcd.print("DEMASIADO MUCHO");
+            }
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
@@ -1456,42 +1524,47 @@ void alinearIMU() {
             vueltasDadas = 0;
             cuadrosVisitados = 0;
             rampaCambio = false;
-        } else if ((cuadrosVisitados > 20 || vueltasDadas > 20) && iOrientacion == A_norte && !bumper ) {
+        } else if ((cuadrosVisitados > 16 || vueltasDadas > 16) && iOrientacion == A_norte && !bumper ) {
             steps = 0;
             velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
             unsigned long inicio = millis();
 
             if (alfa) {
                 lecturaSharp = getSharpCorta(SHARP_A);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     avanzar();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else if (bravo) {
                 lecturaSharp = getSharpCorta(SHARP_B1);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     horizontalDerecha();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else if (charlie) {
                 lecturaSharp = getSharpCorta(SHARP_C);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     reversa();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else if (delta) {
                 lecturaSharp = getSharpCorta(SHARP_D1);
-                while(steps <= lecturaSharp * 350) {
+                while(steps <= lecturaSharp * 370) {
                     horizontalIzquierda();
-                    if (millis() >= inicio + 2000)
+                    if (millis() >= inicio + 2500)
                         steps = 9999;
                 }
             } else
                 return;
             detener();
+
+            if(steps == 9999) {
+                lcd.clear();
+                lcd.print("DEMASIADO MUCHO");
+            }
 
             lcd.clear();
             lcd.print("CALIBRANDO IMU");
