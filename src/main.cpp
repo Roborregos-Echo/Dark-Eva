@@ -2058,8 +2058,9 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     //lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     //lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
-    lcd.print("                ");
+    lcd.print("  PATHFINDING   ");
     lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
+    delay(500);
     bool pathFinished = false;
     int Grid;
     byte x_path = x_actual;
@@ -2429,8 +2430,8 @@ void checarParedes() {
 
     switch(iOrientacion) {
         case A_norte:
+        lectura = getUltrasonicoUno('C');
         if(y_actual > 0) {
-            lectura = getUltrasonicoUno('C');
             if((lectura == 0 || lectura > 15 ) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2468,9 +2469,9 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
+        lectura = getUltrasonicoUno('D');
         if(x_actual > 0)
         {
-            lectura = getUltrasonicoUno('D');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2511,10 +2512,9 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
-
+        lectura = getUltrasonicoUno('A');
         if(x_actual > 0)
         {
-            lectura = getUltrasonicoUno('A');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2529,9 +2529,9 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
+        lectura = getUltrasonicoUno('D');
         if(y_actual > 0)
         {
-            lectura = getUltrasonicoUno('D');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2561,9 +2561,9 @@ void checarParedes() {
         if((lectura != 0 && lectura < 15))
             cuadros[x_actual][y_actual][z_actual].setPared('N', true);
 
+        lectura = getUltrasonicoUno('B');
         if(x_actual > 0)
         {
-            lectura = getUltrasonicoUno('B');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2578,9 +2578,9 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
         cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
+        lectura = getUltrasonicoUno('A');
         if(y_actual > 0)
         {
-            lectura = getUltrasonicoUno('A');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2609,9 +2609,10 @@ void checarParedes() {
         break;
         //--------------------------------------------------------------------
         case D_norte:
+
+        lectura = getUltrasonicoUno('C');
         if(x_actual > 0)
         {
-            lectura = getUltrasonicoUno('C');
             if((lectura == 0 || lectura > 15) > 15 && (cuadros[x_actual-1][y_actual][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual-1][y_actual][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2627,10 +2628,9 @@ void checarParedes() {
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('O', true);
 
-
+        lectura = getUltrasonicoUno('B');
         if(y_actual > 0)
         {
-            lectura = getUltrasonicoUno('B');
             if((lectura == 0 || lectura > 15) && (cuadros[x_actual][y_actual-1][z_actual].getEstado()==NO_EXISTE  ||
             cuadros[x_actual][y_actual-1][z_actual].getEstado()==SIN_RECORRER))
             {
@@ -2642,7 +2642,6 @@ void checarParedes() {
                 B_wall = true;
             }
         }
-
 
         if(lectura != 0 && lectura < 15)
             cuadros[x_actual][y_actual][z_actual].setPared('S', true);
@@ -3565,7 +3564,7 @@ void loop() {
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-    delay(25);
+    delay(500);
 
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
@@ -3584,5 +3583,6 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
+   delay(500);
     resolverLaberinto();
 }
