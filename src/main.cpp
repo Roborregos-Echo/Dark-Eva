@@ -113,12 +113,6 @@ byte    x_last2 = 255;
 byte    y_last2 = 255;
 
 // Varias
-byte x_InicioB = 255;
-byte y_InicioB = 255;
-byte z_InicioB = 255;
-byte x_InicioC = 255;
-byte y_InicioC = 255;
-byte z_InicioC = 255;
 byte x_inicio, y_inicio, z_inicio;
 bool shortMove, Last, Last2;
 bool A_wall, B_wall, C_wall, D_wall;
@@ -135,7 +129,7 @@ byte y_recorrer[50];
 const int VEL_MOTOR                 =   220;
 
 const int VEL_MOTOR_RAMPA           =   255;
-const int VEL_MOTOR_RAMPA_ENCODER   =   249;
+const int VEL_MOTOR_RAMPA_ENCODER   =   245;
 
 const int VEL_MOTOR_VUELTA          =   145;
 
@@ -1748,11 +1742,16 @@ void moverCuadro() {
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                     lcd.clear();
                     lcd.print(vec.y());
-                    if (inicioRampa + 27000 < millis()) {
+                    if (inicioRampa + 60000 < millis()) {
                         detener();
                         lcd.home();
                         lcd.print(" NO SUBIR ");
-                        reversaCuadro();
+                        velocidad(85, 85, 85, 85);
+                        while (getUltrasonicoUno('C') > 2 && getUltrasonicoUno('C') < 6) {
+                            reversa();
+                            delay(50);
+                        };
+                        detener();
                         alinear();
                         alinearIMU();
 
@@ -2056,7 +2055,7 @@ byte gridToCoord(byte grid, char eje) {
     else if(eje == 'y')
         return grid / X_MAX;
 }
-    
+
 byte totalGridToCoord(int grid, char eje) {
     byte z = grid/ (X_MAX*Y_MAX);
     byte y = ( grid - ((X_MAX*Y_MAX)*z) ) / X_MAX;
@@ -2133,7 +2132,6 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     lcd.setCursor(0, 1);
     lcd.print("  PATHFINDING   ");
     lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
-    delay(500);
     bool pathFinished = false;
     int Grid;
     byte x_path = x_actual;
@@ -2435,6 +2433,10 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
                                     gridActual -= 1;
                                 }
                             }
+                            x_actual = gridToCoord(gridActual, 'x');
+                            y_actual = gridToCoord(gridActual, 'y');
+                            lcd.setCursor(0, 1);
+                            lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
                         }
                     } else {
                         for(int i = 0; i<GRID_MAX; i++) {
@@ -2791,10 +2793,6 @@ void recorrerX() {
 
     x_actual++;
     x_inicio++;
-    if(x_InicioB != 255)
-        x_InicioB++;
-    if(x_InicioC != 255)
-        x_InicioC++;
 
     if(x_last != 255 && y_last != 255)
         x_last++;
@@ -2808,7 +2806,7 @@ void recorrerY() {
     //lcd.println("Recorrer Y");
     for(int k = 0; k < Z_MAX; k++){
         for(int j = 0; j < X_MAX; j++) {
-            for(int i = Y_MAX - 1; i > 1; i--){
+            for(int i = Y_MAX - 1; i > 0; i--){
                 cuadros[j][i][k].setEstado(cuadros[j][i-1][k].getEstado());
                 cuadros[j][i][k].setPared('N', cuadros[j][i-1][k].getPared('N'));
                 cuadros[j][i][k].setPared('E', cuadros[j][i-1][k].getPared('E'));
@@ -2827,10 +2825,6 @@ void recorrerY() {
 
     y_actual++;
     y_inicio++;
-    if(y_InicioB != 255)
-        y_InicioB++;
-    if(y_InicioC != 255)
-        y_InicioC++;
 
     if(x_last != 255 && y_last != 255)
         y_last++;
@@ -3637,7 +3631,6 @@ void loop() {
     checarArray();
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
-    delay(500);
 
     checarParedes();
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
@@ -3656,6 +3649,5 @@ void loop() {
        lcd.setCursor(6, 0);
        lcd.print("O");
    }
-   delay(500);
     resolverLaberinto();
 }
