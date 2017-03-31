@@ -234,9 +234,9 @@ byte x_regresoRampa, y_regresoRampa, z_regresoRampa;
 
 //******************************************
 //-------------- CHECKPOINT ----------------
-const int TOTAL_GRID_MAX = X_MAX * Y_MAX * Z_MAX;
-byte checkList1[GRID_MAX];
-byte checkList2[GRID_MAX];
+//const int TOTAL_GRID_MAX = X_MAX * Y_MAX * Z_MAX;
+//byte checkList1[GRID_MAX];
+//byte checkList2[GRID_MAX];
 
 
 //******************************************
@@ -2130,8 +2130,8 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
     //lcd.println("Actual = " + String(x_actual)+ "," + String(y_actual));
     //lcd.println("Destino = " + String(x_destino)+ "," + String(y_destino));
     lcd.setCursor(0, 1);
-    lcd.print("  PATHFINDING   ");
-    lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
+    //lcd.print("  PATHFINDING   ");
+    //lcd.print("    " + String(x_destino) + "," + String(y_destino) + "," + String(z_actual));
     bool pathFinished = false;
     int Grid;
     byte x_path = x_actual;
@@ -3438,10 +3438,14 @@ void checarColor() {
 void checarArray() {
     if (x_actual < 1)
         for(int i = x_actual; i<1; i++)
+        {
             recorrerX();
+        }
     else if(y_actual < 1)
         for(int i = y_actual; i<1; i++)
+        {
             recorrerY();
+        }
 }
 
 
@@ -3585,15 +3589,16 @@ void setup() {
     velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
     // Inicializa toda la matriz de checkpoint en 0
-    for(int i = 0; i < GRID_MAX; i++) {
+    /*for(int i = 0; i < GRID_MAX; i++) {
         checkList1[i] = 0;
         checkList2[i] = 0;
-    }
+    }*/
     x_actual = 1;
     y_actual = 1;
     z_actual = 0;
     x_inicio = x_actual;
     y_inicio = y_actual;
+    z_inicio = z_actual;
     cuadros[x_actual][y_actual][z_actual].setEstado(INICIO);
 
     delay(800);
