@@ -1131,6 +1131,8 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1143,6 +1145,8 @@ void vueltaIzq() {
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1229,6 +1233,8 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1241,6 +1247,8 @@ void vueltaDer() {
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
