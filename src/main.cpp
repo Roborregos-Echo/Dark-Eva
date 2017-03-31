@@ -126,7 +126,7 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   220;
+const int VEL_MOTOR                 =   222;
 
 const int VEL_MOTOR_RAMPA           =   255;
 const int VEL_MOTOR_RAMPA_ENCODER   =   245;
@@ -1173,8 +1173,8 @@ void vueltaIzq() {
             iOrientacion = A_norte;
             break;
     }
-    inFire = false;
-    delay(350);
+    //inFire = false;
+    //delay(350);
     checarInterr();
     checarLimit();
     alinear();
@@ -1272,8 +1272,8 @@ void vueltaDer() {
             break;
     }
 
-    inFire = false;
-    delay(350);
+    //inFire = false;
+    //delay(350);
     checarInterr();
     checarLimit();
     alinear();
