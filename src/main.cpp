@@ -586,7 +586,7 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 90);
+            parpadear(8, 85);
             lcd.print("VICTIMA DERECHA");
 
             vueltaIzq();
@@ -606,7 +606,7 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 90);
+            parpadear(8, 85);
             lcd.print("VICTIMA IZQUIERDA");
 
             vueltaDer();
@@ -637,7 +637,7 @@ void checarInterr() {
                 if(inFire) {
                     cuadros[x_actual][y_actual][z_actual].setmlx(true);
                     lcd.clear();
-                    parpadear(8, 150);
+                    parpadear(10, 110);
                     lcd.print("VICTIMA VISUAL");
 
                     vueltaDer();
@@ -663,46 +663,6 @@ void checarInterr() {
 }
 
 
-void checarInterrSinVuelta() {
-    if(inFire == true && !cuadros[x_actual][y_actual][z_actual].getmlx()) {
-        detener();
-        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
-        bool correcto = false;
-
-        if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
-            lcd.clear();
-            parpadear(8, 85);
-            lcd.print("VICTIMA DERECHA");
-            correcto = true;
-
-        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
-            lcd.clear();
-            parpadear(8, 85);
-            lcd.print("VICTIMA IZQUIERDA");
-            correcto = true;
-        } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
-            int lecturaD = getUltrasonicoUno('D');
-            if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
-                lcd.clear();
-                parpadear(8, 85);
-                lcd.print("VICTIMA VISUAL");
-                correcto = true;
-            }
-        }
-
-        if(correcto) {
-            servoMotor();
-            if(first_victim) {
-                delay(200);
-                servoMotor();
-                first_victim = false;
-            }
-            cuadros[x_actual][y_actual][z_actual].setmlx(true);
-        }
-        inFire = false;
-    }
-}
-
 
 void checarLimit() {
     bool izq = false;
@@ -721,10 +681,10 @@ void checarLimit() {
         lcd.print("  LIMIT  ");
         int pos = steps;
         steps = 0;
-        parpadear(8, 50);
+        parpadear(4, 50);
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
-        for (int o = 0; o < 85; o++) {
+        for (int o = 0; o < 70; o++) {
             if(digitalRead(LIMIT_IZQUIERDO) == 1)
                 izq = true;
 
