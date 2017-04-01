@@ -5,10 +5,10 @@
 ///////////////////                                         ///////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-//----------------------------- D Í A    U N O --------------------------------
+//--------------------------- D Í A    T R E S --------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 //------------------------------ VERSIÓN 2.0.1 --------------------------------
-//--------------------------- 31 / MARZO / 2017 -------------------------------
+//--------------------------- 01 / ABRIL / 2017 -------------------------------
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -584,7 +584,7 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 90);
             lcd.print("VICTIMA DERECHA");
 
             vueltaIzq();
@@ -604,7 +604,7 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 90);
             lcd.print("VICTIMA IZQUIERDA");
 
             vueltaDer();
@@ -635,7 +635,7 @@ void checarInterr() {
                 if(inFire) {
                     cuadros[x_actual][y_actual][z_actual].setmlx(true);
                     lcd.clear();
-                    parpadear(8, 200);
+                    parpadear(8, 150);
                     lcd.print("VICTIMA VISUAL");
 
                     vueltaDer();
@@ -669,20 +669,20 @@ void checarInterrSinVuelta() {
 
         if(digitalRead(heatDefiner) == 1 && digitalRead(visualDefiner) == 0) {
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 85);
             lcd.print("VICTIMA DERECHA");
             correcto = true;
 
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 0) {
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 85);
             lcd.print("VICTIMA IZQUIERDA");
             correcto = true;
         } else if (digitalRead(heatDefiner) == 0 && digitalRead(visualDefiner) == 1) {
             int lecturaD = getUltrasonicoUno('D');
             if(lecturaD != 0 && lecturaD < 15 && getSharpCorta(SHARP_D1) < 15 && getSharpCorta(SHARP_D2) < 15) {
                 lcd.clear();
-                parpadear(8, 100);
+                parpadear(8, 85);
                 lcd.print("VICTIMA VISUAL");
                 correcto = true;
             }
@@ -722,14 +722,14 @@ void checarLimit() {
         parpadear(8, 25);
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
-        for (int o = 0; o < 100; o++) {
+        for (int o = 0; o < 85; o++) {
             if(digitalRead(LIMIT_IZQUIERDO) == 1)
                 izq = true;
 
             if(digitalRead(LIMIT_DERECHO) == 1)
                 der = true;
 
-            delay(12);
+            delay(7);
         }
 
 
@@ -1434,7 +1434,7 @@ void alinearIMU() {
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             delta = true;
 
-        velocidad(VEL_MOTOR_ALINEAR * 1.2, VEL_MOTOR_ALINEAR* 1.2, VEL_MOTOR_ALINEAR* 1.2, VEL_MOTOR_ALINEAR * 1.2);
+        velocidad(VEL_MOTOR_ALINEAR * 1.35, VEL_MOTOR_ALINEAR* 1.35, VEL_MOTOR_ALINEAR* 1.35, VEL_MOTOR_ALINEAR * 1.35);
 
         if(rampaCambio) {
             bool temp;
@@ -3187,7 +3187,7 @@ void resolverLaberinto() {
                 gotoInicio(x_inicio, y_inicio);
 
                 lcd.clear();
-                parpadear(8, 100);
+                parpadear(20, 50);
                 lcd.print(" T E O R I A ES");
                 lcd.setCursor(0, 1);
                 lcd.print("P R A C T I C A");
