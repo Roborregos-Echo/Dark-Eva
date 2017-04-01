@@ -129,7 +129,7 @@ byte y_recorrer[50];
 const int VEL_MOTOR                 =   222;
 
 const int VEL_MOTOR_RAMPA           =   255;
-const int VEL_MOTOR_RAMPA_ENCODER   =   242;
+const int VEL_MOTOR_RAMPA_ENCODER   =   245;
 
 const int VEL_MOTOR_VUELTA          =   145;
 
@@ -248,7 +248,7 @@ const int heatDefiner = 3;
 const int visualDefiner = 14;
 
 bool inFire = false;
-bool first_victim = false;
+bool first_victim = true;
 int contadorLimit = 0;
 unsigned long inicioLimit = 0;
 
@@ -273,6 +273,8 @@ const int LIMIT_DERECHO = 31;
 #define S3 11
 #define sensorOut 13
 #define BOTON_COLOR 22
+
+bool cuadroNegroDetectado = false;
 
 const byte ESTADO_OFF           = 0;
 const byte ESTADO_NEGRO         = 1;
@@ -584,7 +586,7 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 300);
             lcd.print("VICTIMA DERECHA");
 
             vueltaIzq();
@@ -604,7 +606,7 @@ void checarInterr() {
             detener();
             cuadros[x_actual][y_actual][z_actual].setmlx(true);
             lcd.clear();
-            parpadear(8, 100);
+            parpadear(8, 300);
             lcd.print("VICTIMA IZQUIERDA");
 
             vueltaDer();
@@ -635,7 +637,7 @@ void checarInterr() {
                 if(inFire) {
                     cuadros[x_actual][y_actual][z_actual].setmlx(true);
                     lcd.clear();
-                    parpadear(8, 200);
+                    parpadear(8, 300);
                     lcd.print("VICTIMA VISUAL");
 
                     vueltaDer();
@@ -719,19 +721,22 @@ void checarLimit() {
         lcd.print("  LIMIT  ");
         int pos = steps;
         steps = 0;
-        parpadear(8, 25);
+        parpadear(8, 50);
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
 
-        for (int o = 0; o < 100; o++) {
-            if(digitalRead(LIMIT_IZQUIERDO) == 1)
-                izq = true;
+        if(digitalRead(LIMIT_IZQUIERDO) == 1)
+            izq = true;
 
-            if(digitalRead(LIMIT_DERECHO) == 1)
-                der = true;
+        if(digitalRead(LIMIT_DERECHO) == 1)
+            der = true;
 
-            delay(12);
-        }
+        delay(500);
 
+        if(digitalRead(LIMIT_IZQUIERDO) == 1)
+            izq = true;
+
+        if(digitalRead(LIMIT_DERECHO) == 1)
+            der = true;
 
         if(contadorLimit >= 4 && millis() < inicioLimit + 6000) {
             velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
@@ -1142,8 +1147,8 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.clear();
-            //lcd.print(posInicial);
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1156,8 +1161,8 @@ void vueltaIzq() {
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.clear();
-            //lcd.print(posInicial);
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1244,8 +1249,8 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.clear();
-            //lcd.print(posInicial);
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1258,8 +1263,8 @@ void vueltaDer() {
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            //lcd.clear();
-            //lcd.print(posInicial);
+            lcd.clear();
+            lcd.print(posInicial);
             if (millis() >= inicio + 18000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
             } else if (millis() >= inicio + 12000) {
@@ -1434,7 +1439,7 @@ void alinearIMU() {
         if(0 < lecturaUltra && lecturaUltra < 20 && 0 < lecturaSharp && lecturaSharp < 20)
             delta = true;
 
-        velocidad(VEL_MOTOR_ALINEAR * 1.2, VEL_MOTOR_ALINEAR* 1.2, VEL_MOTOR_ALINEAR* 1.2, VEL_MOTOR_ALINEAR * 1.2);
+        velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
 
         if(rampaCambio) {
             bool temp;
@@ -1536,7 +1541,7 @@ void alinearIMU() {
             rampaCambio = false;
         } else if ((cuadrosVisitados > 16 || vueltasDadas > 16) && iOrientacion == A_norte && !bumper ) {
             steps = 0;
-            velocidad(VEL_MOTOR_ALINEAR * 1.2, VEL_MOTOR_ALINEAR* 1.2, VEL_MOTOR_ALINEAR* 1.2, VEL_MOTOR_ALINEAR * 1.2);
+            velocidad(VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR, VEL_MOTOR_ALINEAR);
             unsigned long inicio = millis();
 
             if (alfa) {
@@ -1638,7 +1643,7 @@ void movimientoDerecho(int fuente) {
                 steps = pos * 0.80;
             } else if(inIzq - setIzq > 9) {
                 detener();
-                //delay(1000);
+                delay(1000);
                 int pos = steps;
                 steps = 0;
                 while (steps <= 800)
@@ -1803,7 +1808,6 @@ void moverCuadro() {
                     }
                 }
                 steps = 0;
-                inFire = false;
 
                 while (steps <= 1000) {
                     movimientoDerecho(MOV_FRENTE);
@@ -1832,8 +1836,8 @@ void moverCuadro() {
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 steps = 0;
-                inFire = false;
-                while (steps <= 1500) {
+
+                while (steps <= 1000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
                 steps = 0;
@@ -1875,7 +1879,7 @@ void moverCuadro() {
         velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
         inicioBumper = millis();
         steps = 0;
-        while (steps <= 2000) {
+        while (steps <= 1500) {
             avanzar();
             checarInterr();
             checarLimit();
@@ -3323,7 +3327,7 @@ void calibrarColor() {
     if(first_victim) {
         delay(200);
         servoMotor();
-        //first_victim = false;
+        first_victim = false;
     }
     while(EstadoColor == ESTADO_OFF) {
         lcd.setCursor(0, 0);
@@ -3374,7 +3378,7 @@ bool checarCuadroColor(byte cuadro, byte margen) {
 
 
 void checarColor() {
-    if(checarCuadroColor(COLOR_NEGRO, 100)) {
+    if(checarCuadroColor(COLOR_NEGRO, 75)) {
         lcd.setCursor(0, 0);
         lcd.print("NEGRO DETECTADO!");
         cuadros[x_actual+1][y_actual][z_actual].setPared('O', true);
@@ -3401,6 +3405,7 @@ void checarColor() {
                 break;
         }
         A_wall = true;
+        cuadroNegroDetectado = true;
     }
 
 
@@ -3638,13 +3643,14 @@ void setup() {
     lcd.print("CALIBRADO");
     delay(100);
 
-    /*if(digitalRead(switch_preferencia) == 0)
+    if(digitalRead(switch_preferencia) == 0)
         preferencia = DERECHA;
-    else*/
+    else
         preferencia = IZQUIERDA;
     attachInterrupt(digitalPinToInterrupt(interruptNano), victim_Detected, LOW);
     tiempoVisual = 0;
     alinear();
+
 }
 
 void loop() {
@@ -3656,7 +3662,11 @@ void loop() {
     lcd.setCursor(0,1);
     lcd.print(String(x_actual) + "," + String(y_actual) + "," + String(z_actual));
 
-    checarParedes();
+    if(!cuadroNegroDetectado)
+        checarParedes();
+    else
+        cuadroNegroDetectado = false;
+
     if(cuadros[x_actual][y_actual][z_actual].getPared('S')) {
        lcd.setCursor(0, 0);
        lcd.print("S");
