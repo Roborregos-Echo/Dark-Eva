@@ -126,10 +126,10 @@ byte y_recorrer[50];
 //******************************************
 //--------------- MOTORES ------------------
 
-const int VEL_MOTOR                 =   222;
+const int VEL_MOTOR                 =   225;
 
 const int VEL_MOTOR_RAMPA           =   255;
-const int VEL_MOTOR_RAMPA_ENCODER   =   245;
+const int VEL_MOTOR_RAMPA_ENCODER   =   241;
 
 const int VEL_MOTOR_VUELTA          =   145;
 
@@ -766,7 +766,7 @@ void checarLimit() {
             while (steps <= 400)
                 reversa();
             detener();
-            while (steps <= 1000)
+            while (steps <= 900)
                 horizontalDerecha();
             detener();
             steps = pos - 400;
@@ -777,7 +777,7 @@ void checarLimit() {
                 reversa();
             }
             detener();
-            while (steps <= 1000)
+            while (steps <= 900)
                 horizontalIzquierda();
             detener();
             steps = pos - 400;
@@ -913,7 +913,7 @@ void alinear() {
             detener();
         }*/
     } else if(delta) {
-        while (!(getSharpCorta(SHARP_D1) > 5.5 && getSharpCorta(SHARP_D1) < 8.5)) {
+        while (!(getSharpCorta(SHARP_D1) > 5.5 && getSharpCorta(SHARP_D1) < 7.9)) {
             lcd.clear();
             unsigned long inicio = millis();
             while (getSharpCorta(SHARP_D1) < 5.5) {
@@ -930,7 +930,7 @@ void alinear() {
             detener();
 
             inicio = millis();
-            while (getSharpCorta(SHARP_D1) >  8.5) {
+            while (getSharpCorta(SHARP_D1) >  7.9) {
                 lcd.print(666);
                 horizontalIzquierda();
                 if (millis() >= inicio + 900) {
@@ -1103,13 +1103,9 @@ void vueltaIzq() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            lcd.clear();
-            lcd.print(posInicial);
-            if (millis() >= inicio + 18000) {
+            if (millis() >= inicio + 10000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-            } else if (millis() >= inicio + 12000) {
-                velocidad(VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60);
-            } else if (millis() >= inicio + 6000) {
+            } else if (millis() >= inicio + 5000) {
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             }
         }
@@ -1117,13 +1113,9 @@ void vueltaIzq() {
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            lcd.clear();
-            lcd.print(posInicial);
-            if (millis() >= inicio + 18000) {
+            if (millis() >= inicio + 10000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-            } else if (millis() >= inicio + 12000) {
-                velocidad(VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60);
-            } else if (millis() >= inicio + 6000) {
+            } else if (millis() >= inicio + 5000) {
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             }
         }
@@ -1205,13 +1197,9 @@ void vueltaDer() {
     if(limSup > limInf) {
         while(!(posInicial >= limInf && posInicial <= limSup)) {
             posInicial = getAngulo();
-            lcd.clear();
-            lcd.print(posInicial);
-            if (millis() >= inicio + 18000) {
+            if (millis() >= inicio + 10000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-            } else if (millis() >= inicio + 12000) {
-                velocidad(VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60);
-            } else if (millis() >= inicio + 6000) {
+            } else if (millis() >= inicio + 5000) {
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             }
         }
@@ -1219,13 +1207,9 @@ void vueltaDer() {
     } else {
         while(!(posInicial >= limInf || posInicial <= limSup)) {
             posInicial = getAngulo();
-            lcd.clear();
-            lcd.print(posInicial);
-            if (millis() >= inicio + 18000) {
+            if (millis() >= inicio + 10000) {
                 velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
-            } else if (millis() >= inicio + 12000) {
-                velocidad(VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60, VEL_MOTOR + 60);
-            } else if (millis() >= inicio + 6000) {
+            } else if (millis() >= inicio + 5000) {
                 velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
             }
         }
@@ -1599,7 +1583,6 @@ void movimientoDerecho(int fuente) {
                 steps = pos * 0.80;
             } else if(inIzq - setIzq > 9) {
                 detener();
-                delay(1000);
                 int pos = steps;
                 steps = 0;
                 while (steps <= 800)
@@ -1653,7 +1636,7 @@ void movimientoDerecho(int fuente) {
 
             izqPID.Compute();
             derPID.Compute();
-            velocidad(85 + outIzq, 85 + outDer, 85 + outIzq, 85 + outDer);
+            velocidad(110 + outIzq, 110 + outDer, 110 + outIzq, 110 + outDer);
             break;
         case MOV_REVERSA:
             reversa();
@@ -1693,14 +1676,14 @@ void moverCuadro() {
     malaPared = false;
     cuadrosVisitados++;
     steps = 0;
-    while (steps <= 3700 && !malaPared) {
+    while (steps <= 3800 && !malaPared) {
         movimientoDerecho(MOV_FRENTE);
         checarInterr();
         checarLimit();
     }
 
     imu::Vector<3> vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-    if(vec.y() < -9) {
+    if(vec.y() < -7) {
         lcd.home();
         lcd.print("SUBIR RAMPA");
         subirRampa = true;
@@ -1764,6 +1747,7 @@ void moverCuadro() {
                     }
                 }
                 steps = 0;
+                inFire = false;
 
                 while (steps <= 1000) {
                     movimientoDerecho(MOV_FRENTE);
@@ -1792,7 +1776,7 @@ void moverCuadro() {
                     vec = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
                 }
                 steps = 0;
-
+                inFire = false;
                 while (steps <= 1000) {
                     movimientoDerecho(MOV_FRENTE);
                 }
@@ -1802,7 +1786,7 @@ void moverCuadro() {
     } else {
         steps = 0;
         velocidad(VEL_MOTOR, VEL_MOTOR, VEL_MOTOR, VEL_MOTOR);
-        while (steps <= 950 && !malaPared) {
+        while (steps <= 850 && !malaPared) {
             movimientoDerecho(MOV_FRENTE);
             checarInterr();
             checarLimit();
@@ -1821,12 +1805,12 @@ void moverCuadro() {
         contadorBumper = 0;
     else
         contadorBumper++;
-    if (bumper && contadorBumper > 4) {
+    if (bumper && contadorBumper > 3) {
         lcd.clear();
         lcd.print("BUMPER ATORADO");
         steps = 0;
         unsigned long inicioBumper = millis();
-        while (steps <= 500) {
+        while (steps <= 1000) {
             reversa();
             if(millis() >= inicioBumper + 10000)
                 break;
@@ -1835,7 +1819,7 @@ void moverCuadro() {
         velocidad(VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA, VEL_MOTOR_RAMPA);
         inicioBumper = millis();
         steps = 0;
-        while (steps <= 1500) {
+        while (steps <= 3500) {
             avanzar();
             checarInterr();
             checarLimit();
@@ -2097,7 +2081,7 @@ void reset(){
         }
     }
     alinear();
-    delay(500);
+    delay(2500);
     digitalWrite(timeoutPin, HIGH);
     delay(200);
     digitalWrite(timeoutPin, LOW);
@@ -2429,13 +2413,13 @@ void Pathfinding(byte x_destino, byte y_destino, byte &ref) {
             pathFinished = true;
         }
 
-        bool resetear = true;
+        /*bool resetear = true;
         for(int i = 0; i<GRID_MAX; i++) {
             if(openList[i] != 999)
                 resetear = false;
-        }
-        if(resetear)
-            reset();
+        }*/
+        /*if(resetear)
+            reset();*/
 
     x_lastPath = x_path;
     y_lastPath = y_path;
@@ -3491,10 +3475,6 @@ void hacerPruebas() {
         imprimirValores1();
         imprimirValores2();
         imprimirValores3();
-    } else {
-        leerValores();
-        lcd.clear();
-        lcd.print("VALORES ANADIDOS");
     }
 }
 
